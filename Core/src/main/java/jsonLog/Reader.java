@@ -20,7 +20,7 @@ public class Reader {
 			    String username = "root";
 			    String password = "keanu7.";
 			    
-			 System.out.println("los gehts");
+			 System.out.println("los gsdfsdfehts");
 			 
 			 Connection connection;
 			try {
