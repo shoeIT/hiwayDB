@@ -19,6 +19,10 @@ public class DAL {
 	// String query =
 	// "Select distinct(table_name) from INFORMATION_SCHEMA.TABLES";
 	String query = "SELECT * FROM test.new_table";
+	
+	public DAL() throws Exception {
+		
+	}
 
 	public boolean connectToDB() {
 
@@ -26,23 +30,23 @@ public class DAL {
 
 		
 		try {
-			connection = DriverManager.getConnection(dbUrl, username, password);
+			connectionToDB = DriverManager.getConnection(dbUrl, username, password);
 
-			Statement statement = connection.createStatement();
+			Statement statement = connectionToDB.createStatement();
 			ResultSet resultSet = statement.executeQuery(query);
 			while (resultSet.next()) {
 				String tableName = resultSet.getString(2);
 				System.out.println("Table name : " + tableName);
 			}
-			connection.close();
+			connectionToDB.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		System.out.println("fertig...pressbutton");
-
-		System.in.read();
+		
+		return false;
 	}
 
 }
