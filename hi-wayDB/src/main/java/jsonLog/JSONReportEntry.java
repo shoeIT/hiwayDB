@@ -10,4 +10,5 @@ public class JSONReportEntry {
 	}
 	
 	//public bool readInto
+	//JSONReportEntry
 }
