@@ -1,3 +1,4 @@
+package dal;
 // default package
 // Generated 27.04.2014 17:42:05 by Hibernate Tools 4.0.0
 
