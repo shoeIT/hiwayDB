@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 27.04.2014 17:42:06 by Hibernate Tools 4.0.0 -->
+<hibernate-mapping>
+    <class name="Timestat" table="timestat" catalog="hiwaydb">
+        <id name="id" type="java.lang.Long">
+            <column name="ID" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="stagingevent" class="Stagingevent" fetch="select">
+            <column name="StagingEvent_ID" />
+        </many-to-one>
+        <many-to-one name="invocation" class="Invocation" fetch="select">
+            <column name="Invocation_InvocationID" />
+        </many-to-one>
+        <many-to-one name="filestagingevent" class="Filestagingevent" fetch="select">
+            <column name="FileStagingEvent_ID" />
+        </many-to-one>
+        <property name="didOn" type="timestamp">
+            <column name="DidOn" length="19" not-null="true" />
+        </property>
+        <property name="nminPageFault" type="long">
+            <column name="nMinPageFault" not-null="true" />
+        </property>
+        <property name="nforcedContextSwitch" type="long">
+            <column name="nForcedContextSwitch" not-null="true" />
+        </property>
+        <property name="avgDataSize" type="long">
+            <column name="avgDataSize" not-null="true" />
+        </property>
+        <property name="nsocketRead" type="long">
+            <column name="nSocketRead" not-null="true" />
+        </property>
+        <property name="nioWrite" type="long">
+            <column name="nIoWrite" not-null="true" />
+        </property>
+        <property name="avgResidentSetSize" type="long">
+            <column name="avgResidentSetSize" not-null="true" />
+        </property>
+        <property name="nmajPageFault" type="long">
+            <column name="nMajPageFault" not-null="true" />
+        </property>
+        <property name="nwaitContextSwitch" type="long">
+            <column name="nWaitContextSwitch" not-null="true" />
+        </property>
+        <property name="userTime" type="double">
+            <column name="userTime" precision="22" scale="0" not-null="true" />
+        </property>
+        <property name="realTime" type="double">
+            <column name="realTime" precision="22" scale="0" not-null="true" />
+        </property>
+        <property name="sysTime" type="double">
+            <column name="sysTime" precision="22" scale="0" not-null="true" />
+        </property>
+        <property name="nsocketWrite" type="long">
+            <column name="nSocketWrite" not-null="true" />
+        </property>
+        <property name="maxResidentSetSize" type="long">
+            <column name="maxResidentSetSize" not-null="true" />
+        </property>
+        <property name="avgStackSize" type="long">
+            <column name="avgStackSize" not-null="true" />
+        </property>
+        <property name="nswapOutMainMem" type="long">
+            <column name="nSwapOutMainMem" not-null="true" />
+        </property>
+        <property name="nioRead" type="long">
+            <column name="nIoRead" not-null="true" />
+        </property>
+        <property name="nsignal" type="long">
+            <column name="nSignal" not-null="true" />
+        </property>
+        <property name="avgTextSize" type="long">
+            <column name="avgTextSize" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>

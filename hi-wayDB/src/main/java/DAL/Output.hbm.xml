@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 27.04.2014 17:42:06 by Hibernate Tools 4.0.0 -->
+<hibernate-mapping>
+    <class name="Output" table="output" catalog="hiwaydb">
+        <id name="id" type="java.lang.Long">
+            <column name="ID" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="invocation" class="Invocation" fetch="select">
+            <column name="Invocation_InvocationID" not-null="true" />
+        </many-to-one>
+        <property name="key" type="string">
+            <column name="Key" length="65535" not-null="true" />
+        </property>
+        <property name="content" type="string">
+            <column name="Content" length="65535" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>
