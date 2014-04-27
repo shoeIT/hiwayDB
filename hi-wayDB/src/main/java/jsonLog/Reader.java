@@ -32,21 +32,28 @@ public class Reader {
 			applySettings(configuration.getProperties());
 			SessionFactory sessionFactory = configuration.buildSessionFactory(builder.build());
 			
-			//Session session = sessionFactory.openSession();
-			//session.beginTransaction();
-			//session.save( new Event( "Our very first event!", new Date() ) );
-			//session.save( new Event( "A follow up event", new Date() ) );
-			//session.getTransaction().commit();
-			//session.close();
-			
 			Session session = sessionFactory.openSession();
 			session.beginTransaction();
-			List result = session.createQuery( "from Task" ).list();
-			for ( Task event : (List<Task>) result ) {
-			    System.out.println( "Task (" + event.getTaskName() + ") : " + event.getLanguage());
-			}
+			
+			Task task = new Task();
+			task.setLanguage("egal");
+			task.setTaskName("egal1");
+
+			session.save( task);
+			//session.save( new Event( "A follow up event", new Date() ) );
 			session.getTransaction().commit();
 			session.close();
+			
+		//	Session session = sessionFactory.openSession();
+			//	session.beginTransaction();
+			//	List<Task> result = session.createQuery( "from Task" ).list();
+			//	for ( Task event : (List<Task>) result ) {
+			//	    System.out.println( "Task (" + event.getTaskName() + ") : " + event.getLanguage());
+			//	}
+			//	session.getTransaction().commit();
+			//	session.close();
+			
+			 System.out.println("juchei");
 			
 		} catch (IOException e) {
 			

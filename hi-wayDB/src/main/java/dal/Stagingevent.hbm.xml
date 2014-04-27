@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 27.04.2014 18:21:34 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="dal.Stagingevent" table="stagingevent" catalog="hiwaydb">
+        <id name="id" type="java.lang.Long">
+            <column name="ID" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="invocation" class="dal.Invocation" fetch="select">
+            <column name="Invocation_InvocationID" not-null="true" />
+        </many-to-one>
+        <property name="in" type="boolean">
+            <column name="In" not-null="true">
+                <comment>In our Out</comment>
+            </column>
+        </property>
+        <set name="timestats" table="timestat" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="StagingEvent_ID" />
+            </key>
+            <one-to-many class="dal.Timestat" />
+        </set>
+    </class>
+</hibernate-mapping>

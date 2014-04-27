@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 27.04.2014 18:21:34 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="dal.Task" table="task" catalog="hiwaydb">
+        <id name="taskId" type="long">
+            <column name="TaskID" />
+            <generator class="assigned" />
+        </id>
+        <property name="taskName" type="string">
+            <column name="TaskName" length="65535" />
+        </property>
+        <property name="language" type="string">
+            <column name="Language" length="65535" not-null="true" />
+        </property>
+        <set name="workflowrunHasTasks" table="workflowrun_has_task" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="Task_TaskID" not-null="true" />
+            </key>
+            <one-to-many class="dal.WorkflowrunHasTask" />
+        </set>
+    </class>
+</hibernate-mapping>
