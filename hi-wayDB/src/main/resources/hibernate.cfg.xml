@@ -2,12 +2,47 @@
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
                                          "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
- <session-factory >
-  <property name="hibernate.connection.driver_class">org.gjt.mm.mysql.Driver</property>
-  <property name="hibernate.connection.password">keanu7.</property>
-  <property name="hibernate.connection.url">jdbc:mysql://localhost/hiwaydb</property>
-  <property name="hibernate.connection.username">root</property>
-  <property name="hibernate.default_schema">hiwaydb</property>
-  <property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
- </session-factory>
+	<session-factory>
+		<property name="hibernate.connection.driver_class">org.gjt.mm.mysql.Driver</property>
+		<property name="hibernate.connection.password">keanu7.</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost/hiwaydb</property>
+		<property name="hibernate.connection.username">root</property>
+		<property name="hibernate.default_schema">hiwaydb</property>
+		<!--  <property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>-->
+		<property name="cache.provider_class">
+			org.hibernate.cache.EhCacheProvider
+		</property>
+		<property name="current_session_context_class">thread
+		</property>
+		<property name="hibernate.transaction.factory_class">
+			org.hibernate.transaction.JDBCTransactionFactory
+		</property>
+
+		<mapping class="dal.Task" />
+		<mapping class="dal.WorkflowrunHasTask" />
+		<mapping class="dal.Invocation" />
+		
+		<mapping class="dal.Filestagingevent" />
+		<mapping class="dal.Output" />
+		<mapping class="dal.Stagingevent" />
+
+		<mapping class="dal.Timestat" />
+		<mapping class="dal.Userevent" />
+		<mapping class="dal.Workflowrun" />
+
+	<!-- 	<mapping resource="dal/Task.hbm.xml" />
+		<mapping resource="dal/WorkflowrunHasTask.hbm.xml" />
+		<mapping resource="dal/Invocation.hbm.xml" />
+		<mapping resource="dal/Containerallocated.hbm.xml" />
+		<mapping resource="dal/Containerfinished.hbm.xml" />
+		<mapping resource="dal/Containerrequested.hbm.xml" />
+
+		<mapping resource="dal/Filestagingevent.hbm.xml" />
+		<mapping resource="dal/Output.hbm.xml" />
+		<mapping resource="dal/Stagingevent.hbm.xml" />
+		<mapping resource="dal/Timestat.hbm.xml" />
+		<mapping resource="dal/Userevent.hbm.xml" />
+		<mapping resource="dal/Workflowrun.hbm.xml" />
+ -->
+	</session-factory>
 </hibernate-configuration>
