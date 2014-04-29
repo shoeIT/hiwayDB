@@ -26,6 +26,8 @@ public class Reader {
 
 	private static Path fFilePath;
 	private final static Charset ENCODING = StandardCharsets.UTF_8;
+	
+	private static long 
 
 	public static void main(String[] args) {
 
@@ -54,6 +56,7 @@ public class Reader {
 							
 							System.out.println(zeile.toString());
 							
+							zeile.get
 //													
 //							Session session = sessionFactory.openSession();
 //							session.beginTransaction();
