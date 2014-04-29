@@ -35,7 +35,7 @@ public class WorkflowrunHasTask implements java.io.Serializable {
 	@JoinColumn(name = "task_fk")
 	private Task task;
 
-	@OneToMany
+	@OneToMany(mappedBy="workflowrunHasTask")
 	private Set<Invocation> invocations = new HashSet<Invocation>(0);
 
 	public WorkflowrunHasTask() {
