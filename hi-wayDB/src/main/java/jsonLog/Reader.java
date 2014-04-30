@@ -121,7 +121,7 @@ public class Reader {
 							if(!alreadyInDB)
 							{
 								session.save(task);
-								System.out.println("Neuer Tasks in DB speichern ID: " + task.getTaskId());
+								System.out.println("Neuer.. Tasks in DB speichern ID: " + task.getTaskId());
 							}	
 							
 								runTask = new WorkflowrunHasTask();
