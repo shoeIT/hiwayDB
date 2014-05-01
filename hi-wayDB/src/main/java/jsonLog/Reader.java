@@ -1,7 +1,9 @@
 package jsonLog;
 
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -22,11 +24,11 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.json.JSONObject;
 
-import au.com.bytecode.opencsv.CSVReader;
 import dal.Invocation;
 import dal.Task;
 import dal.Workflowrun;
 import dal.WorkflowrunHasTask;
+import de.huberlin.cuneiform.dag.JsonReportEntry;
 
 public class Reader {
 
@@ -47,13 +49,17 @@ public class Reader {
 			// SessionFactory sessionFactory = getDBSession();
 
 			String input = "D:\\Temp\\wordcount.cf.log";
+
 			
-			//alle Tasks holen
-			 Session session = getDBSession().openSession();
-			 session.beginTransaction();
-			 List<Task> allTasks = session.createQuery("from Task").list();
-			 session.getTransaction().commit();
-			 session.close();
+			BufferedReader test = new BufferedReader(new InputStreamReader(System.in));
+			
+			test.readLine();
+			// alle Tasks holen
+			Session session = getDBSession().openSession();
+			session.beginTransaction();
+			List<Task> allTasks = session.createQuery("from Task").list();
+			session.getTransaction().commit();
+			session.close();
 
 			JsonReportEntry zeile;
 
@@ -74,10 +80,8 @@ public class Reader {
 
 			session = getDBSession().openSession();
 			session.beginTransaction();
-			
-			
-			
-						if (input.endsWith(".log")) {
+
+			if (input.endsWith(".log")) {
 
 				fFilePath = Paths.get(input);
 
@@ -89,54 +93,54 @@ public class Reader {
 						zeile = new JsonReportEntry(scanner.nextLine());
 						System.out.println(zeile.toString());
 
-
-						if (wfRun == null ||(wfRun.getRunId()!=null && wfRun.getRunId().equals(zeile.getRunId().toString()))) {
+						if (wfRun == null
+								|| (wfRun.getRunId() != null && wfRun
+										.getRunId().equals(
+												zeile.getRunId().toString()))) {
 							wfRun = new Workflowrun();
 							if (zeile.getRunId() != null) {
 								wfRun.setRunId(zeile.getRunId().toString());
 								session.save(wfRun);
 							}
 						}
-				
-											
-						if (zeile.getTaskId()!=0  && ( task == null || task.getTaskId()!=zeile.getTaskId())) {
+
+						if (zeile.getTaskId() != 0
+								&& (task == null || task.getTaskId() != zeile
+										.getTaskId())) {
 							task = new Task();
-												
+
 							task.setTaskId(zeile.getTaskId());
 							task.setTaskName(zeile.getTaskName());
 							task.setLanguage("bash");
-							
+
 							boolean alreadyInDB = false;
-							
-							for (Task tempTask : allTasks)
-							{
-								if(tempTask.getTaskId() == task.getTaskId())
-								{
+
+							for (Task tempTask : allTasks) {
+								if (tempTask.getTaskId() == task.getTaskId()) {
 									task = tempTask;
 									alreadyInDB = true;
 									break;
 								}
 							}
-							
-							if(!alreadyInDB)
-							{
+
+							if (!alreadyInDB) {
 								session.save(task);
-								System.out.println("Neuer.. Tasks in DB speichern ID: " + task.getTaskId());
-							}	
-							
-								runTask = new WorkflowrunHasTask();
-								runTask.setTask(task);
-								runTask.setWorkflowrun(wfRun);
-								
-								session.save(runTask);
+								System.out
+										.println("Neuer.. Tasks in DB speichern ID: "
+												+ task.getTaskId());
 							}
-							
-					
-					
+
+							runTask = new WorkflowrunHasTask();
+							runTask.setTask(task);
+							runTask.setWorkflowrun(wfRun);
+
+							// session.save(runTask);
+						}
+
 						if (invoc == null) {
 							invoc = new Invocation();
 							invoc.setInvocationId(zeile.getInvocId());
-							//invoc.setWorkflowrunHasTask(runTask);
+							// invoc.setWorkflowrunHasTask(runTask);
 
 						}
 
@@ -169,10 +173,9 @@ public class Reader {
 
 						}
 
-						
 					}
 				}
-				
+
 			} else {
 				// dann wohl ein JSON String
 			}
