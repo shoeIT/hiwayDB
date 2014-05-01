@@ -51,9 +51,13 @@ public class Reader {
 			String input = "D:\\Temp\\wordcount.cf.log";
 
 			
-			BufferedReader test = new BufferedReader(new InputStreamReader(System.in));
+			try( BufferedReader test = new BufferedReader(new InputStreamReader(System.in)) ) {
+				
+//				while(test.readLine()
+//				;
+				
+			}
 			
-			test.readLine();
 			// alle Tasks holen
 			Session session = getDBSession().openSession();
 			session.beginTransaction();
