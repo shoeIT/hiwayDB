@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 02.05.2014 17:48:05 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="de.huberlin.hiwaydb.dal.Invocation" table="invocation" catalog="hiwaydb">
+        <id name="invocationId" type="long">
+            <column name="InvocationID" />
+            <generator class="assigned" />
+        </id>
+        <many-to-one name="workflowrun" class="de.huberlin.hiwaydb.dal.Workflowrun" fetch="select">
+            <column name="WorkflowRun_ID" not-null="true" />
+        </many-to-one>
+        <many-to-one name="task" class="de.huberlin.hiwaydb.dal.Task" fetch="select">
+            <column name="Task_TaskID" not-null="true" />
+        </many-to-one>
+        <property name="hostname" type="string">
+            <column name="hostname" length="250" />
+        </property>
+        <property name="scheduleTime" type="java.lang.Long">
+            <column name="scheduleTime" />
+        </property>
+        <property name="standardOut" type="string">
+            <column name="StandardOut" length="65535" />
+        </property>
+        <property name="standardError" type="string">
+            <column name="StandardError" length="65535" />
+        </property>
+        <set name="userevents" table="userevent" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="Invocation_InvocationID" not-null="true" />
+            </key>
+            <one-to-many class="de.huberlin.hiwaydb.dal.Userevent" />
+        </set>
+        <set name="outputs" table="output" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="Invocation_InvocationID" not-null="true" />
+            </key>
+            <one-to-many class="de.huberlin.hiwaydb.dal.Output" />
+        </set>
+        <set name="filestagingevents" table="filestagingevent" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="Invocation_InvocationID" not-null="true" />
+            </key>
+            <one-to-many class="de.huberlin.hiwaydb.dal.Filestagingevent" />
+        </set>
+        <set name="timestats" table="timestat" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="Invocation_InvocationID" />
+            </key>
+            <one-to-many class="de.huberlin.hiwaydb.dal.Timestat" />
+        </set>
+        <set name="stagingevents" table="stagingevent" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="Invocation_InvocationID" not-null="true" />
+            </key>
+            <one-to-many class="de.huberlin.hiwaydb.dal.Stagingevent" />
+        </set>
+    </class>
+</hibernate-mapping>

@@ -24,10 +24,10 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.json.JSONObject;
 
-import dal.Invocation;
-import dal.Task;
-import dal.Workflowrun;
-import dal.WorkflowrunHasTask;
+import de.huberlin.hiwaydb.dal.Invocation;
+import de.huberlin.hiwaydb.dal.Task;
+import de.huberlin.hiwaydb.dal.Workflowrun;
+
 import de.huberlin.cuneiform.dag.JsonReportEntry;
 
 public class Reader {
@@ -61,7 +61,7 @@ public class Reader {
 			// alle Tasks holen
 			Session session = getDBSession().openSession();
 			session.beginTransaction();
-			List<Task> allTasks = session.createQuery("from Task").list();
+			List<Invocation> allTasks = session.createQuery("from Invocation").list();
 			session.getTransaction().commit();
 			session.close();
 
@@ -79,7 +79,7 @@ public class Reader {
 			JSONObject valuePart = null;
 			Invocation invoc = null;
 			Workflowrun wfRun = null;
-			WorkflowrunHasTask runTask = null;
+		
 			Task task = null;
 
 			session = getDBSession().openSession();
@@ -119,13 +119,13 @@ public class Reader {
 
 							boolean alreadyInDB = false;
 
-							for (Task tempTask : allTasks) {
-								if (tempTask.getTaskId() == task.getTaskId()) {
-									task = tempTask;
-									alreadyInDB = true;
-									break;
-								}
-							}
+//							for (Task tempTask : allTasks) {
+//								if (tempTask.getTaskId() == task.getTaskId()) {
+//									task = tempTask;
+//									alreadyInDB = true;
+//									break;
+//								}
+//							}
 
 							if (!alreadyInDB) {
 								session.save(task);
@@ -134,11 +134,7 @@ public class Reader {
 												+ task.getTaskId());
 							}
 
-							runTask = new WorkflowrunHasTask();
-							runTask.setTask(task);
-							runTask.setWorkflowrun(wfRun);
-
-							// session.save(runTask);
+						
 						}
 
 						if (invoc == null) {
