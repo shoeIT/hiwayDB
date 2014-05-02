@@ -1,4 +1,4 @@
-package jsonLog;
+package de.huberlin.hiwaydb.LogToDB;
 
 import java.io.IOException;
 import java.sql.Connection;

@@ -5,8 +5,6 @@ import java.util.HashSet;
 
 import javax.persistence.*;
 
-import dal.WorkflowrunHasTask;
-
 import java.util.Set;
 
 /**

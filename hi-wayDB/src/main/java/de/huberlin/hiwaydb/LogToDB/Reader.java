@@ -1,4 +1,4 @@
-package jsonLog;
+package de.huberlin.hiwaydb.LogToDB;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -61,7 +61,7 @@ public class Reader {
 			// alle Tasks holen
 			Session session = getDBSession().openSession();
 			session.beginTransaction();
-			List<Invocation> allTasks = session.createQuery("from Invocation").list();
+			List<Task> allTasks = session.createQuery("from Task").list();
 			session.getTransaction().commit();
 			session.close();
 
@@ -119,13 +119,13 @@ public class Reader {
 
 							boolean alreadyInDB = false;
 
-//							for (Task tempTask : allTasks) {
-//								if (tempTask.getTaskId() == task.getTaskId()) {
-//									task = tempTask;
-//									alreadyInDB = true;
-//									break;
-//								}
-//							}
+							for (Task tempTask : allTasks) {
+								if (tempTask.getTaskId() == task.getTaskId()) {
+									task = tempTask;
+									alreadyInDB = true;
+									break;
+								}
+							}
 
 							if (!alreadyInDB) {
 								session.save(task);
