@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.json.JSONObject;
@@ -27,13 +29,13 @@ import org.json.JSONObject;
 import de.huberlin.hiwaydb.dal.Invocation;
 import de.huberlin.hiwaydb.dal.Task;
 import de.huberlin.hiwaydb.dal.Workflowrun;
-
 import de.huberlin.cuneiform.dag.JsonReportEntry;
 
 public class Reader {
 
 	private static Path fFilePath;
 	private final static Charset ENCODING = StandardCharsets.UTF_8;
+	private static SessionFactory dbSessionFactory;
 
 	public static void main(String[] args) {
 
@@ -50,22 +52,18 @@ public class Reader {
 
 			String input = "D:\\Temp\\wordcount.cf.log";
 
-			
-			try( BufferedReader test = new BufferedReader(new InputStreamReader(System.in)) ) {
-				
-//				while(test.readLine()
-//				;
-				
-			}
-			
-			// alle Tasks holen
-			Session session = getDBSession().openSession();
-			session.beginTransaction();
-			List<Task> allTasks = session.createQuery("from Task").list();
-			session.getTransaction().commit();
-			session.close();
+			try (BufferedReader test = new BufferedReader(
+					new InputStreamReader(System.in))) {
 
-			JsonReportEntry zeile;
+				// while(test.readLine()
+				// ;
+
+			}
+
+			dbSessionFactory = getDBSession();
+			Transaction tx = null;
+			Session session = null;
+			JsonReportEntry logEntryRow;
 
 			UUID runId = null;
 			Long invocId = null;
@@ -79,11 +77,8 @@ public class Reader {
 			JSONObject valuePart = null;
 			Invocation invoc = null;
 			Workflowrun wfRun = null;
-		
-			Task task = null;
 
-			session = getDBSession().openSession();
-			session.beginTransaction();
+			Task task = null;
 
 			if (input.endsWith(".log")) {
 
@@ -93,102 +88,155 @@ public class Reader {
 				try (Scanner scanner = new Scanner(fFilePath, ENCODING.name())) {
 					while (scanner.hasNextLine()) {
 						i++;
-						System.out.println("line " + i);
-						zeile = new JsonReportEntry(scanner.nextLine());
-						System.out.println(zeile.toString());
 
-						if (wfRun == null
-								|| (wfRun.getRunId() != null && wfRun
-										.getRunId().equals(
-												zeile.getRunId().toString()))) {
-							wfRun = new Workflowrun();
-							if (zeile.getRunId() != null) {
-								wfRun.setRunId(zeile.getRunId().toString());
+						try {
+
+							System.out.println("line " + i);
+
+							logEntryRow = new JsonReportEntry(scanner.nextLine());
+							System.out.println(logEntryRow.toString());
+
+							session = dbSessionFactory.openSession();
+							tx = session.beginTransaction();
+							
+							String runID = null;
+							if(logEntryRow.getRunId()!=null)
+							{
+								runID = logEntryRow.getRunId().toString();
+							}
+													
+									
+							long taskID = 0;
+							if(logEntryRow.getTaskId() != 0)
+							{
+								taskID = logEntryRow.getTaskId();
+							}
+									
+									
+							long invocID = 0;
+							if(logEntryRow.getInvocId() != 0)
+							{
+								invocID = logEntryRow.getInvocId();
+							}
+															
+									
+							Long timestampTemp = logEntryRow.getTimestamp();
+
+							
+							
+
+							// hier erst checken ob WFrun, Task und Invocation
+							// bereits eingetragen sind
+							Query query = session
+									.createQuery("FROM Workflowrun E WHERE E.runId='"
+											+ runID+"'");
+							List<Workflowrun> resultsWfRun = query.list();
+
+							query = session
+									.createQuery("FROM Task E WHERE E.taskId ="
+											+ taskID);
+							List<Task> resultsTasks = query.list();
+
+							query = session
+									.createQuery("FROM Invocation E WHERE E.invocationId ="
+											+ invocID);
+							List<Invocation> resultsInvoc = query.list();
+
+							tx.commit();
+
+							if (!resultsWfRun.isEmpty()) {
+								wfRun = resultsWfRun.get(0);
+							}
+							if (!resultsTasks.isEmpty()) {
+								task = resultsTasks.get(0);
+							}
+							if (!resultsInvoc.isEmpty()) {
+								invoc = resultsInvoc.get(0);
+							}
+
+							tx = session.beginTransaction();
+
+							if (wfRun == null && runID != null) {
+
+								wfRun = new Workflowrun();
+								wfRun.setRunId(runID);
 								session.save(wfRun);
 							}
-						}
 
-						if (zeile.getTaskId() != 0
-								&& (task == null || task.getTaskId() != zeile
-										.getTaskId())) {
-							task = new Task();
+							if (taskID != 0 && (task == null)) {
+								task = new Task();
 
-							task.setTaskId(zeile.getTaskId());
-							task.setTaskName(zeile.getTaskName());
-							task.setLanguage("bash");
+								task.setTaskId(taskID);
+								task.setTaskName(logEntryRow.getTaskName());
+								task.setLanguage("bash");
 
-							boolean alreadyInDB = false;
-
-							for (Task tempTask : allTasks) {
-								if (tempTask.getTaskId() == task.getTaskId()) {
-									task = tempTask;
-									alreadyInDB = true;
-									break;
-								}
-							}
-
-							if (!alreadyInDB) {
 								session.save(task);
-								System.out
-										.println("Neuer.. Tasks in DB speichern ID: "
-												+ task.getTaskId());
+								// System.out.println("Neuer.. Tasks in DB speichern ID: "
+								// + task.getTaskId());
 							}
 
-						
-						}
-
-						if (invoc == null) {
-							invoc = new Invocation();
-							invoc.setInvocationId(zeile.getInvocId());
-							// invoc.setWorkflowrunHasTask(runTask);
-
-						}
-
-						key = zeile.getKey();
-
-						switch (key) {
-						case "invoc-host":
-
-							System.out.println(zeile.getValue());
-							if (invoc == null) {
+							if (invocID != 0 && (invoc == null)) {
 								invoc = new Invocation();
-
-								invoc.setInvocationId(zeile.getInvocId());
-							} else {
-								invoc.setHostname(zeile.getValue());
+								invoc.setInvocationId(invocID);
+								invoc.setTask(task);
+								invoc.setWorkflowrun(wfRun);
+								session.save(invoc);
 							}
 
-							break;
-						case "invoc-time":
-							valuePart = zeile.getValueJsonObj();
-							System.out.println("nMinPageFault: "
-									+ valuePart.get("nMinPageFault"));
-							System.out.println("nForcedContextSwitch: "
-									+ valuePart.get("nForcedContextSwitch"));
-							System.out.println("nSocketRead: "
-									+ valuePart.get("nSocketRead"));
-							System.out.println("realTime: "
-									+ valuePart.get("realTime"));
-							break;
+							key = logEntryRow.getKey();
 
+							switch (key) {
+							case "invoc-host":
+
+								System.out.println(logEntryRow.getValue());
+								if (invoc == null) {
+									invoc = new Invocation();
+
+									invoc.setInvocationId(logEntryRow
+											.getInvocId());
+								} else {
+									invoc.setHostname(logEntryRow.getValue());
+								}
+
+								break;
+							case "invoc-time":
+								valuePart = logEntryRow.getValueJsonObj();
+								System.out.println("nMinPageFault: "
+										+ valuePart.get("nMinPageFault"));
+								System.out
+										.println("nForcedContextSwitch: "
+												+ valuePart
+														.get("nForcedContextSwitch"));
+								System.out.println("nSocketRead: "
+										+ valuePart.get("nSocketRead"));
+								System.out.println("realTime: "
+										+ valuePart.get("realTime"));
+								break;
+
+							}
+
+							tx.commit();
+						} catch (Exception e) {
+							if (tx != null)
+								tx.rollback();
+							e.printStackTrace();
+						} finally {
+							session.close();
 						}
 
 					}
-				}
 
-			} else {
+				}
+			}
+
+			else {
 				// dann wohl ein JSON String
 			}
 
-			System.out.println();
-
-			session.getTransaction().commit();
-
-			session.close();
-
+			
 			System.out.println("juchei");
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 
 			e.printStackTrace();
 		}
@@ -206,13 +254,18 @@ public class Reader {
 
 	private static SessionFactory getDBSession() {
 
-		Configuration configuration = new Configuration().configure();
-		StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
-				.applySettings(configuration.getProperties());
-		SessionFactory sessionFactory = configuration
-				.buildSessionFactory(builder.build());
+		try {
+			Configuration configuration = new Configuration().configure();
+			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
+					.applySettings(configuration.getProperties());
+			SessionFactory sessionFactory = configuration
+					.buildSessionFactory(builder.build());
+			return sessionFactory;
+		} catch (Throwable ex) {
+			System.err.println("Failed to create sessionFactory object." + ex);
+			throw new ExceptionInInitializerError(ex);
+		}
 
-		return sessionFactory;
 	}
 
 }

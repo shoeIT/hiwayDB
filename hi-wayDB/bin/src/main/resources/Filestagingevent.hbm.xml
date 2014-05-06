@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 02.05.2014 17:48:05 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="de.huberlin.hiwaydb.dal.Filestagingevent" table="filestagingevent" catalog="hiwaydb">
+        <id name="id" type="java.lang.Long">
+            <column name="ID" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="invocation" class="de.huberlin.hiwaydb.dal.Invocation" fetch="select">
+            <column name="Invocation_InvocationID" not-null="true" />
+        </many-to-one>
+        <property name="name" type="string">
+            <column name="Name" length="250" />
+        </property>
+        <property name="in" type="boolean">
+            <column name="In" not-null="true">
+                <comment>In our Out</comment>
+            </column>
+        </property>
+        <property name="size" type="java.lang.Long">
+            <column name="Size" />
+        </property>
+        <set name="timestats" table="timestat" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="FileStagingEvent_ID" />
+            </key>
+            <one-to-many class="de.huberlin.hiwaydb.dal.Timestat" />
+        </set>
+    </class>
+</hibernate-mapping>
