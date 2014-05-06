@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import de.huberlin.hiwaydb.dal.Invocation;
 import de.huberlin.hiwaydb.dal.Task;
+import de.huberlin.hiwaydb.dal.Timestat;
 import de.huberlin.hiwaydb.dal.Workflowrun;
 import de.huberlin.cuneiform.dag.JsonReportEntry;
 
@@ -93,43 +94,35 @@ public class Reader {
 
 							System.out.println("line " + i);
 
-							logEntryRow = new JsonReportEntry(scanner.nextLine());
+							logEntryRow = new JsonReportEntry(
+									scanner.nextLine());
 							System.out.println(logEntryRow.toString());
 
 							session = dbSessionFactory.openSession();
 							tx = session.beginTransaction();
-							
+
 							String runID = null;
-							if(logEntryRow.getRunId()!=null)
-							{
+							if (logEntryRow.getRunId() != null) {
 								runID = logEntryRow.getRunId().toString();
 							}
-													
-									
+
 							long taskID = 0;
-							if(logEntryRow.getTaskId() != 0)
-							{
+							if (logEntryRow.getTaskId() != 0) {
 								taskID = logEntryRow.getTaskId();
 							}
-									
-									
+
 							long invocID = 0;
-							if(logEntryRow.getInvocId() != 0)
-							{
+							if (logEntryRow.getInvocId() != 0) {
 								invocID = logEntryRow.getInvocId();
 							}
-															
-									
-							Long timestampTemp = logEntryRow.getTimestamp();
 
-							
-							
+							Long timestampTemp = logEntryRow.getTimestamp();
 
 							// hier erst checken ob WFrun, Task und Invocation
 							// bereits eingetragen sind
 							Query query = session
 									.createQuery("FROM Workflowrun E WHERE E.runId='"
-											+ runID+"'");
+											+ runID + "'");
 							List<Workflowrun> resultsWfRun = query.list();
 
 							query = session
@@ -187,32 +180,52 @@ public class Reader {
 
 							switch (key) {
 							case "invoc-host":
-
-								System.out.println(logEntryRow.getValue());
-								if (invoc == null) {
-									invoc = new Invocation();
-
-									invoc.setInvocationId(logEntryRow
-											.getInvocId());
-								} else {
-									invoc.setHostname(logEntryRow.getValue());
-								}
-
+								invoc.setHostname(logEntryRow.getValue());
 								break;
-							case "invoc-time":
+							case "wf-name":
+								wfRun.setWfName(logEntryRow.getValue());
+								break;
+							case "wf-time":
+								String val = logEntryRow.getValue().replace('"', ' ').trim();
+								Long test = Long.parseLong(val,10);		
+								
+								wfRun.setWfTime(test);
+								break;
+							case "invoc-time-sched":
+								invoc.setScheduleTime(Long.parseLong(logEntryRow.getValue().replace('"', ' ').trim(),10));
+								break;
+								
+							case JsonReportEntry.KEY_INVOC_STDERR:
+								invoc.setStandardError(logEntryRow.getValue());
+								break;
+							case JsonReportEntry.KEY_INVOC_STDOUT:
+								invoc.setStandardOut(logEntryRow.getValue());
+								break;
+							case JsonReportEntry.KEY_INVOC_TIME:
 								valuePart = logEntryRow.getValueJsonObj();
-								System.out.println("nMinPageFault: "
-										+ valuePart.get("nMinPageFault"));
-								System.out
-										.println("nForcedContextSwitch: "
-												+ valuePart
-														.get("nForcedContextSwitch"));
-								System.out.println("nSocketRead: "
-										+ valuePart.get("nSocketRead"));
-								System.out.println("realTime: "
-										+ valuePart.get("realTime"));
+								
+								Timestat invocTime = new Timestat();
+								invocTime.setInvocation(invoc);
+								invocTime.setNminPageFault(Long.parseLong(valuePart.get("nMinPageFault").toString(),10));
+								invocTime.setNforcedContextSwitch(Long.parseLong(valuePart.get("nForcedContextSwitch").toString(),10));
+								invocTime.setAvgDataSize(Long.parseLong(valuePart.get("avgDataSize").toString(),10));
+								invocTime.setNsocketRead(Long.parseLong(valuePart.get("nSocketRead").toString(),10));								
+								invocTime.setNioWrite(Long.parseLong(valuePart.get("nIoWrite").toString(),10));
+								invocTime.setAvgResidentSetSize(Long.parseLong(valuePart.get("avgResidentSetSize").toString(),10));
+								invocTime.setNmajPageFault(Long.parseLong(valuePart.get("nMajPageFault").toString(),10));
+								invocTime.setNwaitContextSwitch(Long.parseLong(valuePart.get("nWaitContextSwitch").toString(),10));
+								invocTime.setUserTime(Double.parseDouble(valuePart.get("userTime").toString()));							
+								invocTime.setRealTime(Double.parseDouble(valuePart.get("realTime").toString()));
+								invocTime.setSysTime(Double.parseDouble(valuePart.get("sysTime").toString()));
+								invocTime.setNsocketWrite(Long.parseLong(valuePart.get("nSocketWrite").toString(),10));
+								invocTime.setMaxResidentSetSize(Long.parseLong(valuePart.get("maxResidentSetSize").toString(),10));
+								invocTime.setAvgStackSize(Long.parseLong(valuePart.get("avgStackSize").toString(),10));
+								invocTime.setNswapOutMainMem(Long.parseLong(valuePart.get("nSwapOutMainMem").toString(),10));
+								invocTime.setNioRead(Long.parseLong(valuePart.get("nIoRead").toString(),10));
+								invocTime.setNsignal(Long.parseLong(valuePart.get("nSignal").toString(),10));
+								invocTime.setAvgTextSize(Long.parseLong(valuePart.get("avgTextSize").toString(),10));				
+								session.save(invocTime);
 								break;
-
 							}
 
 							tx.commit();
@@ -220,8 +233,11 @@ public class Reader {
 							if (tx != null)
 								tx.rollback();
 							e.printStackTrace();
+							break;
+							
 						} finally {
 							session.close();
+							
 						}
 
 					}
@@ -233,7 +249,6 @@ public class Reader {
 				// dann wohl ein JSON String
 			}
 
-			
 			System.out.println("juchei");
 
 		} catch (Exception e) {
