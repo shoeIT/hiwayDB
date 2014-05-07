@@ -11,15 +11,15 @@ public class Output implements java.io.Serializable {
 	private Long id;
 	@ManyToOne
 	private Invocation invocation;
-	private String key;
+	private String keypart;
 	private String content;
 
 	public Output() {
 	}
 
-	public Output(Invocation invocation, String key, String content) {
+	public Output(Invocation invocation, String keypart, String content) {
 		this.invocation = invocation;
-		this.key = key;
+		this.keypart = keypart;
 		this.content = content;
 	}
 
@@ -39,12 +39,12 @@ public class Output implements java.io.Serializable {
 		this.invocation = invocation;
 	}
 
-	public String getKey() {
-		return this.key;
+	public String getKeypart() {
+		return this.keypart;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setKeypart(String keypart) {
+		this.keypart = keypart;
 	}
 
 	public String getContent() {

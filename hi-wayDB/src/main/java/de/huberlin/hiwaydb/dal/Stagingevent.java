@@ -15,7 +15,7 @@ public class Stagingevent implements java.io.Serializable {
 	private Long id;
 	@ManyToOne
 	private Invocation invocation;
-	private boolean in;
+	private boolean inevent;
 	
 	@OneToMany(mappedBy="stagingevent")
 	private Set<Timestat> timestats = new HashSet<Timestat>(0);
@@ -24,14 +24,14 @@ public class Stagingevent implements java.io.Serializable {
 	public Stagingevent() {
 	}
 
-	public Stagingevent(Invocation invocation, boolean in) {
+	public Stagingevent(Invocation invocation, boolean inEvent) {
 		this.invocation = invocation;
-		this.in = in;
+		this.inevent = inEvent;
 	}
 
-	public Stagingevent(Invocation invocation, boolean in, Set timestats) {
+	public Stagingevent(Invocation invocation, boolean inEvent, Set timestats) {
 		this.invocation = invocation;
-		this.in = in;
+		this.inevent = inEvent;
 		this.timestats = timestats;
 	}
 
@@ -51,12 +51,12 @@ public class Stagingevent implements java.io.Serializable {
 		this.invocation = invocation;
 	}
 
-	public boolean isIn() {
-		return this.in;
+	public boolean isinEvent() {
+		return this.inevent;
 	}
 
-	public void setIn(boolean in) {
-		this.in = in;
+	public void setinEvent(boolean inEvent) {
+		this.inevent = inEvent;
 	}
 
 	public Set getTimestats() {
