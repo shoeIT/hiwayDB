@@ -54,8 +54,8 @@ public class Reader {
 
 			// SessionFactory sessionFactory = getDBSession();
 
-			//String input = "D:\\Temp\\wordcount.cf.log";
-			String input = "D:\\Temp\\variant-call-09-setup.cf.log";
+			String input = "D:\\Temp\\wordcount.cf.log";
+			//String input = "D:\\Temp\\variant-call-09-setup.cf.log";
 
 			try (BufferedReader test = new BufferedReader(
 					new InputStreamReader(System.in))) {
@@ -111,14 +111,14 @@ public class Reader {
 							}
 
 							long taskID = 0;
-							if (logEntryRow.getTaskId() != 0) {
+							if (logEntryRow.getTaskId() != null) {
 								taskID = logEntryRow.getTaskId();
 							}
 
-							long invocID = 0;
-							if (logEntryRow.getInvocId() != 0) {
-								invocID = logEntryRow.getInvocId();
-							}
+							//long invocID = 0;
+							//if (logEntryRow.getInvocId() != 0) {
+								long invocID = logEntryRow.getInvocId();
+							//}
 
 							Long timestampTemp = logEntryRow.getTimestamp();
 
@@ -149,7 +149,7 @@ public class Reader {
 											+ invocID);
 							List<Stagingevent> resultsStagingOut = query.list();
 
-							tx.commit();
+							//tx.commit();
 
 							if (!resultsWfRun.isEmpty()) {
 								wfRun = resultsWfRun.get(0);
@@ -175,7 +175,7 @@ public class Reader {
 
 								task.setTaskId(taskID);
 								task.setTaskName(logEntryRow.getTaskName());
-								task.setLanguage("bash");
+								task.setLanguage(logEntryRow.getLang());
 
 								session.save(task);
 								// System.out.println("Neuer.. Tasks in DB speichern ID: "
