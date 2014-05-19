@@ -21,10 +21,9 @@
 		<mapping class="de.huberlin.hiwaydb.dal.Workflowrun" />
 		<mapping class="de.huberlin.hiwaydb.dal.Invocation" />
 		
-		<mapping class="de.huberlin.hiwaydb.dal.Filestagingevent" />
-		<mapping class="de.huberlin.hiwaydb.dal.Output" />
-		<mapping class="de.huberlin.hiwaydb.dal.Stagingevent" />
-
+		<mapping class="de.huberlin.hiwaydb.dal.Files" />
+		<mapping class="de.huberlin.hiwaydb.dal.Inoutput" />
+		
 		<mapping class="de.huberlin.hiwaydb.dal.Timestat" />
 		<mapping class="de.huberlin.hiwaydb.dal.Userevent" />
        

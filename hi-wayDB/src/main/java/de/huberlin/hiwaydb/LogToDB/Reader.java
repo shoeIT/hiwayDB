@@ -58,7 +58,7 @@ public class Reader {
 					}
 				} else {
 					System.out
-							.println("Eingabe: keine Logdatei, String direkt übergeben.");
+							.println("Eingabe: keine Logdatei, String direkt uebergeben.");
 					writer.lineToDB(new JsonReportEntry(args[0].toString()));
 				}
 			}
