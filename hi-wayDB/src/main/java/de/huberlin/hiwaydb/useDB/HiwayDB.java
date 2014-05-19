@@ -1,5 +1,6 @@
 package de.huberlin.hiwaydb.useDB;
 
+import java.util.Collection;
 import java.util.Set;
 
 import de.huberlin.hiwaydb.LogToDB.WriteHiwayDB;
@@ -25,6 +26,19 @@ public class HiwayDB implements HiwayDBI
 
 	@Override
 	public Set<InvocStat> getLogEntriesForTask(long taskID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Set<InvocStat> getLogEntriesSinceForTask(Collection<Long> taskID,
+			long sinceTimestamp) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Set<InvocStat> getLogEntriesForTask(Collection<Long> taskID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
