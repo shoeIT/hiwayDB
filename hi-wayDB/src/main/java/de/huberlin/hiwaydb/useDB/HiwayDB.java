@@ -5,7 +5,7 @@ import java.util.Set;
 import de.huberlin.hiwaydb.LogToDB.WriteHiwayDB;
 import de.huberlin.wbi.cuneiform.core.invoc.JsonReportEntry;
 
-public class HiwayDB implements UseHiwayDB
+public class HiwayDB implements HiwayDBI
 {
 
 	@Override
@@ -16,8 +16,15 @@ public class HiwayDB implements UseHiwayDB
 		 
 	}
 
+		@Override
+	public Set<InvocStat> getLogEntriesSinceForTask(long taskID,
+			long sinceTimestamp) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
-	public Set<InvocStat> getLogEntries(long taskID, String hostname) {
+	public Set<InvocStat> getLogEntriesForTask(long taskID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
