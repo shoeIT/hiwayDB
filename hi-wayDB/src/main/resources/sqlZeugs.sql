@@ -2,9 +2,6 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
--- -----------------------------------------------------
--- Schema hiwayDB
--- -----------------------------------------------------
 DROP SCHEMA IF EXISTS `hiwayDB` ;
 CREATE SCHEMA IF NOT EXISTS `hiwayDB` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
 SHOW WARNINGS;
@@ -74,36 +71,14 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `StagingEvent`
+-- Table `File`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `StagingEvent` ;
+DROP TABLE IF EXISTS `File` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `StagingEvent` (
+CREATE TABLE IF NOT EXISTS `File` (
   `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `In` BIT NOT NULL COMMENT 'In our Out',
-  `Invocation_InvocationID` BIGINT UNSIGNED NOT NULL,
-  PRIMARY KEY (`ID`),
-  INDEX `fk_StagingEvent_Invocation1_idx` (`Invocation_InvocationID` ASC),
-  CONSTRAINT `fk_StagingEvent_Invocation1`
-    FOREIGN KEY (`Invocation_InvocationID`)
-    REFERENCES `Invocation` (`InvocationID`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-SHOW WARNINGS;
-
--- -----------------------------------------------------
--- Table `FileStagingEvent`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `FileStagingEvent` ;
-
-SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `FileStagingEvent` (
-  `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `Name` VARCHAR(250) NULL,
-  `In` BIT NOT NULL COMMENT 'In our Out',
+  `Name` VARCHAR(250) NOT NULL,
   `Size` BIGINT UNSIGNED NULL,
   `Invocation_InvocationID` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`ID`),
@@ -144,26 +119,22 @@ CREATE TABLE IF NOT EXISTS `TimeStat` (
   `nIoRead` BIGINT UNSIGNED NOT NULL,
   `nSignal` BIGINT UNSIGNED NOT NULL,
   `avgTextSize` BIGINT UNSIGNED NOT NULL,
-  `StagingEvent_ID` BIGINT UNSIGNED NULL,
-  `FileStagingEvent_ID` BIGINT UNSIGNED NULL,
   `Invocation_InvocationID` BIGINT UNSIGNED NULL,
+  `Type` VARCHAR(100) NOT NULL,
+  `File_ID` BIGINT UNSIGNED NULL,
   PRIMARY KEY (`ID`),
-  INDEX `fk_TimeStat_StagingEvent1_idx` (`StagingEvent_ID` ASC),
-  INDEX `fk_TimeStat_FileStagingEvent1_idx` (`FileStagingEvent_ID` ASC),
   INDEX `fk_TimeStat_Invocation1_idx` (`Invocation_InvocationID` ASC),
-  CONSTRAINT `fk_TimeStat_StagingEvent1`
-    FOREIGN KEY (`StagingEvent_ID`)
-    REFERENCES `StagingEvent` (`ID`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_TimeStat_FileStagingEvent1`
-    FOREIGN KEY (`FileStagingEvent_ID`)
-    REFERENCES `FileStagingEvent` (`ID`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+  INDEX `fk_TimeStat_File1_idx` (`File_ID` ASC),
+  UNIQUE INDEX `uniInvoc` (`Invocation_InvocationID` ASC, `Type` ASC),
+  UNIQUE INDEX `uniFile` (`File_ID` ASC, `Type` ASC),
   CONSTRAINT `fk_TimeStat_Invocation1`
     FOREIGN KEY (`Invocation_InvocationID`)
     REFERENCES `Invocation` (`InvocationID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_TimeStat_File1`
+    FOREIGN KEY (`File_ID`)
+    REFERENCES `File` (`ID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -171,16 +142,17 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `Output`
+-- Table `InOutput`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `Output` ;
+DROP TABLE IF EXISTS `InOutput` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `Output` (
+CREATE TABLE IF NOT EXISTS `InOutput` (
   `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `Key` TEXT NOT NULL,
+  `Keypart` TEXT NOT NULL,
   `Content` TEXT NOT NULL,
   `Invocation_InvocationID` BIGINT UNSIGNED NOT NULL,
+  `Type` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`ID`),
   INDEX `fk_Output_Invocation1_idx` (`Invocation_InvocationID` ASC),
   CONSTRAINT `fk_Output_Invocation1`
@@ -207,6 +179,28 @@ CREATE TABLE IF NOT EXISTS `UserEvent` (
   CONSTRAINT `fk_UserEvent_Invocation1`
     FOREIGN KEY (`Invocation_InvocationID`)
     REFERENCES `Invocation` (`InvocationID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
+-- Table `HiwayEvent`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `HiwayEvent` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `HiwayEvent` (
+  `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Content` TEXT NOT NULL,
+  `Type` VARCHAR(200) NOT NULL,
+  `WorkflowRun_ID` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`ID`),
+  INDEX `fk_HiwayEvent_WorkflowRun1_idx` (`WorkflowRun_ID` ASC),
+  CONSTRAINT `fk_HiwayEvent_WorkflowRun1`
+    FOREIGN KEY (`WorkflowRun_ID`)
+    REFERENCES `WorkflowRun` (`ID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
