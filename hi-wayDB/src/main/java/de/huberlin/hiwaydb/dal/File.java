@@ -26,7 +26,7 @@ public class File implements java.io.Serializable {
 	private Invocation invocation;
 	private String name;
 	private Long size;
-	@OneToMany(mappedBy="filestagingevent")
+	@OneToMany(mappedBy="file")
 	private Set<Timestat> timestats = new HashSet<Timestat>(0);
 
 	public File() {

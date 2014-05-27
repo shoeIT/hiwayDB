@@ -17,11 +17,12 @@
         <property name="format_sql">true</property>
         <property name="use_sql_comments">true</property>-->
       
+        <mapping class="de.huberlin.hiwaydb.dal.Hiwayevent" />
        <mapping class="de.huberlin.hiwaydb.dal.Task" />
 		<mapping class="de.huberlin.hiwaydb.dal.Workflowrun" />
 		<mapping class="de.huberlin.hiwaydb.dal.Invocation" />
 		
-		<mapping class="de.huberlin.hiwaydb.dal.Files" />
+		<mapping class="de.huberlin.hiwaydb.dal.File" />
 		<mapping class="de.huberlin.hiwaydb.dal.Inoutput" />
 		
 		<mapping class="de.huberlin.hiwaydb.dal.Timestat" />

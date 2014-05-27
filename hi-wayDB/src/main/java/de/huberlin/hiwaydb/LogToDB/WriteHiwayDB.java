@@ -12,8 +12,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.mapping.Collection;
 import org.json.JSONObject;
 
+import de.huberlin.hiwaydb.dal.File;
+import de.huberlin.hiwaydb.dal.Inoutput;
 import de.huberlin.hiwaydb.dal.Invocation;
 import de.huberlin.hiwaydb.dal.Task;
 import de.huberlin.hiwaydb.dal.Timestat;
@@ -25,9 +28,8 @@ public class WriteHiwayDB {
 	private SessionFactory dbSessionFactory;
 	private Transaction tx;
 	private Session session;
-	
-	public WriteHiwayDB()
-	{
+
+	public WriteHiwayDB() {
 		dbSessionFactory = getDBSession();
 	}
 
@@ -39,15 +41,29 @@ public class WriteHiwayDB {
 
 			session = dbSessionFactory.openSession();
 			tx = session.beginTransaction();
+			Query query = null;
+			List<Task> resultsTasks = null;
+			List<Workflowrun> resultsWfRun = null;
+			List<File> resultsFile = null;
 
 			String runID = null;
 			if (logEntryRow.getRunId() != null) {
 				runID = logEntryRow.getRunId().toString();
+
+				query = session
+						.createQuery("FROM Workflowrun E WHERE E.runId='"
+								+ runID + "'");
+
+				resultsWfRun = query.list();
 			}
 
 			long taskID = 0;
 			if (logEntryRow.getTaskId() != null) {
 				taskID = logEntryRow.getTaskId();
+
+				query = session.createQuery("FROM Task E WHERE E.taskId ="
+						+ taskID);
+				resultsTasks = query.list();
 			}
 
 			// long invocID = 0;
@@ -55,47 +71,38 @@ public class WriteHiwayDB {
 			long invocID = logEntryRow.getInvocId();
 			// }
 
-			Long timestampTemp = logEntryRow.getTimestamp();
-
-			// hier erst checken ob WFrun, Task und Invocation
-			// bereits eingetragen sind
-			Query query = session
-					.createQuery("FROM Workflowrun E WHERE E.runId='" + runID
-							+ "'");
-			List<Workflowrun> resultsWfRun = query.list();
-
-			query = session
-					.createQuery("FROM Task E WHERE E.taskId =" + taskID);
-			List<Task> resultsTasks = query.list();
-
 			query = session
 					.createQuery("FROM Invocation E WHERE E.invocationId ="
 							+ invocID);
 			List<Invocation> resultsInvoc = query.list();
 
-			query = session
-					.createQuery("FROM Stagingevent E WHERE inevent=1 AND E.invocation="
-							+ invocID);
-//			List<Stagingevent> resultsStagingIn = query.list();
-//
-//			query = session
-//					.createQuery("FROM Stagingevent E WHERE inevent=0 AND E.invocation="
-//							+ invocID);
-//			List<Stagingevent> resultsStagingOut = query.list();
+			Long timestampTemp = logEntryRow.getTimestamp();
 
-			// tx.commit();
+			String filename = null;
+			if (logEntryRow.getFile() != null) {
+				filename = logEntryRow.getFile();
+
+				query = session.createQuery("FROM File E WHERE E.name='"
+						+ filename + "' AND E.invocation=" + invocID);
+				resultsFile = query.list();
+			}
 
 			Workflowrun wfRun = null;
-			if (!resultsWfRun.isEmpty()) {
+			if (resultsWfRun != null && !resultsWfRun.isEmpty()) {
 				wfRun = resultsWfRun.get(0);
 			}
 			Task task = null;
-			if (!resultsTasks.isEmpty()) {
+			if (resultsTasks != null && !resultsTasks.isEmpty()) {
 				task = resultsTasks.get(0);
 			}
 			Invocation invoc = null;
-			if (!resultsInvoc.isEmpty()) {
+			if (resultsInvoc != null && !resultsInvoc.isEmpty()) {
 				invoc = resultsInvoc.get(0);
+			}
+
+			File file = null;
+			if (resultsFile != null && !resultsFile.isEmpty()) {
+				file = resultsFile.get(0);
 			}
 
 			// tx = session.beginTransaction();
@@ -127,6 +134,14 @@ public class WriteHiwayDB {
 				session.save(invoc);
 			}
 
+			if (file == null && filename != null) {
+
+				file = new File();
+				file.setName(filename);
+				file.setInvocation(invoc);
+				session.save(file);
+			}
+
 			String key = logEntryRow.getKey();
 
 			JSONObject valuePart;
@@ -151,23 +166,28 @@ public class WriteHiwayDB {
 			case JsonReportEntry.KEY_INVOC_STDERR:
 				invoc.setStandardError(logEntryRow.getValue());
 				break;
-//			case JsonReportEntry.KEY_INVOC_OUTPUT:
-//				valuePart = logEntryRow.getValueJsonObj();
-//
-//				Output output;
-//
-//				for (Iterator<String> iterator = valuePart.keys(); iterator
-//						.hasNext();) {
-//					String keypart = iterator.next();
-//					System.out.println(keypart);
-//					output = new Output();
-//					output.setKeypart(keypart);
-//					output.setInvocation(invoc);
-//					output.setContent(valuePart.get(keypart).toString());
-//					session.save(output);
-//				}
-//
-//				break;
+
+			case "invoc-exec":
+				valuePart = logEntryRow.getValueJsonObj();
+
+				Inoutput input = new Inoutput();
+				input.setKeypart("invoc-exec");
+				input.setInvocation(invoc);
+				input.setContent(valuePart.toString());
+				input.setType("input");
+				session.save(input);
+				break;
+
+			case JsonReportEntry.KEY_INVOC_OUTPUT:
+				valuePart = logEntryRow.getValueJsonObj();
+
+				Inoutput output = new Inoutput();
+				output.setKeypart("invoc-output");
+				output.setInvocation(invoc);
+				output.setContent(valuePart.toString());
+				output.setType("output");
+				session.save(output);
+				break;
 			case JsonReportEntry.KEY_INVOC_STDOUT:
 				invoc.setStandardOut(logEntryRow.getValue());
 				break;
@@ -175,44 +195,26 @@ public class WriteHiwayDB {
 				valuePart = logEntryRow.getValueJsonObj();
 
 				Timestat invocTime = GetTimeStat(valuePart);
-
+				invocTime.setType("invoc-time");
 				invocTime.setInvocation(invoc);
 
 				session.save(invocTime);
 				break;
 
-//			case "invoc-time-stagein":
-//				valuePart = logEntryRow.getValueJsonObj();
-//
-//				if (resultsStagingIn.isEmpty()) {
-//					Stagingevent se = new Stagingevent();
-//
-//					se.setinEvent(true);
-//					se.setInvocation(invoc);
-//					session.save(se);
-//
-//					Timestat invocTimeStage = GetTimeStat(valuePart);
-//					invocTimeStage.setStagingevent(se);
-//					session.save(invocTimeStage);
-//					break;
-//				}
-//
-//			case "invoc-time-stageout":
-//				valuePart = logEntryRow.getValueJsonObj();
-//
-//				if (resultsStagingOut.isEmpty()) {
-//					Stagingevent seOut = new Stagingevent();
-//
-//					seOut.setinEvent(false);
-//					seOut.setInvocation(invoc);
-//					session.save(seOut);
-//
-//					Timestat invocTimeStageOut = GetTimeStat(valuePart);
-//					invocTimeStageOut.setStagingevent(seOut);
-//
-//					session.save(invocTimeStageOut);
-//				}
-//				break;
+			case "file-size-stagein":
+
+				file.setSize(Long.parseLong(
+						logEntryRow.getValue().replace('"', ' ').trim(), 10));
+
+				break;
+			case "file-size-stageout":
+
+				file.setSize(Long.parseLong(
+						logEntryRow.getValue().replace('"', ' ').trim(), 10));
+
+				break;
+			default:
+				throw new Exception("Der Typ ist nicht bekannt.");
 			}
 
 			tx.commit();

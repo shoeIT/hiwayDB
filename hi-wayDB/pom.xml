@@ -12,6 +12,12 @@
 
 	<dependencies>
 
+  <dependency>
+    <groupId>com.couchbase.client</groupId>
+    <artifactId>couchbase-client</artifactId>
+    <version>1.4.1</version>
+  </dependency>
+
 		<dependency>
 			<groupId>de.huberlin.wbi.cuneiform</groupId>
 			<artifactId>cuneiform-core</artifactId>

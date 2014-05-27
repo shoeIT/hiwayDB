@@ -6,7 +6,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import java.util.Scanner;
 
 import de.huberlin.wbi.cuneiform.core.invoc.JsonReportEntry;
@@ -45,15 +44,20 @@ public class Reader {
 
 					fFilePath = Paths.get(input);
 
+					int result = 0;
 					int i = 0;
 					try (Scanner scanner = new Scanner(fFilePath,
 							ENCODING.name())) {
 						while (scanner.hasNextLine()) {
 							i++;
 							System.out.println("line " + i);
-
-							writer.lineToDB(new JsonReportEntry(scanner
+							
+						
+							result = writer.lineToDB(new JsonReportEntry(scanner
 									.nextLine()));
+							
+							if(result==-1)
+								break;
 						}
 					}
 				} else {
