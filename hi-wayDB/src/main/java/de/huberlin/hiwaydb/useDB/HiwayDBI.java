@@ -7,6 +7,8 @@ import de.huberlin.wbi.cuneiform.core.invoc.JsonReportEntry;
 
 public interface HiwayDBI {
 	
+	public void setConfigFile(String configFile);
+	public String getConfigFile();
 	public int logToDB(JsonReportEntry entry);
 	public Set<InvocStat> getLogEntriesSinceForTask (long taskID, long sinceTimestamp );
 	public Set<InvocStat> getLogEntriesForTask (long taskID );

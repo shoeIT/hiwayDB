@@ -15,6 +15,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.mapping.Collection;
 import org.json.JSONObject;
 
+import de.huberlin.hiwaydb.dal.DBConnection;
 import de.huberlin.hiwaydb.dal.File;
 import de.huberlin.hiwaydb.dal.Inoutput;
 import de.huberlin.hiwaydb.dal.Invocation;
@@ -28,9 +29,14 @@ public class WriteHiwayDB {
 	private SessionFactory dbSessionFactory;
 	private Transaction tx;
 	private Session session;
-
-	public WriteHiwayDB() {
-		dbSessionFactory = getDBSession();
+	private String configFile;
+	
+	
+	public WriteHiwayDB(String configFile) {
+		
+		DBConnection con = new DBConnection(configFile);
+		
+		dbSessionFactory = con.getDBSession();
 	}
 
 	public int lineToDB(JsonReportEntry logEntryRow) {
@@ -274,18 +280,4 @@ public class WriteHiwayDB {
 		return timeStat;
 	}
 
-	private static SessionFactory getDBSession() {
-		try {
-			Configuration configuration = new Configuration().configure();
-			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
-					.applySettings(configuration.getProperties());
-			SessionFactory sessionFactory = configuration
-					.buildSessionFactory(builder.build());
-			return sessionFactory;
-		} catch (Throwable ex) {
-			System.err.println("Failed to create sessionFactory object." + ex);
-			throw new ExceptionInInitializerError(ex);
-		}
-
-	}
 }

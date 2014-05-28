@@ -1,26 +1,28 @@
 package de.huberlin.hiwaydb.useDB;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 public class InvocStat {
 
-	private long timestamp;
-	private long realTime;
+	private Date timestamp;
+	private double realTime;
 	private long taskID;
 	private String hostname;
-	
-	private Set<FileStat> inputFiles = new HashSet<FileStat>(0);
-	private Set<FileStat> outputFiles = new HashSet<FileStat>(0);
+	private long invocID;
+	private Set<FileStat> ionputFiles = new HashSet<FileStat>(0);
+	//private Set<FileStat> outputFiles = new HashSet<FileStat>(0);
 
 	public InvocStat() {
 	}
 
-	public InvocStat(long timestamp, long realTime, long taskID, String hostname) {
+	public InvocStat(Date timestamp, long realTime, long taskID, String hostname, long invocId) {
 		this.timestamp = timestamp;
 		this.realTime = realTime;
 		this.taskID = taskID;
 		this.hostname = hostname;
+		this.invocID = invocId;
 	}
 
 	
@@ -32,13 +34,21 @@ public class InvocStat {
 	public void setTaskId(long taskId) {
 		this.taskID = taskId;
 	}
+	
+	public long getInvocId() {
+		return this.invocID;
+	}
 
-	public long getTimestamp() {
+	public void setInvocId(long invocId) {
+		this.invocID = invocId;
+	}
+
+	public Date getTimestamp() {
 		return this.timestamp;
 	}
 
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
+	public void setTimestamp(Date date) {
+		this.timestamp = date;
 	}
 	
 	
@@ -50,28 +60,28 @@ public class InvocStat {
 		this.hostname = hostname;
 	}
 
-	public long getRealTime() {
+	public double getRealTime() {
 		return this.realTime;
 	}
 
-	public void setRealTime(long realtime) {
+	public void setRealTime(double realtime) {
 		this.realTime = realtime;
 	}
 	
-	public Set<FileStat> getOutputfiles() {
-		return this.outputFiles;
-	}
-
-	public void setOutputfiles(Set<FileStat> outputFiles) {
-		this.outputFiles = outputFiles;
-	}
+//	public Set<FileStat> getOutputfiles() {
+//		return this.outputFiles;
+//	}
+//
+//	public void setOutputfiles(Set<FileStat> outputFiles) {
+//		this.outputFiles = outputFiles;
+//	}
 	
-	public Set<FileStat> getInputfiles() {
-		return this.inputFiles;
+	public Set<FileStat> getIonputfiles() {
+		return this.ionputFiles;
 	}
 
-	public void setInputfiles(Set<FileStat> inputFiles) {
-		this.inputFiles = inputFiles;
+	public void setIonputfiles(Set<FileStat> ionputFiles) {
+		this.ionputFiles = ionputFiles;
 	}
 
 }
