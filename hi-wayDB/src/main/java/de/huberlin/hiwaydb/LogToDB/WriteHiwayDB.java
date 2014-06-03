@@ -23,7 +23,7 @@ import de.huberlin.hiwaydb.dal.Invocation;
 import de.huberlin.hiwaydb.dal.Task;
 import de.huberlin.hiwaydb.dal.Timestat;
 import de.huberlin.hiwaydb.dal.Workflowrun;
-import de.huberlin.wbi.cuneiform.core.invoc.JsonReportEntry;
+import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public class WriteHiwayDB {
 

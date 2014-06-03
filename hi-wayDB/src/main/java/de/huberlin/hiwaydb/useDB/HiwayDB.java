@@ -18,9 +18,7 @@ import de.huberlin.hiwaydb.dal.Invocation;
 import de.huberlin.hiwaydb.dal.Task;
 import de.huberlin.hiwaydb.dal.Timestat;
 import de.huberlin.hiwaydb.dal.Workflowrun;
-import de.huberlin.wbi.cuneiform.core.invoc.JsonReportEntry;
-import de.huberlin.wbi.hiway.common.FileStat;
-import de.huberlin.wbi.hiway.common.InvocStat;
+import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public class HiwayDB implements HiwayDBI {
 	private String configFile = "hibernate.cfg.xml";
@@ -28,6 +26,20 @@ public class HiwayDB implements HiwayDBI {
 	private SessionFactory dbSessionFactory = null;
 	private Transaction tx;
 	private Session session;
+
+	private String dbURL;
+	private String password;
+	private String username;
+
+	public HiwayDB(String username, String password, String dbURL) {
+		this.username = username;
+		this.password = password;
+		this.dbURL = dbURL;
+	}
+	
+	public HiwayDB() {
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public void logToDB(JsonReportEntry entry) throws Exception {
@@ -49,6 +61,7 @@ public class HiwayDB implements HiwayDBI {
 		return null;
 	}
 
+	@Override
 	public Set<String> getHostNames() {
 		// TODO Auto-generated method stub
 		return null;
@@ -72,7 +85,8 @@ public class HiwayDB implements HiwayDBI {
 		Query query = null;
 		List<Invocation> resultsInvoc = null;
 
-		query = session.createQuery("FROM Invocation I  WHERE I.task ="+ taskId);
+		query = session.createQuery("FROM Invocation I  WHERE I.task ="
+				+ taskId);
 		// join I.invocationId
 		resultsInvoc = query.list();
 
@@ -86,7 +100,7 @@ public class HiwayDB implements HiwayDBI {
 
 			invoc.setHostName(tempInvoc.getHostname());
 			invoc.setTaskId(taskId);
-			//invoc.setInvocId(tempInvoc.getInvocationId());
+			// invoc.setInvocId(tempInvoc.getInvocationId());
 
 			// Time
 			Timestat time;
@@ -107,33 +121,32 @@ public class HiwayDB implements HiwayDBI {
 				FileStat ioFile;
 
 				for (Timestat t : f.getTimestats()) {
-					
+
 					ioFile = new FileStat();
 					ioFile.setFileName(f.getName());
 					ioFile.setRealTime(t.getRealTime());
-					
-					if(t.getType()=="file-time-stagein")
-					{
+
+					if (t.getType() == "file-time-stagein") {
 						iFiles.add(ioFile);
 					}
-					
-					if(t.getType()=="file-time-stageout")
-					{
+
+					if (t.getType() == "file-time-stageout") {
 						oFiles.add(ioFile);
-					}						
+					}
 				}
 			}
 
 			invoc.setInputfiles(iFiles);
 			invoc.setOutputfiles(oFiles);
-			
+
 			resultList.add(invoc);
 		}
 
 		return resultList;
-	
+
 	}
 
+	@Override
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
 		// TODO Auto-generated method stub
 		return null;
@@ -152,8 +165,8 @@ public class HiwayDB implements HiwayDBI {
 		return null;
 	}
 
-	public Collection<InvocStat> getLogEntriesSinceForTasks(Set<Long> taskIds,
-			long sinceTimestamp) {
+	@Override
+	public Collection<InvocStat> getLogEntriesSinceForTasks(Set<Long> taskIds,long sinceTimestamp) {
 		// TODO Auto-generated method stub
 		return null;
 	}

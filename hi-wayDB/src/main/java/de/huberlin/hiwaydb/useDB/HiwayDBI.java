@@ -3,8 +3,7 @@ package de.huberlin.hiwaydb.useDB;
 import java.util.Collection;
 import java.util.Set;
 
-import de.huberlin.wbi.cuneiform.core.invoc.JsonReportEntry;
-import de.huberlin.wbi.hiway.common.InvocStat;
+import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public interface HiwayDBI {
 	

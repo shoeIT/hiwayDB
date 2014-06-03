@@ -14,7 +14,7 @@ import org.json.JSONException;
 
 import de.huberlin.hiwaydb.LogToDB.WriteHiwayDB;
 import de.huberlin.hiwaydb.dal.File;
-import de.huberlin.wbi.cuneiform.core.invoc.JsonReportEntry;
+import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public class Reader {
 
