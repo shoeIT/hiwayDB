@@ -42,10 +42,10 @@ public class HiwayDB implements HiwayDBI {
 	}
 
 	@Override
-	public void logToDB(JsonReportEntry entry) throws Exception {
+	public void logToDB(JsonReportEntry entry) {
 		WriteHiwayDB writer = new WriteHiwayDB(configFile);
-
-		writer.lineToDB(entry);
+		
+			writer.lineToDB(entry);	
 
 	}
 

@@ -27,7 +27,7 @@ public interface HiwayDBI {
 
 	public String getTaskName(long taskId);
 
-	public void logToDB(JsonReportEntry entry) throws Exception;
+	public void logToDB(JsonReportEntry entry);
 }
 
 

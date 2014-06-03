@@ -40,7 +40,7 @@ public class WriteHiwayDB {
 		dbSessionFactory = con.getDBSession();
 	}
 
-	public int lineToDB(JsonReportEntry logEntryRow) throws Exception {
+	public int lineToDB(JsonReportEntry logEntryRow){
 
 		try {
 
@@ -249,9 +249,9 @@ public class WriteHiwayDB {
 		} catch (Exception e) {
 			if (tx != null)
 				tx.rollback();
-			//e.printStackTrace();
-			throw e;
-			//return -1;
+			e.printStackTrace();
+			//throw e;
+			return -1;
 			//return 1;
 
 		} finally {
