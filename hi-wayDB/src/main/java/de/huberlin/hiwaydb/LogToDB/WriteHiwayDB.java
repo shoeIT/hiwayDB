@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import de.huberlin.hiwaydb.dal.DBConnection;
 import de.huberlin.hiwaydb.dal.File;
+import de.huberlin.hiwaydb.dal.Hiwayevent;
 import de.huberlin.hiwaydb.dal.Inoutput;
 import de.huberlin.hiwaydb.dal.Invocation;
 import de.huberlin.hiwaydb.dal.Task;
@@ -39,7 +40,7 @@ public class WriteHiwayDB {
 		dbSessionFactory = con.getDBSession();
 	}
 
-	public int lineToDB(JsonReportEntry logEntryRow) {
+	public int lineToDB(JsonReportEntry logEntryRow) throws Exception {
 
 		try {
 
@@ -72,10 +73,19 @@ public class WriteHiwayDB {
 				resultsTasks = query.list();
 			}
 
-			// long invocID = 0;
-			// if (logEntryRow.getInvocId() != 0) {
-			long invocID = logEntryRow.getInvocId();
-			// }
+			long invocID = 0;
+			
+			try
+			{
+				if (logEntryRow.getInvocId() != 0) {
+					 invocID = logEntryRow.getInvocId();
+				}
+			}
+			catch(NullPointerException e){
+			
+			}
+			
+			
 
 			query = session
 					.createQuery("FROM Invocation E WHERE E.invocationId ="
@@ -195,7 +205,7 @@ public class WriteHiwayDB {
 				session.save(output);
 				break;
 			case JsonReportEntry.KEY_INVOC_STDOUT:
-				invoc.setStandardOut(logEntryRow.getValue());
+				//invoc.setStandardOut(logEntryRow.getValue());
 				break;
 			case JsonReportEntry.KEY_INVOC_TIME:
 				valuePart = logEntryRow.getValueJsonObj();
@@ -219,6 +229,16 @@ public class WriteHiwayDB {
 						logEntryRow.getValue().replace('"', ' ').trim(), 10));
 
 				break;
+			case "hiway-event":
+				valuePart = logEntryRow.getValueJsonObj();
+
+				Hiwayevent he = new Hiwayevent();
+				he.setWorkflowrun(wfRun);
+				he.setContent(valuePart.toString());
+				he.setType(valuePart.get("type").toString());
+				session.save(he);
+
+				break;
 			default:
 				throw new Exception("Der Typ ist nicht bekannt.");
 			}
@@ -229,8 +249,10 @@ public class WriteHiwayDB {
 		} catch (Exception e) {
 			if (tx != null)
 				tx.rollback();
-			e.printStackTrace();
-			return -1;
+			//e.printStackTrace();
+			throw e;
+			//return -1;
+			//return 1;
 
 		} finally {
 			session.close();

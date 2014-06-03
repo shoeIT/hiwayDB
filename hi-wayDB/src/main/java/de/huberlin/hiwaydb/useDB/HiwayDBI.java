@@ -4,22 +4,34 @@ import java.util.Collection;
 import java.util.Set;
 
 import de.huberlin.wbi.cuneiform.core.invoc.JsonReportEntry;
+import de.huberlin.wbi.hiway.common.InvocStat;
 
 public interface HiwayDBI {
 	
 	public void setConfigFile(String configFile);
 	public String getConfigFile();
-	public int logToDB(JsonReportEntry entry);
-	public Set<InvocStat> getLogEntriesSinceForTask (long taskID, long sinceTimestamp );
-	public Set<InvocStat> getLogEntriesForTask (long taskID );
-	public Set<InvocStat> getLogEntriesSinceForTask (Collection<Long> taskID, long sinceTimestamp );
-	public Set<InvocStat> getLogEntriesForTask (Collection<Long> taskID );
 	
-	//	public Set<InvocStat> getLogEntriesSinceForTask (long taskID, long sinceTimestamp );
-//	public Set<InvocStat> getLogEntriesSinceForHost (String hostname, long sinceTimestamp );
-//	public Set<InvocStat> getLogEntriesSince (long sinceTimestamp );
-//	public Set<InvocStat> getLogEntries (long taskID );
-//	public Set<InvocStat> getLogEntriesAll();
+	public Set<String> getHostNames();
+
+	public Collection<InvocStat> getLogEntries();
+
+	public Collection<InvocStat> getLogEntriesForTask(long taskId);
+
+	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds);
+
+	public Collection<InvocStat> getLogEntriesSince(long sinceTimestamp);
+
+	public Collection<InvocStat> getLogEntriesSinceForTask(long taskId,
+			long sinceTimestamp);
+
+	public Collection<InvocStat> getLogEntriesSinceForTasks(Set<Long> taskIds,
+			long sinceTimestamp);
+
+	public Set<Long> getTaskIdsForWorkflow(String workflowName);
+
+	public String getTaskName(long taskId);
+
+	public void logToDB(JsonReportEntry entry) throws Exception;
 }
 
 

@@ -19,6 +19,8 @@ import de.huberlin.hiwaydb.dal.Task;
 import de.huberlin.hiwaydb.dal.Timestat;
 import de.huberlin.hiwaydb.dal.Workflowrun;
 import de.huberlin.wbi.cuneiform.core.invoc.JsonReportEntry;
+import de.huberlin.wbi.hiway.common.FileStat;
+import de.huberlin.wbi.hiway.common.InvocStat;
 
 public class HiwayDB implements HiwayDBI {
 	private String configFile = "hibernate.cfg.xml";
@@ -28,22 +30,38 @@ public class HiwayDB implements HiwayDBI {
 	private Session session;
 
 	@Override
-	public int logToDB(JsonReportEntry entry) {
+	public void logToDB(JsonReportEntry entry) throws Exception {
 		WriteHiwayDB writer = new WriteHiwayDB(configFile);
 
-		return writer.lineToDB(entry);
+		writer.lineToDB(entry);
 
 	}
 
 	@Override
-	public Set<InvocStat> getLogEntriesSinceForTask(long taskID,
-			long sinceTimestamp) {
+	public void setConfigFile(String configFile) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public String getConfigFile() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Set<String> getHostNames() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Set<InvocStat> getLogEntriesForTask(long taskID) {
+	public Collection<InvocStat> getLogEntries() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<InvocStat> getLogEntriesForTask(long taskId) {
 		if (dbSessionFactory == null) {
 			DBConnection con = new DBConnection(configFile);
 			dbSessionFactory = con.getDBSession();
@@ -54,85 +72,101 @@ public class HiwayDB implements HiwayDBI {
 		Query query = null;
 		List<Invocation> resultsInvoc = null;
 
-		query = session.createQuery("FROM Invocation I  WHERE I.task ="	+ taskID);
-		//join I.invocationId 
+		query = session.createQuery("FROM Invocation I  WHERE I.task ="+ taskId);
+		// join I.invocationId
 		resultsInvoc = query.list();
-		
+
 		Set<InvocStat> resultList = new HashSet<InvocStat>();
 		Invocation tempInvoc;
-		
-		
+
 		for (int i = 0; i < resultsInvoc.size(); i++) {
 			tempInvoc = resultsInvoc.get(i);
-			
+
 			InvocStat invoc = new InvocStat();
-			
-			invoc.setHostname(tempInvoc.getHostname());
-			invoc.setTaskId(taskID);
-			invoc.setInvocId(tempInvoc.getInvocationId());
-						
-			//Time
+
+			invoc.setHostName(tempInvoc.getHostname());
+			invoc.setTaskId(taskId);
+			//invoc.setInvocId(tempInvoc.getInvocationId());
+
+			// Time
 			Timestat time;
-			
-			for(Timestat t : tempInvoc.getTimestats())
-			{
-				if(t.getType().equalsIgnoreCase("invoc-time")){
+
+			for (Timestat t : tempInvoc.getTimestats()) {
+				if (t.getType().equalsIgnoreCase("invoc-time")) {
 					invoc.setRealTime(t.getRealTime());
-					invoc.setTimestamp(t.getDidOn());
+					invoc.setTimestamp(t.getDidOn().getTime());
 				}
 			}
-			
-			Set<FileStat> ioFiles = new HashSet<FileStat>();
-						
-			//Files
-			for(File f : tempInvoc.getFiles()){
-				
+
+			Set<FileStat> iFiles = new HashSet<FileStat>();
+			Set<FileStat> oFiles = new HashSet<FileStat>();
+
+			// Files
+			for (File f : tempInvoc.getFiles()) {
+
 				FileStat ioFile;
-				
-				for(Timestat t : f.getTimestats())
-				{
-						ioFile =  new FileStat();
-						ioFile.setFilename(f.getName());
-						ioFile.setRealTime(t.getRealTime());
-						ioFile.setType(t.getType());	
-						
-						ioFiles.add(ioFile);
-				}
-				
-			}
-			
-			invoc.setIonputfiles(ioFiles);
-			
+
+				for (Timestat t : f.getTimestats()) {
 					
-			resultList.add(invoc);
+					ioFile = new FileStat();
+					ioFile.setFileName(f.getName());
+					ioFile.setRealTime(t.getRealTime());
+					
+					if(t.getType()=="file-time-stagein")
+					{
+						iFiles.add(ioFile);
+					}
+					
+					if(t.getType()=="file-time-stageout")
+					{
+						oFiles.add(ioFile);
+					}						
+				}
+			}
+
+			invoc.setInputfiles(iFiles);
+			invoc.setOutputfiles(oFiles);
 			
+			resultList.add(invoc);
 		}
 
 		return resultList;
+	
+	}
+
+	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public Set<InvocStat> getLogEntriesSinceForTask(Collection<Long> taskID,
+	public Collection<InvocStat> getLogEntriesSince(long sinceTimestamp) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<InvocStat> getLogEntriesSinceForTask(long taskId,
+			long sinceTimestamp) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Collection<InvocStat> getLogEntriesSinceForTasks(Set<Long> taskIds,
 			long sinceTimestamp) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Set<InvocStat> getLogEntriesForTask(Collection<Long> taskID) {
+	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void setConfigFile(String configFile) {
-		this.configFile = configFile;
-
+	public String getTaskName(long taskId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
-
-	@Override
-	public String getConfigFile() {
-		return this.configFile;
-	}
-
 }
