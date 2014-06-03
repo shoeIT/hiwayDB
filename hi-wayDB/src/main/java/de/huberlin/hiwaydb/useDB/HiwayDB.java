@@ -45,8 +45,7 @@ public class HiwayDB implements HiwayDBI {
 	public void logToDB(JsonReportEntry entry) {
 		WriteHiwayDB writer = new WriteHiwayDB(configFile);
 		
-			writer.lineToDB(entry);	
-
+		writer.lineToDB(entry);	
 	}
 
 
