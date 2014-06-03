@@ -6,10 +6,7 @@ import java.util.Set;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public interface HiwayDBI {
-	
-	public void setConfigFile(String configFile);
-	public String getConfigFile();
-	
+
 	public Set<String> getHostNames();
 
 	public Collection<InvocStat> getLogEntries();

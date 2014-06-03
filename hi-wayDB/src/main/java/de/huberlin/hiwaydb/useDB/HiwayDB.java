@@ -49,17 +49,6 @@ public class HiwayDB implements HiwayDBI {
 
 	}
 
-	@Override
-	public void setConfigFile(String configFile) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public String getConfigFile() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public Set<String> getHostNames() {
