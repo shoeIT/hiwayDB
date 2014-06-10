@@ -79,8 +79,22 @@ public class HiwayDB implements HiwayDBI {
 
 	@Override
 	public Collection<InvocStat> getLogEntries() {
-		// TODO Auto-generated method stub ALLE
-		return null;
+		if (dbSessionFactory == null) {
+			DBConnection con = new DBConnection(configFile);
+			dbSessionFactory = con.getDBSession();
+		}
+
+		session = dbSessionFactory.openSession();
+
+		Query query = null;
+		List<Invocation> resultsInvoc = null;
+
+		query = session.createQuery("FROM Invocation I");
+		// join I.invocationId
+		resultsInvoc = query.list();
+
+		return createInvocStat(resultsInvoc);
+		
 	}
 
 	@Override
@@ -100,14 +114,39 @@ public class HiwayDB implements HiwayDBI {
 		// join I.invocationId
 		resultsInvoc = query.list();
 
-		return createInvocStat(resultsInvoc, taskId);
+		return createInvocStat(resultsInvoc);
 
 	}
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
-		// TODO Auto-generated method stub
-		return null;
+		if (dbSessionFactory == null) {
+			DBConnection con = new DBConnection(configFile);
+			dbSessionFactory = con.getDBSession();
+		}
+
+		session = dbSessionFactory.openSession();
+
+		Query query = null;
+		List<Invocation> resultsInvoc = null;
+		
+		String queryString = "FROM Invocation I  WHERE ";
+				
+		for(Long l : taskIds)
+		{
+			queryString+= " I.task = " + l.toString() + " or ";
+		}
+		
+		System.out.println(queryString.substring(0,queryString.length() - 4));
+		
+		query = session.createQuery(queryString.substring(0,queryString.length() - 4));
+		
+				
+		// join I.invocationId
+		resultsInvoc = query.list();
+
+		return createInvocStat(resultsInvoc);
+		
 	}
 
 	@Override
@@ -132,18 +171,65 @@ public class HiwayDB implements HiwayDBI {
 
 	@Override
 	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
-		// TODO Auto-generated method stub
-		return null;
+		if (dbSessionFactory == null) {
+			DBConnection con = new DBConnection(configFile);
+			dbSessionFactory = con.getDBSession();
+		}
+
+		session = dbSessionFactory.openSession();
+
+		Query query = null;
+		List<Workflowrun> resultsWF = null;
+
+		query = session.createQuery("FROM Workflowrun W WHERE W.wfName ='"+ workflowName+"'");
+
+		//query = session	.createQuery("select new list(hostname)  FROM Invocation I");
+
+		resultsWF =  query.list();
+		 	
+		Set<Long> tempResult = new HashSet<Long>();
+		
+		for(Workflowrun w : resultsWF)
+		{
+			//System.out.println("in getHostnames: " + i.getHostname());
+			for(Invocation i : w.getInvocations())
+			{
+				tempResult.add(i.getTask().getTaskId());
+			}
+		}
+
+		return tempResult;		
 	}
 
 	@Override
 	public String getTaskName(long taskId) {
-		// TODO Auto-generated method stub
-		return null;
+		if (dbSessionFactory == null) {
+			DBConnection con = new DBConnection(configFile);
+			dbSessionFactory = con.getDBSession();
+		}
+
+		session = dbSessionFactory.openSession();
+
+		Query query = null;
+		List<Task> resultsInvoc = null;
+
+		query = session.createQuery("FROM Task T  WHERE T.taskId ="
+				+ taskId);
+		// join I.invocationId
+		resultsInvoc = query.list();
+
+		if(!resultsInvoc.isEmpty())
+		{
+			return resultsInvoc.get(0).getTaskName();
+		}
+		else
+		{
+			return "";
+		}	
+		
 	}
 
-	private Collection<InvocStat> createInvocStat(List<Invocation> invocations,
-			long taskId) {
+	private Collection<InvocStat> createInvocStat(List<Invocation> invocations) {
 
 		Set<InvocStat> resultList = new HashSet<InvocStat>();
 		Invocation tempInvoc;
@@ -154,7 +240,7 @@ public class HiwayDB implements HiwayDBI {
 			InvocStat invoc = new InvocStat();
 
 			invoc.setHostName(tempInvoc.getHostname());
-			invoc.setTaskId(taskId);
+			invoc.setTaskId(tempInvoc.getTask().getTaskId());
 			// invoc.setInvocId(tempInvoc.getInvocationId());
 
 			// Time

@@ -7,8 +7,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.json.JSONException;
 
@@ -38,17 +40,48 @@ public class Reader {
 
 			System.out.println("getLogEntriesForTask:");
 			
-			for (InvocStat f : testGet.getLogEntriesForTask(1317103212)) {
-				System.out.println("Task: "
-						+ f.getTaskId() + " RealTime:" + f.getRealTime());
-			}
+//			for (InvocStat f : testGet.getLogEntriesForTask(1317103212)) {
+//				System.out.println("Task: "
+//						+ f.getTaskId() + " RealTime:" + f.getRealTime());
+//			}
+//			
+			
+System.out.println("getLogEntriesForTask mit Set:");
 
+			Set<Long> tasks = new HashSet<Long>();
+			tasks.add((long) 466017906);
+			tasks.add((long) 1317103212);
+			tasks.add((long) 1330859931);
+			
+					
+//			for (InvocStat f : testGet.getLogEntriesForTasks(tasks)) {
+//				System.out.println("Task: "
+//						+ f.getTaskId() + " RealTime:" + f.getRealTime());
+//			}
 			
 	System.out.println("getHostnames:");
 			
 			for (String f : testGet.getHostNames()){
 				System.out.println("Hostname: " + f );
 			}
+			
+			
+			System.out.println("TaskIDs for Workflow:variant-call-09.cf");
+					
+					for (Long f : testGet.getTaskIdsForWorkflow("\"variant-call-09.cf\"")){
+						System.out.println("ID: " + f );
+					}
+			
+					System.out.println("getTaskNames for ID :");
+				System.out.println("466017906: " + testGet.getTaskName(466017906) );
+				System.out.println("1357269702: " + testGet.getTaskName(1357269702) );
+					
+//			System.out.println("All Invocs:");
+//					
+//			for (InvocStat f : testGet.getLogEntries()) {
+//				System.out.println("Task: "
+//						+ f.getTaskId() + " RealTime:" + f.getRealTime());
+//			}
 
 			
 			WriteHiwayDB writer = null;
@@ -144,7 +177,7 @@ public class Reader {
 
 		} catch (Exception e) {
 
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		finally
 		{
