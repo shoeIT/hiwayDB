@@ -36,7 +36,7 @@ public class HiwayDB implements HiwayDBI {
 		this.password = password;
 		this.dbURL = dbURL;
 	}
-	
+
 	public HiwayDB() {
 		// TODO Auto-generated constructor stub
 	}
@@ -44,16 +44,37 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public void logToDB(JsonReportEntry entry) {
 		WriteHiwayDB writer = new WriteHiwayDB(configFile);
-		
-		writer.lineToDB(entry);	
-	}
 
+		writer.lineToDB(entry);
+	}
 
 	@Override
 	public Set<String> getHostNames() {
-		// TODO Auto-generated method stub
-		//alle Hostnames, die so gespeichert sind
-		return null;
+		if (dbSessionFactory == null) {
+			DBConnection con = new DBConnection(configFile);
+			dbSessionFactory = con.getDBSession();
+		}
+
+		session = dbSessionFactory.openSession();
+
+		Query query = null;
+		List<Invocation> resultsInvoc = null;
+
+		query = session.createQuery("FROM Invocation I");
+
+		//query = session	.createQuery("select new list(hostname)  FROM Invocation I");
+
+		resultsInvoc =  query.list();
+		 	
+		Set<String> tempResult = new HashSet();
+		
+		for(Invocation i : resultsInvoc)
+		{
+			//System.out.println("in getHostnames: " + i.getHostname());
+			tempResult.add(i.getHostname())	;		
+		}
+
+		return tempResult;
 	}
 
 	@Override
@@ -79,11 +100,56 @@ public class HiwayDB implements HiwayDBI {
 		// join I.invocationId
 		resultsInvoc = query.list();
 
+		return createInvocStat(resultsInvoc, taskId);
+
+	}
+
+	@Override
+	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<InvocStat> getLogEntriesSince(long sinceTimestamp) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<InvocStat> getLogEntriesSinceForTask(long taskId,
+			long sinceTimestamp) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<InvocStat> getLogEntriesSinceForTasks(Set<Long> taskIds,
+			long sinceTimestamp) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getTaskName(long taskId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Collection<InvocStat> createInvocStat(List<Invocation> invocations,
+			long taskId) {
+
 		Set<InvocStat> resultList = new HashSet<InvocStat>();
 		Invocation tempInvoc;
 
-		for (int i = 0; i < resultsInvoc.size(); i++) {
-			tempInvoc = resultsInvoc.get(i);
+		for (int i = 0; i < invocations.size(); i++) {
+			tempInvoc = invocations.get(i);
 
 			InvocStat invoc = new InvocStat();
 
@@ -123,52 +189,13 @@ public class HiwayDB implements HiwayDBI {
 						oFiles.add(ioFile);
 					}
 				}
+
+				invoc.setInputfiles(iFiles);
+				invoc.setOutputfiles(oFiles);
+
+				resultList.add(invoc);
 			}
-
-			invoc.setInputfiles(iFiles);
-			invoc.setOutputfiles(oFiles);
-
-			resultList.add(invoc);
 		}
-
 		return resultList;
-
-	}
-
-	@Override
-	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Collection<InvocStat> getLogEntriesSince(long sinceTimestamp) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Collection<InvocStat> getLogEntriesSinceForTask(long taskId,
-			long sinceTimestamp) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Collection<InvocStat> getLogEntriesSinceForTasks(Set<Long> taskIds,long sinceTimestamp) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getTaskName(long taskId) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

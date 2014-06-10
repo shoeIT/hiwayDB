@@ -53,7 +53,6 @@ public class InvocStat {
 	}
 
 	public InvocStat(long timestamp, long taskId) {
-		this();
 		this.timestamp = timestamp;
 		this.taskId = taskId;
 	}

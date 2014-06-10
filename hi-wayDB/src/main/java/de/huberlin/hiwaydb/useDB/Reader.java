@@ -36,11 +36,21 @@ public class Reader {
 
 			System.out.println("go...");
 
-//			for (InvocStat f : testGet.getLogEntriesForTask(1317103212)) {
-//				System.out.println("Invoc: " + f.getInvocId() + " , Task: "
-//						+ f.getTaskId() + " RealTime:" + f.getRealTime());
-//			}
+			System.out.println("getLogEntriesForTask:");
+			
+			for (InvocStat f : testGet.getLogEntriesForTask(1317103212)) {
+				System.out.println("Task: "
+						+ f.getTaskId() + " RealTime:" + f.getRealTime());
+			}
 
+			
+	System.out.println("getHostnames:");
+			
+			for (String f : testGet.getHostNames()){
+				System.out.println("Hostname: " + f );
+			}
+
+			
 			WriteHiwayDB writer = null;
 
 			if (args.length == 0) {
@@ -56,78 +66,80 @@ public class Reader {
 						writer.lineToDB(new JsonReportEntry(line));
 					}
 				}
-			} else {
-				System.out.println("Eingabe: Name der logdatei:  " + args[0]
-						+ " Config: " + args[1]);
-
-				if (args[1] != "") {
-					writer = new WriteHiwayDB(args[1]);
-				} else {
-					writer = new WriteHiwayDB("hibernate.cfg.xml");
-				}
-
-				// String input = "D:\\Temp\\" + args[0];
-				//e00_01_3r_variant-call-setup-09_001
-				//e00_02_2r_variant-call-setup-09_001
-				//e11_11_1x_variant-call-09_003
-				//
-				//e11_16_1x2x3x5x6x7x_variant-call-09_005
-				//e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
-				//String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
-				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e11_13_1x2x3x_variant-call-09_004.log";
-
-				System.out.println("Input: " + input);
-				
-				if (input.endsWith(".log")) {
-
-					fFilePath = Paths.get(input);
-
-					int result = 0;
-					int i = 0;
-					try (Scanner scanner = new Scanner(fFilePath,
-							ENCODING.name())) {
-						while (scanner.hasNextLine()) {
-							i++;
-							System.out.println("line " + i);
-
-							String line = scanner.nextLine();
-
-							
-							line = line.replaceAll("\0", ""); 
-									
-							if (!line.isEmpty()) {
-
-								try
-								{
-									result = writer.lineToDB(new JsonReportEntry(line));
-								}
-								catch(JSONException e)
-								{
-									System.out.println("FEHLER!!!!!!!!!!!!: " + line);
-									jsonFehler.add("Z" + i + " | " + e.getMessage());
-								}
-								catch(org.hibernate.exception.ConstraintViolationException e)
-								{
-									System.out.println("FEHLER!!!!!!!!!!!!: " + line);
-									fehler.add("Z" + i + " | " + e.getMessage());
-								}
-								catch(Exception e)
-								{
-									System.out.println("FEHLER!!!!!!!!!!!!: " + line);
-									fehler.add("Z" + i + " | " + e.getMessage());
-								}							
-							}
-
-							if (result == -1)						
-								break;
-						}
-					}
-				} else {
+			} 
+			//else {
+//				System.out.println("Eingabe: Name der logdatei:  " + args[0]
+//						+ " Config: " + args[1]);
+//
+//				if (args[1] != "") {
+//					writer = new WriteHiwayDB(args[1]);
+//				} else {
+//					writer = new WriteHiwayDB("hibernate.cfg.xml");
+//				}
+//
+//				// String input = "D:\\Temp\\" + args[0];
+//				//e00_01_3r_variant-call-setup-09_001
+//				//e00_02_2r_variant-call-setup-09_001
+//				//e11_11_1x_variant-call-09_003
+//				//
+//				//e11_16_1x2x3x5x6x7x_variant-call-09_005
+//				//e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
+//				//String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
+//				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e11_13_1x2x3x_variant-call-09_004.log";
+//
+//				System.out.println("Input: " + input);
+//				
+//				if (input.endsWith(".log")) {
+//
+//					fFilePath = Paths.get(input);
+//
+//					int result = 0;
+//					int i = 0;
+//					try (Scanner scanner = new Scanner(fFilePath,
+//							ENCODING.name())) {
+//						while (scanner.hasNextLine()) {
+//							i++;
+//							System.out.println("line " + i);
+//
+//							String line = scanner.nextLine();
+//
+//							
+//							line = line.replaceAll("\0", ""); 
+//									
+//							if (!line.isEmpty()) {
+//
+//								try
+//								{
+//									result = writer.lineToDB(new JsonReportEntry(line));
+//								}
+//								catch(JSONException e)
+//								{
+//									System.out.println("FEHLER!!!!!!!!!!!!: " + line);
+//									jsonFehler.add("Z" + i + " | " + e.getMessage());
+//								}
+//								catch(org.hibernate.exception.ConstraintViolationException e)
+//								{
+//									System.out.println("FEHLER!!!!!!!!!!!!: " + line);
+//									fehler.add("Z" + i + " | " + e.getMessage());
+//								}
+//								catch(Exception e)
+//								{
+//									System.out.println("FEHLER!!!!!!!!!!!!: " + line);
+//									fehler.add("Z" + i + " | " + e.getMessage());
+//								}							
+//							}
+//
+//							if (result == -1)						
+//								break;
+//						}
+//					}
+				//}
+			else {
 					System.out
 							.println("Eingabe: keine Logdatei, String direkt uebergeben.");
 					writer.lineToDB(new JsonReportEntry(args[0].toString()));
 				}
-			}
+			//}
 			System.out.println("juchei fertig...");
 
 		} catch (Exception e) {
