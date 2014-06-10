@@ -31,16 +31,15 @@ public class WriteHiwayDB {
 	private Transaction tx;
 	private Session session;
 	private String configFile;
-	
-	
+
 	public WriteHiwayDB(String configFile) {
-		
+
 		DBConnection con = new DBConnection(configFile);
-		
+
 		dbSessionFactory = con.getDBSession();
 	}
 
-	public int lineToDB(JsonReportEntry logEntryRow){
+	public int lineToDB(JsonReportEntry logEntryRow) {
 
 		try {
 
@@ -52,6 +51,7 @@ public class WriteHiwayDB {
 			List<Task> resultsTasks = null;
 			List<Workflowrun> resultsWfRun = null;
 			List<File> resultsFile = null;
+			Timestat fileTime = null;
 
 			String runID = null;
 			if (logEntryRow.getRunId() != null) {
@@ -73,19 +73,11 @@ public class WriteHiwayDB {
 				resultsTasks = query.list();
 			}
 
-			long invocID = 0;
-			
-			try
-			{
-				if (logEntryRow.getInvocId() != 0) {
-					 invocID = logEntryRow.getInvocId();
-				}
+			Long invocID = (long) 0;
+
+			if (logEntryRow.hasInvocId()) {
+				invocID = logEntryRow.getInvocId();
 			}
-			catch(NullPointerException e){
-			
-			}
-			
-			
 
 			query = session
 					.createQuery("FROM Invocation E WHERE E.invocationId ="
@@ -205,8 +197,29 @@ public class WriteHiwayDB {
 				session.save(output);
 				break;
 			case JsonReportEntry.KEY_INVOC_STDOUT:
-				//invoc.setStandardOut(logEntryRow.getValue());
+				// invoc.setStandardOut(logEntryRow.getValue());
 				break;
+				
+				
+			case "file-time-stagein":
+				valuePart = logEntryRow.getValueJsonObj();
+
+				fileTime = GetTimeStat(valuePart);
+				fileTime.setType("file-time-stagein");
+				//fileTime.setInvocation(invoc);
+				fileTime.setFile(file);
+				session.save(fileTime);
+				break;
+			case "file-time-stageout":
+				valuePart = logEntryRow.getValueJsonObj();
+
+				fileTime = GetTimeStat(valuePart);
+				fileTime.setType("file-time-stagein");
+				//fileTime.setInvocation(invoc);
+				fileTime.setFile(file);
+				session.save(fileTime);
+				break;
+				
 			case JsonReportEntry.KEY_INVOC_TIME:
 				valuePart = logEntryRow.getValueJsonObj();
 
@@ -250,9 +263,9 @@ public class WriteHiwayDB {
 			if (tx != null)
 				tx.rollback();
 			e.printStackTrace();
-			//throw e;
+			// throw e;
 			return -1;
-			//return 1;
+			// return 1;
 
 		} finally {
 			session.close();

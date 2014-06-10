@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS `Invocation` (
   `InvocationID` BIGINT UNSIGNED NOT NULL,
   `hostname` VARCHAR(250) NULL,
   `scheduleTime` BIGINT UNSIGNED NULL,
-  `StandardOut` TEXT NULL,
-  `StandardError` TEXT NULL,
+  `StandardOut` LONGTEXT NULL,
+  `StandardError` LONGTEXT NULL,
   `WorkflowRun_ID` BIGINT UNSIGNED NOT NULL,
   `Task_TaskID` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`InvocationID`),
@@ -150,11 +150,12 @@ SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `InOutput` (
   `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Keypart` TEXT NOT NULL,
-  `Content` TEXT NOT NULL,
+  `Content` LONGTEXT NOT NULL,
   `Invocation_InvocationID` BIGINT UNSIGNED NOT NULL,
   `Type` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`ID`),
   INDEX `fk_Output_Invocation1_idx` (`Invocation_InvocationID` ASC),
+  UNIQUE INDEX `NoDouble` (`Keypart`(100) ASC, `Invocation_InvocationID` ASC, `Type`(45) ASC),
   CONSTRAINT `fk_Output_Invocation1`
     FOREIGN KEY (`Invocation_InvocationID`)
     REFERENCES `Invocation` (`InvocationID`)
@@ -172,7 +173,7 @@ DROP TABLE IF EXISTS `UserEvent` ;
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `UserEvent` (
   `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `Content` TEXT NOT NULL,
+  `Content` LONGTEXT NOT NULL,
   `Invocation_InvocationID` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`ID`),
   INDEX `fk_UserEvent_Invocation1_idx` (`Invocation_InvocationID` ASC),
@@ -193,7 +194,7 @@ DROP TABLE IF EXISTS `HiwayEvent` ;
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `HiwayEvent` (
   `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `Content` TEXT NOT NULL,
+  `Content` LONGTEXT NOT NULL,
   `Type` VARCHAR(200) NOT NULL,
   `WorkflowRun_ID` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`ID`),

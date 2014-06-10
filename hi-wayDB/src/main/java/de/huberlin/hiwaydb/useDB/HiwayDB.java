@@ -52,12 +52,13 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Set<String> getHostNames() {
 		// TODO Auto-generated method stub
+		//alle Hostnames, die so gespeichert sind
 		return null;
 	}
 
 	@Override
 	public Collection<InvocStat> getLogEntries() {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub ALLE
 		return null;
 	}
 

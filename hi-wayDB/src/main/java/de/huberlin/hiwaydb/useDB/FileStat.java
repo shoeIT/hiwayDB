@@ -38,6 +38,7 @@ public class FileStat {
 	private double realTime;
 	private long size;
 
+	
 	public FileStat() {
 	}
 

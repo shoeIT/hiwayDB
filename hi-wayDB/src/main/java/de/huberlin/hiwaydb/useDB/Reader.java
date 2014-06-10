@@ -12,6 +12,8 @@ import java.util.Scanner;
 
 import org.json.JSONException;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+
 import de.huberlin.hiwaydb.LogToDB.WriteHiwayDB;
 import de.huberlin.hiwaydb.dal.File;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
@@ -68,9 +70,11 @@ public class Reader {
 				//e00_01_3r_variant-call-setup-09_001
 				//e00_02_2r_variant-call-setup-09_001
 				//e11_11_1x_variant-call-09_003
-				//e11_13_1x2x3x_variant-call-09_004
+				//
 				//e11_16_1x2x3x5x6x7x_variant-call-09_005
-				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
+				//e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
+				//String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
+				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e11_13_1x2x3x_variant-call-09_004.log";
 
 				System.out.println("Input: " + input);
 				
@@ -89,7 +93,7 @@ public class Reader {
 							String line = scanner.nextLine();
 
 							
-							line = line.replace(" ", "");
+							line = line.replaceAll("\0", ""); 
 									
 							if (!line.isEmpty()) {
 
@@ -99,20 +103,23 @@ public class Reader {
 								}
 								catch(JSONException e)
 								{
-									//System.out.println("FEHLER!!!!!!!!!!!!: " + line);
+									System.out.println("FEHLER!!!!!!!!!!!!: " + line);
 									jsonFehler.add("Z" + i + " | " + e.getMessage());
+								}
+								catch(org.hibernate.exception.ConstraintViolationException e)
+								{
+									System.out.println("FEHLER!!!!!!!!!!!!: " + line);
+									fehler.add("Z" + i + " | " + e.getMessage());
 								}
 								catch(Exception e)
 								{
-									//System.out.println("FEHLER!!!!!!!!!!!!: " + line);
+									System.out.println("FEHLER!!!!!!!!!!!!: " + line);
 									fehler.add("Z" + i + " | " + e.getMessage());
-								}
-							
-
+								}							
 							}
 
-//							if (result == -1)
-//								break;
+							if (result == -1)						
+								break;
 						}
 					}
 				} else {
@@ -125,7 +132,7 @@ public class Reader {
 
 		} catch (Exception e) {
 
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		finally
 		{
