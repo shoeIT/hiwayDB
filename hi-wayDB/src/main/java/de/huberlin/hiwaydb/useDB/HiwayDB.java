@@ -165,7 +165,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesSinceForTasks(Set<Long> taskIds,
 			long sinceTimestamp) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stubdd
 		return null;
 	}
 
