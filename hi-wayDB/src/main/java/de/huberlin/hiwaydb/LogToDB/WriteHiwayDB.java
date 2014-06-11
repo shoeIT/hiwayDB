@@ -155,24 +155,23 @@ public class WriteHiwayDB {
 			JSONObject valuePart;
 			switch (key) {
 			case "invoc-host":
-				invoc.setHostname(logEntryRow.getValue());
+				invoc.setHostname(logEntryRow.getValueRawString());
 				break;
 			case "wf-name":
-				wfRun.setWfName(logEntryRow.getValue());
+				wfRun.setWfName(logEntryRow.getValueRawString());
 				break;
 			case "wf-time":
-				String val = logEntryRow.getValue().replace('"', ' ').trim();
+				String val = logEntryRow.getValueRawString();
 				Long test = Long.parseLong(val, 10);
 
 				wfRun.setWfTime(test);
 				break;
 			case "invoc-time-sched":
-				invoc.setScheduleTime(Long.parseLong(logEntryRow.getValue()
-						.replace('"', ' ').trim(), 10));
+				invoc.setScheduleTime(Long.parseLong(logEntryRow.getValueRawString(), 10));
 				break;
 
 			case JsonReportEntry.KEY_INVOC_STDERR:
-				invoc.setStandardError(logEntryRow.getValue());
+				invoc.setStandardError(logEntryRow.getValueRawString());
 				break;
 
 			case "invoc-exec":
@@ -233,13 +232,13 @@ public class WriteHiwayDB {
 			case "file-size-stagein":
 
 				file.setSize(Long.parseLong(
-						logEntryRow.getValue().replace('"', ' ').trim(), 10));
+						logEntryRow.getValueRawString(), 10));
 
 				break;
 			case "file-size-stageout":
 
 				file.setSize(Long.parseLong(
-						logEntryRow.getValue().replace('"', ' ').trim(), 10));
+						logEntryRow.getValueRawString(), 10));
 
 				break;
 			case "hiway-event":
