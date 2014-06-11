@@ -52,13 +52,14 @@ public class InvocStat {
 		outputFiles = new HashMap<>();
 	}
 
-	public InvocStat(long timestamp, long taskId) {
-		this.timestamp = timestamp;
+	public InvocStat(long taskId) {
+		this.timestamp = -1;
 		this.taskId = taskId;
 	}
 
 	public InvocStat(long timestamp, long realTime, long taskId, String hostName) {
-		this(timestamp, taskId);
+		this(taskId);
+		this.timestamp = timestamp;
 		this.realTime = realTime;
 		this.hostName = hostName;
 	}
@@ -127,16 +128,17 @@ public class InvocStat {
 		}
 	}
 
-	public void setRealTime(double d) {
+	public void setRealTime(double d, long timestamp) {
 		this.realTime = d;
+		setTimestamp(timestamp);
 	}
 
 	public void setTaskId(long taskId) {
 		this.taskId = taskId;
 	}
 
-	public void setTimestamp(long date) {
-		this.timestamp = date;
+	private void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 }

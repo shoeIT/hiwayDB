@@ -248,8 +248,7 @@ public class HiwayDB implements HiwayDBI {
 
 			for (Timestat t : tempInvoc.getTimestats()) {
 				if (t.getType().equalsIgnoreCase("invoc-time")) {
-					invoc.setRealTime(t.getRealTime());
-					invoc.setTimestamp(t.getDidOn().getTime());
+					invoc.setRealTime(t.getRealTime(), t.getDidOn().getTime());
 				}
 			}
 
