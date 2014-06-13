@@ -25,7 +25,7 @@
 		<mapping class="de.huberlin.hiwaydb.dal.File" />
 		<mapping class="de.huberlin.hiwaydb.dal.Inoutput" />
 		
-		<mapping class="de.huberlin.hiwaydb.dal.Timestat" />
+		
 		<mapping class="de.huberlin.hiwaydb.dal.Userevent" />
        
        <!--

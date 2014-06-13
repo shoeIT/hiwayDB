@@ -21,8 +21,8 @@ import de.huberlin.hiwaydb.dal.Hiwayevent;
 import de.huberlin.hiwaydb.dal.Inoutput;
 import de.huberlin.hiwaydb.dal.Invocation;
 import de.huberlin.hiwaydb.dal.Task;
-import de.huberlin.hiwaydb.dal.Timestat;
 import de.huberlin.hiwaydb.dal.Workflowrun;
+import de.huberlin.hiwaydb.useDB.HiwayDBI;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public class WriteHiwayDB {
@@ -51,9 +51,10 @@ public class WriteHiwayDB {
 			List<Task> resultsTasks = null;
 			List<Workflowrun> resultsWfRun = null;
 			List<File> resultsFile = null;
-			Timestat fileTime = null;
-
+		
 			String runID = null;
+			Long wfId = 0l
+					;
 			if (logEntryRow.getRunId() != null) {
 				runID = logEntryRow.getRunId().toString();
 
@@ -62,6 +63,12 @@ public class WriteHiwayDB {
 								+ runID + "'");
 
 				resultsWfRun = query.list();
+			}
+			
+			Workflowrun wfRun = null;
+			if (resultsWfRun != null && !resultsWfRun.isEmpty()) {
+				wfRun = resultsWfRun.get(0);
+				wfId = wfRun.getId();
 			}
 
 			long taskID = 0;
@@ -81,7 +88,7 @@ public class WriteHiwayDB {
 
 			query = session
 					.createQuery("FROM Invocation E WHERE E.invocationId ="
-							+ invocID);
+							+ invocID + " and E.workflowrun='"+wfId+"'");
 			List<Invocation> resultsInvoc = query.list();
 
 			Long timestampTemp = logEntryRow.getTimestamp();
@@ -95,10 +102,7 @@ public class WriteHiwayDB {
 				resultsFile = query.list();
 			}
 
-			Workflowrun wfRun = null;
-			if (resultsWfRun != null && !resultsWfRun.isEmpty()) {
-				wfRun = resultsWfRun.get(0);
-			}
+			
 			Task task = null;
 			if (resultsTasks != null && !resultsTasks.isEmpty()) {
 				task = resultsTasks.get(0);
@@ -151,10 +155,13 @@ public class WriteHiwayDB {
 			}
 
 			String key = logEntryRow.getKey();
+		
+			//public static final String KEY_INVOC_TIME_STAGEIN = "invoc-time-stagein";
+			//public static final String KEY_INVOC_TIME_STAGEOUT = "invoc-time-stageout";
 
 			JSONObject valuePart;
 			switch (key) {
-			case "invoc-host":
+			case HiwayDBI.KEY_INVOC_HOST:
 				invoc.setHostname(logEntryRow.getValueRawString());
 				break;
 			case "wf-name":
@@ -166,7 +173,7 @@ public class WriteHiwayDB {
 
 				wfRun.setWfTime(test);
 				break;
-			case "invoc-time-sched":
+			case HiwayDBI.KEY_INVOC_TIME_SCHED:
 				invoc.setScheduleTime(Long.parseLong(logEntryRow.getValueRawString(), 10));
 				break;
 
@@ -195,38 +202,35 @@ public class WriteHiwayDB {
 				output.setType("output");
 				session.save(output);
 				break;
+				
 			case JsonReportEntry.KEY_INVOC_STDOUT:
-				// invoc.setStandardOut(logEntryRow.getValue());
+				invoc.setStandardOut(logEntryRow.getValueRawString());
 				break;
-				
-				
-			case "file-time-stagein":
+								
+			case HiwayDBI.KEY_FILE_TIME_STAGEIN:
 				valuePart = logEntryRow.getValueJsonObj();
-
-				fileTime = GetTimeStat(valuePart);
-				fileTime.setType("file-time-stagein");
-				//fileTime.setInvocation(invoc);
-				fileTime.setFile(file);
-				session.save(fileTime);
+				file.setRealTimeIn(GetTimeStat(valuePart));							
+				
 				break;
-			case "file-time-stageout":
+			case HiwayDBI.KEY_FILE_TIME_STAGEOUT:
 				valuePart = logEntryRow.getValueJsonObj();
-
-				fileTime = GetTimeStat(valuePart);
-				fileTime.setType("file-time-stagein");
-				//fileTime.setInvocation(invoc);
-				fileTime.setFile(file);
-				session.save(fileTime);
+				valuePart = logEntryRow.getValueJsonObj();
+				
+				file.setRealTimeOut(GetTimeStat(valuePart));	
 				break;
 				
 			case JsonReportEntry.KEY_INVOC_TIME:
 				valuePart = logEntryRow.getValueJsonObj();
 
-				Timestat invocTime = GetTimeStat(valuePart);
-				invocTime.setType("invoc-time");
-				invocTime.setInvocation(invoc);
-
-				session.save(invocTime);
+				try				
+				{
+				invoc.setRealTime( GetTimeStat(valuePart));
+				}
+				catch (NumberFormatException e)
+				{
+					invoc.setRealTime(1l);
+				}
+				
 				break;
 
 			case "file-size-stagein":
@@ -241,7 +245,7 @@ public class WriteHiwayDB {
 						logEntryRow.getValueRawString(), 10));
 
 				break;
-			case "hiway-event":
+			case HiwayDBI.KEY_HIWAY_EVENT :
 				valuePart = logEntryRow.getValueJsonObj();
 
 				Hiwayevent he = new Hiwayevent();
@@ -271,47 +275,47 @@ public class WriteHiwayDB {
 		}
 	}
 
-	private static Timestat GetTimeStat(JSONObject valuePart) {
+	private static Long GetTimeStat(JSONObject valuePart) {
 
-		Timestat timeStat = new Timestat();
-		timeStat.setNminPageFault(Long.parseLong(valuePart.get("nMinPageFault")
-				.toString(), 10));
-		timeStat.setNforcedContextSwitch(Long.parseLong(
-				valuePart.get("nForcedContextSwitch").toString(), 10));
-		timeStat.setAvgDataSize(Long.parseLong(valuePart.get("avgDataSize")
-				.toString(), 10));
-		timeStat.setNsocketRead(Long.parseLong(valuePart.get("nSocketRead")
-				.toString(), 10));
-		timeStat.setNioWrite(Long.parseLong(valuePart.get("nIoWrite")
-				.toString(), 10));
-		timeStat.setAvgResidentSetSize(Long.parseLong(
-				valuePart.get("avgResidentSetSize").toString(), 10));
-		timeStat.setNmajPageFault(Long.parseLong(valuePart.get("nMajPageFault")
-				.toString(), 10));
-		timeStat.setNwaitContextSwitch(Long.parseLong(
-				valuePart.get("nWaitContextSwitch").toString(), 10));
-		timeStat.setUserTime(Double.parseDouble(valuePart.get("userTime")
-				.toString()));
-		timeStat.setRealTime(Double.parseDouble(valuePart.get("realTime")
-				.toString()));
-		timeStat.setSysTime(Double.parseDouble(valuePart.get("sysTime")
-				.toString()));
-		timeStat.setNsocketWrite(Long.parseLong(valuePart.get("nSocketWrite")
-				.toString(), 10));
-		timeStat.setMaxResidentSetSize(Long.parseLong(
-				valuePart.get("maxResidentSetSize").toString(), 10));
-		timeStat.setAvgStackSize(Long.parseLong(valuePart.get("avgStackSize")
-				.toString(), 10));
-		timeStat.setNswapOutMainMem(Long.parseLong(
-				valuePart.get("nSwapOutMainMem").toString(), 10));
-		timeStat.setNioRead(Long.parseLong(valuePart.get("nIoRead").toString(),
-				10));
-		timeStat.setNsignal(Long.parseLong(valuePart.get("nSignal").toString(),
-				10));
-		timeStat.setAvgTextSize(Long.parseLong(valuePart.get("avgTextSize")
-				.toString(), 10));
+		//Timestat timeStat = new Timestat();
+//		timeStat.setNminPageFault(Long.parseLong(valuePart.get("nMinPageFault")
+//				.toString(), 10));
+//		timeStat.setNforcedContextSwitch(Long.parseLong(
+//				valuePart.get("nForcedContextSwitch").toString(), 10));
+//		timeStat.setAvgDataSize(Long.parseLong(valuePart.get("avgDataSize")
+//				.toString(), 10));
+//		timeStat.setNsocketRead(Long.parseLong(valuePart.get("nSocketRead")
+//				.toString(), 10));
+//		timeStat.setNioWrite(Long.parseLong(valuePart.get("nIoWrite")
+//				.toString(), 10));
+//		timeStat.setAvgResidentSetSize(Long.parseLong(
+//				valuePart.get("avgResidentSetSize").toString(), 10));
+//		timeStat.setNmajPageFault(Long.parseLong(valuePart.get("nMajPageFault")
+//				.toString(), 10));
+//		timeStat.setNwaitContextSwitch(Long.parseLong(
+//				valuePart.get("nWaitContextSwitch").toString(), 10));
+//		timeStat.setUserTime(Double.parseDouble(valuePart.get("userTime")
+//				.toString()));
+//		timeStat.setRealTime(Double.parseDouble(valuePart.get("realTime")
+//				.toString()));
+//		timeStat.setSysTime(Double.parseDouble(valuePart.get("sysTime")
+//				.toString()));
+//		timeStat.setNsocketWrite(Long.parseLong(valuePart.get("nSocketWrite")
+//				.toString(), 10));
+//		timeStat.setMaxResidentSetSize(Long.parseLong(
+//				valuePart.get("maxResidentSetSize").toString(), 10));
+//		timeStat.setAvgStackSize(Long.parseLong(valuePart.get("avgStackSize")
+//				.toString(), 10));
+//		timeStat.setNswapOutMainMem(Long.parseLong(
+//				valuePart.get("nSwapOutMainMem").toString(), 10));
+//		timeStat.setNioRead(Long.parseLong(valuePart.get("nIoRead").toString(),
+//				10));
+//		timeStat.setNsignal(Long.parseLong(valuePart.get("nSignal").toString(),
+//				10));
+//		timeStat.setAvgTextSize(Long.parseLong(valuePart.get("avgTextSize")
+//				.toString(), 10));
 
-		return timeStat;
+		return Long.parseLong(valuePart.get("realTime").toString(), 10);
 	}
 
 }

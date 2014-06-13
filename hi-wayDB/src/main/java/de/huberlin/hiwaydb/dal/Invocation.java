@@ -2,10 +2,12 @@ package de.huberlin.hiwaydb.dal;
 
 // Generated 19.05.2014 12:56:25 by Hibernate Tools 3.4.0.CR1
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -17,24 +19,29 @@ import javax.persistence.OneToMany;
 public class Invocation implements java.io.Serializable {
 
 	@Id
-	private long invocationId;
+	@GeneratedValue
+	private Long id;
+	private Long invocationId;
 	@ManyToOne
 	private Task task;
 	@ManyToOne
 	private Workflowrun workflowrun;
-	
+
 	private String hostname;
 	private Long scheduleTime;
 	private String standardOut;
 	private String standardError;
-	
-	@OneToMany(mappedBy="invocation")
+
+	private Long realTime;
+	private Long realTimeIn;
+	private Long realTimeOut;
+	private Date didOn;
+
+	@OneToMany(mappedBy = "invocation")
 	private Set<Inoutput> inoutputs = new HashSet<Inoutput>(0);
-	@OneToMany(mappedBy="invocation")
+	@OneToMany(mappedBy = "invocation")
 	private Set<File> files = new HashSet<File>(0);
-	@OneToMany(mappedBy="invocation")
-	private Set<Timestat> timestats = new HashSet<Timestat>(0);
-	@OneToMany(mappedBy="invocation")
+	@OneToMany(mappedBy = "invocation")
 	private Set<Userevent> userevents = new HashSet<Userevent>(0);
 
 	public Invocation() {
@@ -49,7 +56,8 @@ public class Invocation implements java.io.Serializable {
 	public Invocation(long invocationId, Task task, Workflowrun workflowrun,
 			String hostname, Long scheduleTime, String standardOut,
 			String standardError, Set<Inoutput> inoutputs, Set<File> files,
-			Set<Timestat> timestats, Set<Userevent> userevents) {
+			Set<Userevent> userevents, Long realTime, Long realTimeIn,
+			Long realTimeOut, Date didOn) {
 		this.invocationId = invocationId;
 		this.task = task;
 		this.workflowrun = workflowrun;
@@ -59,8 +67,19 @@ public class Invocation implements java.io.Serializable {
 		this.standardError = standardError;
 		this.inoutputs = inoutputs;
 		this.files = files;
-		this.timestats = timestats;
 		this.userevents = userevents;
+		this.realTime = realTime;
+		this.realTimeIn = realTimeIn;
+		this.realTimeOut = realTimeOut;
+		this.didOn = didOn;
+	}
+
+	public Long getId() {
+		return this.id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public long getInvocationId() {
@@ -135,20 +154,44 @@ public class Invocation implements java.io.Serializable {
 		this.files = files;
 	}
 
-	public Set<Timestat> getTimestats() {
-		return this.timestats;
-	}
-
-	public void setTimestats(Set<Timestat> timestats) {
-		this.timestats = timestats;
-	}
-
 	public Set<Userevent> getUserevents() {
 		return this.userevents;
 	}
 
 	public void setUserevents(Set<Userevent> userevents) {
 		this.userevents = userevents;
+	}
+
+	public Long getRealTime() {
+		return this.realTime;
+	}
+
+	public void setRealTime(Long realTime) {
+		this.realTime = realTime;
+	}
+
+	public Long getRealTimeIn() {
+		return this.realTimeIn;
+	}
+
+	public void setRealTimeIn(Long realTimeIn) {
+		this.realTimeIn = realTimeIn;
+	}
+
+	public Long getRealTimeOut() {
+		return this.realTimeOut;
+	}
+
+	public void setRealTimeOut(Long realTimeOut) {
+		this.realTimeOut = realTimeOut;
+	}
+
+	public Date getDidOn() {
+		return this.didOn;
+	}
+
+	public void setDidOn(Date didOn) {
+		this.didOn = didOn;
 	}
 
 }

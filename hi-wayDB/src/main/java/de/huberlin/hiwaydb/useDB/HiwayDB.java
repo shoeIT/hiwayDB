@@ -16,7 +16,6 @@ import de.huberlin.hiwaydb.dal.DBConnection;
 import de.huberlin.hiwaydb.dal.File;
 import de.huberlin.hiwaydb.dal.Invocation;
 import de.huberlin.hiwaydb.dal.Task;
-import de.huberlin.hiwaydb.dal.Timestat;
 import de.huberlin.hiwaydb.dal.Workflowrun;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
@@ -62,16 +61,16 @@ public class HiwayDB implements HiwayDBI {
 
 		query = session.createQuery("FROM Invocation I");
 
-		//query = session	.createQuery("select new list(hostname)  FROM Invocation I");
+		// query = session
+		// .createQuery("select new list(hostname)  FROM Invocation I");
 
-		resultsInvoc =  query.list();
-		 	
+		resultsInvoc = query.list();
+
 		Set<String> tempResult = new HashSet();
-		
-		for(Invocation i : resultsInvoc)
-		{
-			//System.out.println("in getHostnames: " + i.getHostname());
-			tempResult.add(i.getHostname())	;		
+
+		for (Invocation i : resultsInvoc) {
+			// System.out.println("in getHostnames: " + i.getHostname());
+			tempResult.add(i.getHostname());
 		}
 
 		return tempResult;
@@ -94,7 +93,7 @@ public class HiwayDB implements HiwayDBI {
 		resultsInvoc = query.list();
 
 		return createInvocStat(resultsInvoc);
-		
+
 	}
 
 	@Override
@@ -129,44 +128,23 @@ public class HiwayDB implements HiwayDBI {
 
 		Query query = null;
 		List<Invocation> resultsInvoc = null;
-		
+
 		String queryString = "FROM Invocation I  WHERE ";
-				
-		for(Long l : taskIds)
-		{
-			queryString+= " I.task = " + l.toString() + " or ";
+
+		for (Long l : taskIds) {
+			queryString += " I.task = " + l.toString() + " or ";
 		}
-		
-		System.out.println(queryString.substring(0,queryString.length() - 4));
-		
-		query = session.createQuery(queryString.substring(0,queryString.length() - 4));
-		
-				
+
+		System.out.println(queryString.substring(0, queryString.length() - 4));
+
+		query = session.createQuery(queryString.substring(0,
+				queryString.length() - 4));
+
 		// join I.invocationId
 		resultsInvoc = query.list();
 
 		return createInvocStat(resultsInvoc);
-		
-	}
 
-	@Override
-	public Collection<InvocStat> getLogEntriesSince(long sinceTimestamp) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Collection<InvocStat> getLogEntriesSinceForTask(long taskId,
-			long sinceTimestamp) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Collection<InvocStat> getLogEntriesSinceForTasks(Set<Long> taskIds,
-			long sinceTimestamp) {
-		// TODO Auto-generated method stubdd
-		return null;
 	}
 
 	@Override
@@ -181,24 +159,24 @@ public class HiwayDB implements HiwayDBI {
 		Query query = null;
 		List<Workflowrun> resultsWF = null;
 
-		query = session.createQuery("FROM Workflowrun W WHERE W.wfName ='"+ workflowName+"'");
+		query = session.createQuery("FROM Workflowrun W WHERE W.wfName ='"
+				+ workflowName + "'");
 
-		//query = session	.createQuery("select new list(hostname)  FROM Invocation I");
+		// query = session
+		// .createQuery("select new list(hostname)  FROM Invocation I");
 
-		resultsWF =  query.list();
-		 	
+		resultsWF = query.list();
+
 		Set<Long> tempResult = new HashSet<Long>();
-		
-		for(Workflowrun w : resultsWF)
-		{
-			//System.out.println("in getHostnames: " + i.getHostname());
-			for(Invocation i : w.getInvocations())
-			{
+
+		for (Workflowrun w : resultsWF) {
+			// System.out.println("in getHostnames: " + i.getHostname());
+			for (Invocation i : w.getInvocations()) {
 				tempResult.add(i.getTask().getTaskId());
 			}
 		}
 
-		return tempResult;		
+		return tempResult;
 	}
 
 	@Override
@@ -213,20 +191,16 @@ public class HiwayDB implements HiwayDBI {
 		Query query = null;
 		List<Task> resultsInvoc = null;
 
-		query = session.createQuery("FROM Task T  WHERE T.taskId ="
-				+ taskId);
+		query = session.createQuery("FROM Task T  WHERE T.taskId =" + taskId);
 		// join I.invocationId
 		resultsInvoc = query.list();
 
-		if(!resultsInvoc.isEmpty())
-		{
+		if (!resultsInvoc.isEmpty()) {
 			return resultsInvoc.get(0).getTaskName();
-		}
-		else
-		{
+		} else {
 			return "";
-		}	
-		
+		}
+
 	}
 
 	private Collection<InvocStat> createInvocStat(List<Invocation> invocations) {
@@ -241,16 +215,8 @@ public class HiwayDB implements HiwayDBI {
 
 			invoc.setHostName(tempInvoc.getHostname());
 			invoc.setTaskId(tempInvoc.getTask().getTaskId());
-			// invoc.setInvocId(tempInvoc.getInvocationId());
-
-			// Time
-			Timestat time;
-
-			for (Timestat t : tempInvoc.getTimestats()) {
-				if (t.getType().equalsIgnoreCase("invoc-time")) {
-					invoc.setRealTime(t.getRealTime(), t.getDidOn().getTime());
-				}
-			}
+			invoc.setRealTime(tempInvoc.getRealTime(), tempInvoc.getDidOn()
+					.getTime());
 
 			Set<FileStat> iFiles = new HashSet<FileStat>();
 			Set<FileStat> oFiles = new HashSet<FileStat>();
@@ -260,19 +226,18 @@ public class HiwayDB implements HiwayDBI {
 
 				FileStat ioFile;
 
-				for (Timestat t : f.getTimestats()) {
+				ioFile = new FileStat();
+				ioFile.setFileName(f.getName());
+			
 
-					ioFile = new FileStat();
-					ioFile.setFileName(f.getName());
-					ioFile.setRealTime(t.getRealTime());
+				if (f.getRealTimeIn() > 0) {
+					iFiles.add(ioFile);
+					ioFile.setRealTime(f.getRealTimeIn());
+				}
 
-					if (t.getType() == "file-time-stagein") {
-						iFiles.add(ioFile);
-					}
-
-					if (t.getType() == "file-time-stageout") {
-						oFiles.add(ioFile);
-					}
+				if (f.getRealTimeOut() > 0) {
+					oFiles.add(ioFile);
+					ioFile.setRealTime(f.getRealTimeOut());
 				}
 
 				invoc.setInputfiles(iFiles);
@@ -282,5 +247,85 @@ public class HiwayDB implements HiwayDBI {
 			}
 		}
 		return resultList;
+	}
+
+	
+	@Override
+	public Collection<InvocStat> getLogEntriesForHost(String hostName) {
+		if (dbSessionFactory == null) {
+			DBConnection con = new DBConnection(configFile);
+			dbSessionFactory = con.getDBSession();
+		}
+
+		session = dbSessionFactory.openSession();
+
+		Query query = null;
+		List<Invocation> resultsInvoc = null;
+
+		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"'");
+		
+		resultsInvoc = query.list();
+
+		return createInvocStat(resultsInvoc);
+	}
+
+	@Override
+	public Collection<InvocStat> getLogEntriesForHostSince(String hostName,
+			long timestamp) {
+		if (dbSessionFactory == null) {
+			DBConnection con = new DBConnection(configFile);
+			dbSessionFactory = con.getDBSession();
+		}
+
+		session = dbSessionFactory.openSession();
+
+		Query query = null;
+		List<Invocation> resultsInvoc = null;
+
+		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.didOn > " + timestamp);
+		
+		resultsInvoc = query.list();
+
+		return createInvocStat(resultsInvoc);
+	}
+
+	@Override
+	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId,
+			String hostName) {	
+			if (dbSessionFactory == null) {
+				DBConnection con = new DBConnection(configFile);
+				dbSessionFactory = con.getDBSession();
+			}
+
+			session = dbSessionFactory.openSession();
+
+			Query query = null;
+			List<Invocation> resultsInvoc = null;
+
+			query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.task = " + taskId);
+			
+			resultsInvoc = query.list();
+
+			return createInvocStat(resultsInvoc);
+	}
+
+	@Override
+	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
+			String hostName, long timestamp) {
+		if (dbSessionFactory == null) {
+			DBConnection con = new DBConnection(configFile);
+			dbSessionFactory = con.getDBSession();
+		}
+
+		session = dbSessionFactory.openSession();
+
+		Query query = null;
+		List<Invocation> resultsInvoc = null;
+
+		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.didOn > " + timestamp +" and I.task = " + taskId);
+		
+		resultsInvoc = query.list();
+
+		return createInvocStat(resultsInvoc);
 	}
 }

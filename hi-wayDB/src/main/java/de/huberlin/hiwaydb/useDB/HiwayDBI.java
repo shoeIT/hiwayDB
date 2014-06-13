@@ -1,5 +1,6 @@
 package de.huberlin.hiwaydb.useDB;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Set;
 
@@ -23,18 +24,12 @@ public interface HiwayDBI {
 	public Collection<InvocStat> getLogEntries();
 	public Collection<InvocStat> getLogEntriesForTask(long taskId);
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds);
-	public Collection<InvocStat> getLogEntriesSince(long sinceTimestamp);
-	public Collection<InvocStat> getLogEntriesSinceForTask(long taskId,
-			long sinceTimestamp);
-	public Collection<InvocStat> getLogEntriesSinceForTasks(Set<Long> taskIds,
-			long sinceTimestamp);
 	
-//	public Collection<InvocStat> getLogEntries();
-//	public Collection<InvocStat> getLogEntriesForHost(String hostName);
-//	public Collection<InvocStat> getLogEntriesForHostSince(String hostName, long timestamp);
-//	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId, String hostName);
-//	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId, String hostName, long timestamp);
+	public Collection<InvocStat> getLogEntriesForHost(String hostName);
+	public Collection<InvocStat> getLogEntriesForHostSince(String hostName, long timestamp);
+	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId, String hostName);
+	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId, String hostName, long timestamp);
 
-	public void logToDB(JsonReportEntry entry);
+	public void logToDB(JsonReportEntry entry);	
 
 }
