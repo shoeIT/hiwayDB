@@ -230,12 +230,13 @@ public class HiwayDB implements HiwayDBI {
 				ioFile.setFileName(f.getName());
 			
 
-				if (f.getRealTimeIn() > 0) {
+				if (f.getRealTimeIn() != null) {
 					iFiles.add(ioFile);
 					ioFile.setRealTime(f.getRealTimeIn());
 				}
 
-				if (f.getRealTimeOut() > 0) {
+				
+				if (f.getRealTimeOut() != null) {
 					oFiles.add(ioFile);
 					ioFile.setRealTime(f.getRealTimeOut());
 				}

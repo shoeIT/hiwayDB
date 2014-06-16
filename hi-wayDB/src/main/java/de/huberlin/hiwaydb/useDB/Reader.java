@@ -73,8 +73,7 @@ public class Reader {
 				// Shutting down properly
 				client.shutdown();
 
-			}
-			else if(lineIn.equalsIgnoreCase("db")){
+			} else if (lineIn.equalsIgnoreCase("db")) {
 
 				HiwayDBI testGet = new HiwayDB();
 
@@ -126,26 +125,46 @@ public class Reader {
 				// System.out.println("Task: "
 				// + f.getTaskId() + " RealTime:" + f.getRealTime());
 				// }
+
+				System.out.println("All for host:");
+
+				for (InvocStat f : testGet.getLogEntriesForHost("dbis13:8042")) {
+					System.out.println("Host: " + f.getHostName() + "TaskID: "
+							+ f.getTaskId() + " | RealTime:" + f.getRealTime());
+				}
+
+				System.out.println("All for host since:");
+				Calendar cal = Calendar.getInstance();
+				cal.set(2004, Calendar.MAY, 12);
+
+				for (InvocStat f : testGet.getLogEntriesForHostSince(
+						"dbis13:8042", cal.getTimeInMillis())) {
+					System.out.println("Host: " + f.getHostName() + "TaskID: "
+							+ f.getTaskId() + " | RealTime:" + f.getRealTime()
+							+ " Date: " + f.getTimestamp());
+				}
+
+				System.out.println("All for Task on Host:");
+				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
+						1722821279659l, "dbis13:8042")) {
+					System.out.println("Host: " + f.getHostName() + "TaskID: "
+							+ f.getTaskId() + " | RealTime:" + f.getRealTime()
+							+ " Date: " + f.getTimestamp());
+				}
+
 				
-				 System.out.println("All for host:");
-				 
-				 for (InvocStat f : testGet.getLogEntriesForHost("dbis13:8042")) {
-					 System.out.println("Host: "
-					 + f.getHostName() + " RealTime:" + f.getRealTime());
-					 }
-				 
- System.out.println("All for host since:");
- Calendar cal = Calendar.getInstance();
- cal.set(2004, Calendar.MAY, 12);
-				 
-				 for (InvocStat f : testGet.getLogEntriesForHostSince("dbis13:8042",cal.getTimeInMillis() )) {
-					 System.out.println("Host: "
-					 + f.getHostName() + " RealTime:" + f.getRealTime());
-					 }
-					
-			}
-			else
-			{
+				
+				cal.set(2004, Calendar.MAY, 12);
+				
+				System.out.println("All for Task on Host Since:");
+				for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(
+						1722821279659l, "dbis12:8042",cal.getTimeInMillis())) {
+					System.out.println("Host: " + f.getHostName() + "TaskID: "
+							+ f.getTaskId() + " | RealTime:" + f.getRealTime()
+							+ " Date: " + f.getTimestamp());
+				}
+
+			} else {
 				WriteHiwayDB writer = null;
 
 				if (args.length == 0) {
