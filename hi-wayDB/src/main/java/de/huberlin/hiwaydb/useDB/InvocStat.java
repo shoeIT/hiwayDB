@@ -141,4 +141,14 @@ public class InvocStat {
 		this.timestamp = timestamp;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{Timestamp: " + this.timestamp + " | Host: " + this.hostName
+				+ " | TaskID: " + this.taskId + " | Time: " + this.realTime + " }");
+
+		return sb.toString();
+	}
+
 }

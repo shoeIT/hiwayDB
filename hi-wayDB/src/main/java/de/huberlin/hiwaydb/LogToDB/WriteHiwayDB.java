@@ -38,6 +38,14 @@ public class WriteHiwayDB {
 
 		dbSessionFactory = con.getDBSession();
 	}
+	
+	
+	public WriteHiwayDB(String dbURL, String username, String password, String file) {
+
+		DBConnection con = new DBConnection(dbURL, username, password, file);
+
+		dbSessionFactory = con.getDBSession();
+	}
 
 	public int lineToDB(JsonReportEntry logEntryRow) {
 

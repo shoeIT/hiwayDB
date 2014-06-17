@@ -48,6 +48,7 @@ public class Reader {
 			}
 
 			if (lineIn.equalsIgnoreCase("c")) {
+				
 				System.out.println("couchbase connecten...");
 
 				// (Subset) of nodes in the cluster to establish a connection
@@ -75,11 +76,12 @@ public class Reader {
 
 			} else if (lineIn.equalsIgnoreCase("db")) {
 
-				HiwayDBI testGet = new HiwayDB();
+				HiwayDBI testGet = new HiwayDB(
+						"jdbc:mysql://localhost/hiwaydb", "root", "keanu7.");
 
 				System.out.println("go...");
 
-				System.out.println("getLogEntriesForTask:");
+			//	System.out.println("getLogEntriesForTask:");
 
 				// for (InvocStat f : testGet.getLogEntriesForTask(1317103212))
 				// {
@@ -88,12 +90,12 @@ public class Reader {
 				// }
 				//
 
-				System.out.println("getLogEntriesForTask mit Set:");
-
-				Set<Long> tasks = new HashSet<Long>();
-				tasks.add((long) 466017906);
-				tasks.add(1317103212l);
-				tasks.add(121135303675312l);
+//				System.out.println("getLogEntriesForTask mit Set:");
+//
+//				Set<Long> tasks = new HashSet<Long>();
+//				tasks.add((long) 466017906);
+//				tasks.add(1317103212l);
+//				tasks.add(121135303675312l);
 
 				// for (InvocStat f : testGet.getLogEntriesForTasks(tasks)) {
 				// System.out.println("Task: "
@@ -103,14 +105,13 @@ public class Reader {
 				System.out.println("getHostnames:");
 
 				for (String f : testGet.getHostNames()) {
-					System.out.println("Hostname: " + f);
+					System.out.println(f.toString());
 				}
 
 				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
 
-				for (Long f : testGet
-						.getTaskIdsForWorkflow("variant-call-09.cf")) {
-					System.out.println("ID: " + f);
+				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
+					System.out.println(f.toString());
 				}
 
 				System.out.println("getTaskNames for ID :");
@@ -126,69 +127,72 @@ public class Reader {
 				// + f.getTaskId() + " RealTime:" + f.getRealTime());
 				// }
 
-				System.out.println("All for host:");
+			//	System.out.println("All for host:");
 
-//				for (InvocStat f : testGet.getLogEntriesForHost("dbis13:8042")) {
-//					System.out.println("Host: " + f.getHostName() + "TaskID: "
-//							+ f.getTaskId() + " | RealTime:" + f.getRealTime());
-//				}
-//
-//				System.out.println("All for host since:");
-//				
-//				cal.set(2004, Calendar.MAY, 12);
-//
-//				for (InvocStat f : testGet.getLogEntriesForHostSince(
-//						"dbis13:8042", cal.getTimeInMillis())) {
-//					System.out.println("Host: " + f.getHostName() + "TaskID: "
-//							+ f.getTaskId() + " | RealTime:" + f.getRealTime()
-//							+ " Date: " + f.getTimestamp());
-//				}
+				// for (InvocStat f :
+				// testGet.getLogEntriesForHost("dbis13:8042")) {
+				// System.out.println("Host: " + f.getHostName() + "TaskID: "
+				// + f.getTaskId() + " | RealTime:" + f.getRealTime());
+				// }
+				//
+				// System.out.println("All for host since:");
+				//
+				// cal.set(2004, Calendar.MAY, 12);
+				//
+				// for (InvocStat f : testGet.getLogEntriesForHostSince(
+				// "dbis13:8042", cal.getTimeInMillis())) {
+				// System.out.println("Host: " + f.getHostName() + "TaskID: "
+				// + f.getTaskId() + " | RealTime:" + f.getRealTime()
+				// + " Date: " + f.getTimestamp());
+				// }
 
 				System.out.println("All for Task on Host:");
 				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
 						1722821279659l, "dbis13:8042")) {
-					System.out.println("Host: " + f.getHostName() + "TaskID: "
-							+ f.getTaskId() + " | RealTime:" + f.getRealTime()
-							+ " Date: " + f.getTimestamp());
+					System.out.println(f.toString());
 				}
 
 				Calendar cal = Calendar.getInstance();
-				
+
 				cal.set(2004, Calendar.MAY, 12);
-				
+
 				System.out.println("All for Task on Host Since:");
 				for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(
-						1722821279659l, "dbis12:8042",cal.getTimeInMillis())) {
-					System.out.println("Host: " + f.getHostName() + "TaskID: "
-							+ f.getTaskId() + " | RealTime:" + f.getRealTime()
-							+ " Date: " + f.getTimestamp());
+						1722821279659l, "dbis12:8042", cal.getTimeInMillis())) {
+					System.out.println(f.toString());
 				}
 
 			} else {
 				WriteHiwayDB writer = null;
 
-				if (args.length == 0) {
-					System.out.println("keine Eingabe...lese StandardIn");
+//				if (args.length == 0) {
+//					System.out.println("keine Eingabe...lese StandardIn");
+//
+//					// writer = new WriteHiwayDB("hibernate.cfg.xml");
+//					writer = new WriteHiwayDB("jdbc:mysql://localhost/hiwaydb",
+//							"root", "keanu7.", "hibernate.cfg.xml");
+//
+//					try (BufferedReader test = new BufferedReader(
+//							new InputStreamReader(System.in))) {
+//
+//						String line = test.readLine();
+//						while (line != null) {
+//							writer.lineToDB(new JsonReportEntry(line));
+//						}
+//					}
+//				} 
+//				else {
+//					System.out.println("Eingabe: Name der logdatei:  "
+//							+ args[0] + " Config: " + args[1]);
 
-					writer = new WriteHiwayDB("hibernate.cfg.xml");
-
-					try (BufferedReader test = new BufferedReader(
-							new InputStreamReader(System.in))) {
-
-						String line = test.readLine();
-						while (line != null) {
-							writer.lineToDB(new JsonReportEntry(line));
-						}
-					}
-				} else {
-					System.out.println("Eingabe: Name der logdatei:  "
-							+ args[0] + " Config: " + args[1]);
-
-					if (args[1] != "") {
-						writer = new WriteHiwayDB(args[1]);
-					} else {
-						writer = new WriteHiwayDB("hibernate.cfg.xml");
-					}
+//					if (args[1] != "") {
+//						writer = new WriteHiwayDB(args[1]);
+//					} else {
+//						writer = new WriteHiwayDB("hibernate.cfg.xml");
+//					}
+				
+				writer = new WriteHiwayDB("jdbc:mysql://localhost/hiwaydb",
+						"root", "keanu7.", "hibernate.cfg.xml");
 
 					// String input = "D:\\Temp\\" + args[0];
 					// e00_01_3r_variant-call-setup-09_001
@@ -199,7 +203,7 @@ public class Reader {
 					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
 					// String input =
 					// "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
-					String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e11_13_1x2x3x_variant-call-09_004.log";
+					String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e00_01_3r_variant-call-setup-09_001.log";
 
 					System.out.println("Input: " + input);
 
@@ -257,7 +261,7 @@ public class Reader {
 					}
 				}
 				System.out.println("juchei fertig...");
-			}
+			//}
 		} catch (Exception e) {
 
 			e.printStackTrace();
