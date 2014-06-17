@@ -76,25 +76,25 @@ public class HiwayDB implements HiwayDBI {
 		return tempResult;
 	}
 
-	@Override
-	public Collection<InvocStat> getLogEntries() {
-		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(configFile);
-			dbSessionFactory = con.getDBSession();
-		}
-
-		session = dbSessionFactory.openSession();
-
-		Query query = null;
-		List<Invocation> resultsInvoc = null;
-
-		query = session.createQuery("FROM Invocation I");
-		// join I.invocationId
-		resultsInvoc = query.list();
-
-		return createInvocStat(resultsInvoc);
-
-	}
+//	@Override
+//	public Collection<InvocStat> getLogEntries() {
+	//	if (dbSessionFactory == null) {
+//			DBConnection con = new DBConnection(configFile);
+//			dbSessionFactory = con.getDBSession();
+//		}
+//
+//		session = dbSessionFactory.openSession();
+//
+//		Query query = null;
+//		List<Invocation> resultsInvoc = null;
+//
+//		query = session.createQuery("FROM Invocation I");
+//		// join I.invocationId
+//		resultsInvoc = query.list();
+//
+//		return createInvocStat(resultsInvoc);
+//
+//	}
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTask(long taskId) {
@@ -251,44 +251,44 @@ public class HiwayDB implements HiwayDBI {
 	}
 
 	
-	@Override
-	public Collection<InvocStat> getLogEntriesForHost(String hostName) {
-		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(configFile);
-			dbSessionFactory = con.getDBSession();
-		}
+	//@Override
+//	public Collection<InvocStat> getLogEntriesForHost(String hostName) {
+//		if (dbSessionFactory == null) {
+//			DBConnection con = new DBConnection(configFile);
+//			dbSessionFactory = con.getDBSession();
+//		}
+//
+//		session = dbSessionFactory.openSession();
+//
+//		Query query = null;
+//		List<Invocation> resultsInvoc = null;
+//
+//		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"'");
+//		
+//		resultsInvoc = query.list();
+//
+//		return createInvocStat(resultsInvoc);
+//	}
 
-		session = dbSessionFactory.openSession();
-
-		Query query = null;
-		List<Invocation> resultsInvoc = null;
-
-		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"'");
-		
-		resultsInvoc = query.list();
-
-		return createInvocStat(resultsInvoc);
-	}
-
-	@Override
-	public Collection<InvocStat> getLogEntriesForHostSince(String hostName,
-			long timestamp) {
-		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(configFile);
-			dbSessionFactory = con.getDBSession();
-		}
-
-		session = dbSessionFactory.openSession();
-
-		Query query = null;
-		List<Invocation> resultsInvoc = null;
-
-		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.didOn > " + timestamp);
-		
-		resultsInvoc = query.list();
-
-		return createInvocStat(resultsInvoc);
-	}
+//	@Override
+//	public Collection<InvocStat> getLogEntriesForHostSince(String hostName,
+//			long timestamp) {
+//		if (dbSessionFactory == null) {
+//			DBConnection con = new DBConnection(configFile);
+//			dbSessionFactory = con.getDBSession();
+//		}
+//
+//		session = dbSessionFactory.openSession();
+//
+//		Query query = null;
+//		List<Invocation> resultsInvoc = null;
+//
+//		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.didOn > " + timestamp);
+//		
+//		resultsInvoc = query.list();
+//
+//		return createInvocStat(resultsInvoc);
+//	}
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId,
