@@ -48,6 +48,7 @@ public class Reader {
 			}
 
 			if (lineIn.equalsIgnoreCase("c")) {
+				
 				System.out.println("couchbase connecten...");
 
 				// (Subset) of nodes in the cluster to establish a connection
@@ -80,7 +81,7 @@ public class Reader {
 
 				System.out.println("go...");
 
-				System.out.println("getLogEntriesForTask:");
+			//	System.out.println("getLogEntriesForTask:");
 
 				// for (InvocStat f : testGet.getLogEntriesForTask(1317103212))
 				// {
@@ -89,12 +90,12 @@ public class Reader {
 				// }
 				//
 
-				System.out.println("getLogEntriesForTask mit Set:");
-
-				Set<Long> tasks = new HashSet<Long>();
-				tasks.add((long) 466017906);
-				tasks.add(1317103212l);
-				tasks.add(121135303675312l);
+//				System.out.println("getLogEntriesForTask mit Set:");
+//
+//				Set<Long> tasks = new HashSet<Long>();
+//				tasks.add((long) 466017906);
+//				tasks.add(1317103212l);
+//				tasks.add(121135303675312l);
 
 				// for (InvocStat f : testGet.getLogEntriesForTasks(tasks)) {
 				// System.out.println("Task: "
@@ -104,14 +105,13 @@ public class Reader {
 				System.out.println("getHostnames:");
 
 				for (String f : testGet.getHostNames()) {
-					System.out.println("Hostname: " + f);
+					System.out.println(f.toString());
 				}
 
 				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
 
-				for (Long f : testGet
-						.getTaskIdsForWorkflow("variant-call-09.cf")) {
-					System.out.println("ID: " + f);
+				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
+					System.out.println(f.toString());
 				}
 
 				System.out.println("getTaskNames for ID :");
@@ -127,7 +127,7 @@ public class Reader {
 				// + f.getTaskId() + " RealTime:" + f.getRealTime());
 				// }
 
-				System.out.println("All for host:");
+			//	System.out.println("All for host:");
 
 				// for (InvocStat f :
 				// testGet.getLogEntriesForHost("dbis13:8042")) {
@@ -149,9 +149,7 @@ public class Reader {
 				System.out.println("All for Task on Host:");
 				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
 						1722821279659l, "dbis13:8042")) {
-					System.out.println("Host: " + f.getHostName() + "TaskID: "
-							+ f.getTaskId() + " | RealTime:" + f.getRealTime()
-							+ " Date: " + f.getTimestamp());
+					System.out.println(f.toString());
 				}
 
 				Calendar cal = Calendar.getInstance();
@@ -161,9 +159,7 @@ public class Reader {
 				System.out.println("All for Task on Host Since:");
 				for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(
 						1722821279659l, "dbis12:8042", cal.getTimeInMillis())) {
-					System.out.println("Host: " + f.getHostName() + "TaskID: "
-							+ f.getTaskId() + " | RealTime:" + f.getRealTime()
-							+ " Date: " + f.getTimestamp());
+					System.out.println(f.toString());
 				}
 
 			} else {
