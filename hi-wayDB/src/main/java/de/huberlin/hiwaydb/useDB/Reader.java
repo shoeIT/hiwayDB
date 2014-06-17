@@ -128,21 +128,21 @@ public class Reader {
 
 				System.out.println("All for host:");
 
-				for (InvocStat f : testGet.getLogEntriesForHost("dbis13:8042")) {
-					System.out.println("Host: " + f.getHostName() + "TaskID: "
-							+ f.getTaskId() + " | RealTime:" + f.getRealTime());
-				}
-
-				System.out.println("All for host since:");
-				Calendar cal = Calendar.getInstance();
-				cal.set(2004, Calendar.MAY, 12);
-
-				for (InvocStat f : testGet.getLogEntriesForHostSince(
-						"dbis13:8042", cal.getTimeInMillis())) {
-					System.out.println("Host: " + f.getHostName() + "TaskID: "
-							+ f.getTaskId() + " | RealTime:" + f.getRealTime()
-							+ " Date: " + f.getTimestamp());
-				}
+//				for (InvocStat f : testGet.getLogEntriesForHost("dbis13:8042")) {
+//					System.out.println("Host: " + f.getHostName() + "TaskID: "
+//							+ f.getTaskId() + " | RealTime:" + f.getRealTime());
+//				}
+//
+//				System.out.println("All for host since:");
+//				
+//				cal.set(2004, Calendar.MAY, 12);
+//
+//				for (InvocStat f : testGet.getLogEntriesForHostSince(
+//						"dbis13:8042", cal.getTimeInMillis())) {
+//					System.out.println("Host: " + f.getHostName() + "TaskID: "
+//							+ f.getTaskId() + " | RealTime:" + f.getRealTime()
+//							+ " Date: " + f.getTimestamp());
+//				}
 
 				System.out.println("All for Task on Host:");
 				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
@@ -152,7 +152,7 @@ public class Reader {
 							+ " Date: " + f.getTimestamp());
 				}
 
-				
+				Calendar cal = Calendar.getInstance();
 				
 				cal.set(2004, Calendar.MAY, 12);
 				
