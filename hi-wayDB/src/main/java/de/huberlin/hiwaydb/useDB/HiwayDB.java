@@ -38,11 +38,13 @@ public class HiwayDB implements HiwayDBI {
 
 	public HiwayDB() {
 		// TODO Auto-generated constructor stub
+		DBConnection con = new DBConnection("hibernate.cfg.xml");
+		dbSessionFactory = con.getDBSession();
 	}
 
 	@Override
 	public void logToDB(JsonReportEntry entry) {
-		WriteHiwayDB writer = new WriteHiwayDB(configFile);
+		WriteHiwayDB writer = new WriteHiwayDB("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
 
 		writer.lineToDB(entry);
 	}
@@ -50,7 +52,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Set<String> getHostNames() {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(configFile);
+			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -99,7 +101,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesForTask(long taskId) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(configFile);
+			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -120,7 +122,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(configFile);
+			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -150,7 +152,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(configFile);
+			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -159,7 +161,7 @@ public class HiwayDB implements HiwayDBI {
 		Query query = null;
 		List<Workflowrun> resultsWF = null;
 
-		query = session.createQuery("FROM Workflowrun W WHERE W.wfName ='"
+		query = session.createQuery("FROM Workflowrun W WHERE W.wfname ='"
 				+ workflowName + "'");
 
 		// query = session
@@ -182,7 +184,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public String getTaskName(long taskId) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(configFile);
+			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -191,7 +193,7 @@ public class HiwayDB implements HiwayDBI {
 		Query query = null;
 		List<Task> resultsInvoc = null;
 
-		query = session.createQuery("FROM Task T  WHERE T.taskId =" + taskId);
+		query = session.createQuery("FROM Task T  WHERE T.taskid =" + taskId);
 		// join I.invocationId
 		resultsInvoc = query.list();
 
@@ -294,7 +296,7 @@ public class HiwayDB implements HiwayDBI {
 	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId,
 			String hostName) {	
 			if (dbSessionFactory == null) {
-				DBConnection con = new DBConnection(configFile);
+				DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
 				dbSessionFactory = con.getDBSession();
 			}
 
@@ -314,7 +316,7 @@ public class HiwayDB implements HiwayDBI {
 	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
 			String hostName, long timestamp) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(configFile);
+			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -323,7 +325,7 @@ public class HiwayDB implements HiwayDBI {
 		Query query = null;
 		List<Invocation> resultsInvoc = null;
 
-		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.didOn > " + timestamp +" and I.task = " + taskId);
+		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.didon > " + timestamp +" and I.task = " + taskId);
 		
 		resultsInvoc = query.list();
 

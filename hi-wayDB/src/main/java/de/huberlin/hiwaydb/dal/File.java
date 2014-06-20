@@ -26,8 +26,8 @@ public class File implements java.io.Serializable {
 	private Invocation invocation;
 	private String name;
 	private Long size;
-	private Long realTimeIn;
-	private Long realTimeOut;
+	private Long realtimein;
+	private Long realtimeout;
 	
 
 	public File() {
@@ -38,13 +38,13 @@ public class File implements java.io.Serializable {
 		this.name = name;
 	}
 
-	public File(Invocation invocation, String name, Long realTimeOut,
-			Long realTimeIn, Long size) {
+	public File(Invocation invocation, String name, Long realtimeout,
+			Long realtimein, Long size) {
 		this.invocation = invocation;
 		this.name = name;
 		this.size = size;
-		this.realTimeIn = realTimeIn;
-		this.realTimeOut = realTimeOut;
+		this.realtimein = realtimein;
+		this.realtimeout = realtimeout;
 		
 	}
 
@@ -81,18 +81,18 @@ public class File implements java.io.Serializable {
 	}
 
 	public Long getRealTimeIn() {
-		return this.realTimeIn;
+		return this.realtimein;
 	}
 
-	public void setRealTimeIn(Long realTimeIn) {
-		this.realTimeIn = realTimeIn;
+	public void setRealTimeIn(Long realtimein) {
+		this.realtimein = realtimein;
 	}
 	public Long getRealTimeOut() {
-		return this.realTimeOut;
+		return this.realtimeout;
 	}
 
-	public void setRealTimeOut(Long realTimeOut) {
-		this.realTimeOut = realTimeOut;
+	public void setRealTimeOut(Long realtimeout) {
+		this.realtimeout = realtimeout;
 	}
 
 

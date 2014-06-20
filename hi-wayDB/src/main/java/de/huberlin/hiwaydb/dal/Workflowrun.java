@@ -18,9 +18,9 @@ public class Workflowrun implements java.io.Serializable {
 
 	@Id @GeneratedValue
 	private Long id;
-	private String runId;
-	private String wfName;
-	private Long wfTime;
+	private String runid;
+	private String wfname;
+	private Long wftime;
 	@OneToMany(mappedBy="workflowrun")
 	private Set<Hiwayevent> hiwayevents = new HashSet<Hiwayevent>(0);
 	@OneToMany(mappedBy="workflowrun")
@@ -29,15 +29,15 @@ public class Workflowrun implements java.io.Serializable {
 	public Workflowrun() {
 	}
 
-	public Workflowrun(String runId) {
-		this.runId = runId;
+	public Workflowrun(String runid) {
+		this.runid = runid;
 	}
 
-	public Workflowrun(String runId, String wfName, Long wfTime,
+	public Workflowrun(String runid, String wfname, Long wftime,
 			Set<Hiwayevent> hiwayevents, Set<Invocation> invocations) {
-		this.runId = runId;
-		this.wfName = wfName;
-		this.wfTime = wfTime;
+		this.runid = runid;
+		this.wfname = wfname;
+		this.wftime = wftime;
 		this.hiwayevents = hiwayevents;
 		this.invocations = invocations;
 	}
@@ -51,27 +51,27 @@ public class Workflowrun implements java.io.Serializable {
 	}
 
 	public String getRunId() {
-		return this.runId;
+		return this.runid;
 	}
 
-	public void setRunId(String runId) {
-		this.runId = runId;
+	public void setRunId(String runid) {
+		this.runid = runid;
 	}
 
 	public String getWfName() {
-		return this.wfName;
+		return this.wfname;
 	}
 
-	public void setWfName(String wfName) {
-		this.wfName = wfName;
+	public void setWfName(String wfname) {
+		this.wfname = wfname;
 	}
 
 	public Long getWfTime() {
-		return this.wfTime;
+		return this.wftime;
 	}
 
-	public void setWfTime(Long wfTime) {
-		this.wfTime = wfTime;
+	public void setWfTime(Long wftime) {
+		this.wftime = wftime;
 	}
 
 	public Set<Hiwayevent> getHiwayevents() {

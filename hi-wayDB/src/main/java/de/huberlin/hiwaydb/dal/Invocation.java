@@ -21,7 +21,7 @@ public class Invocation implements java.io.Serializable {
 	@Id
 	@GeneratedValue
 	private Long id;
-	private Long invocationId;
+	private Long invocationid;
 	@ManyToOne
 	private Task task;
 	@ManyToOne
@@ -29,13 +29,13 @@ public class Invocation implements java.io.Serializable {
 
 	private String hostname;
 	private Long scheduleTime;
-	private String standardOut;
-	private String standardError;
+	private String standardout;
+	private String standarderror;
 
-	private Long realTime;
-	private Long realTimeIn;
-	private Long realTimeOut;
-	private Date didOn;
+	private Long realtime;
+	private Long realtimein;
+	private Long realtimeout;
+	private Date didon;
 
 	@OneToMany(mappedBy = "invocation")
 	private Set<Inoutput> inoutputs = new HashSet<Inoutput>(0);
@@ -48,30 +48,30 @@ public class Invocation implements java.io.Serializable {
 	}
 
 	public Invocation(long invocationId, Task task, Workflowrun workflowrun) {
-		this.invocationId = invocationId;
+		this.invocationid = invocationId;
 		this.task = task;
 		this.workflowrun = workflowrun;
 	}
 
-	public Invocation(long invocationId, Task task, Workflowrun workflowrun,
+	public Invocation(long invocationid, Task task, Workflowrun workflowrun,
 			String hostname, Long scheduleTime, String standardOut,
 			String standardError, Set<Inoutput> inoutputs, Set<File> files,
-			Set<Userevent> userevents, Long realTime, Long realTimeIn,
-			Long realTimeOut, Date didOn) {
-		this.invocationId = invocationId;
+			Set<Userevent> userevents, Long realTime, Long realtimein,
+			Long realtimeout, Date didon) {
+		this.invocationid = invocationid;
 		this.task = task;
 		this.workflowrun = workflowrun;
 		this.hostname = hostname;
 		this.scheduleTime = scheduleTime;
-		this.standardOut = standardOut;
-		this.standardError = standardError;
+		this.standardout = standardOut;
+		this.standarderror = standardError;
 		this.inoutputs = inoutputs;
 		this.files = files;
 		this.userevents = userevents;
-		this.realTime = realTime;
-		this.realTimeIn = realTimeIn;
-		this.realTimeOut = realTimeOut;
-		this.didOn = didOn;
+		this.realtime = realTime;
+		this.realtimein = realtimein;
+		this.realtimeout = realtimeout;
+		this.didon = didon;
 	}
 
 	public Long getId() {
@@ -83,11 +83,11 @@ public class Invocation implements java.io.Serializable {
 	}
 
 	public long getInvocationId() {
-		return this.invocationId;
+		return this.invocationid;
 	}
 
 	public void setInvocationId(long invocationId) {
-		this.invocationId = invocationId;
+		this.invocationid = invocationId;
 	}
 
 	public Task getTask() {
@@ -123,19 +123,19 @@ public class Invocation implements java.io.Serializable {
 	}
 
 	public String getStandardOut() {
-		return this.standardOut;
+		return this.standardout;
 	}
 
 	public void setStandardOut(String standardOut) {
-		this.standardOut = standardOut;
+		this.standardout = standardOut;
 	}
 
 	public String getStandardError() {
-		return this.standardError;
+		return this.standarderror;
 	}
 
 	public void setStandardError(String standardError) {
-		this.standardError = standardError;
+		this.standarderror = standardError;
 	}
 
 	public Set<Inoutput> getInoutputs() {
@@ -163,35 +163,35 @@ public class Invocation implements java.io.Serializable {
 	}
 
 	public Long getRealTime() {
-		return this.realTime;
+		return this.realtime;
 	}
 
 	public void setRealTime(Long realTime) {
-		this.realTime = realTime;
+		this.realtime = realTime;
 	}
 
 	public Long getRealTimeIn() {
-		return this.realTimeIn;
+		return this.realtimein;
 	}
 
-	public void setRealTimeIn(Long realTimeIn) {
-		this.realTimeIn = realTimeIn;
+	public void setRealTimeIn(Long realtimein) {
+		this.realtimein = realtimein;
 	}
 
 	public Long getRealTimeOut() {
-		return this.realTimeOut;
+		return this.realtimeout;
 	}
 
-	public void setRealTimeOut(Long realTimeOut) {
-		this.realTimeOut = realTimeOut;
+	public void setRealTimeOut(Long realtimeout) {
+		this.realtimeout = realtimeout;
 	}
 
 	public Date getDidOn() {
-		return this.didOn;
+		return this.didon;
 	}
 
-	public void setDidOn(Date didOn) {
-		this.didOn = didOn;
+	public void setDidOn(Date didon) {
+		this.didon = didon;
 	}
 
 }

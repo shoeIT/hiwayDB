@@ -8,12 +8,12 @@ SHOW WARNINGS;
 USE `hiwayDB` ;
 
 -- -----------------------------------------------------
--- Table `WorkflowRun`
+-- Table `Workflowrun`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `WorkflowRun` ;
+DROP TABLE IF EXISTS `Workflowrun` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `WorkflowRun` (
+CREATE TABLE IF NOT EXISTS `Workflowrun` (
   `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `RunID` VARCHAR(36) NOT NULL,
   `WfName` TEXT NULL,
@@ -51,14 +51,14 @@ CREATE TABLE IF NOT EXISTS `Invocation` (
   `scheduleTime` BIGINT UNSIGNED NULL,
   `StandardOut` LONGTEXT NULL,
   `StandardError` LONGTEXT NULL,
-  `WorkflowRun_ID` BIGINT UNSIGNED NOT NULL,
+  `Workflowrun_ID` BIGINT UNSIGNED NOT NULL,
   `Task_TaskID` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`InvocationID`),
-  INDEX `fk_Invocation_WorkflowRun1_idx` (`WorkflowRun_ID` ASC),
+  INDEX `fk_Invocation_Workflowrun1_idx` (`Workflowrun_ID` ASC),
   INDEX `fk_Invocation_Task1_idx` (`Task_TaskID` ASC),
-  CONSTRAINT `fk_Invocation_WorkflowRun1`
-    FOREIGN KEY (`WorkflowRun_ID`)
-    REFERENCES `WorkflowRun` (`ID`)
+  CONSTRAINT `fk_Invocation_Workflowrun1`
+    FOREIGN KEY (`Workflowrun_ID`)
+    REFERENCES `Workflowrun` (`ID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Invocation_Task1`
@@ -93,12 +93,12 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `TimeStat`
+-- Table `Timestat`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `TimeStat` ;
+DROP TABLE IF EXISTS `Timestat` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `TimeStat` (
+CREATE TABLE IF NOT EXISTS `Timestat` (
   `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `DidOn` TIMESTAMP NOT NULL,
   `nMinPageFault` BIGINT UNSIGNED NOT NULL,
@@ -123,16 +123,16 @@ CREATE TABLE IF NOT EXISTS `TimeStat` (
   `Type` VARCHAR(100) NOT NULL,
   `File_ID` BIGINT UNSIGNED NULL,
   PRIMARY KEY (`ID`),
-  INDEX `fk_TimeStat_Invocation1_idx` (`Invocation_InvocationID` ASC),
-  INDEX `fk_TimeStat_File1_idx` (`File_ID` ASC),
+  INDEX `fk_Timestat_Invocation1_idx` (`Invocation_InvocationID` ASC),
+  INDEX `fk_Timestat_File1_idx` (`File_ID` ASC),
   UNIQUE INDEX `uniInvoc` (`Invocation_InvocationID` ASC, `Type` ASC),
   UNIQUE INDEX `uniFile` (`File_ID` ASC, `Type` ASC),
-  CONSTRAINT `fk_TimeStat_Invocation1`
+  CONSTRAINT `fk_Timestat_Invocation1`
     FOREIGN KEY (`Invocation_InvocationID`)
     REFERENCES `Invocation` (`InvocationID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_TimeStat_File1`
+  CONSTRAINT `fk_Timestat_File1`
     FOREIGN KEY (`File_ID`)
     REFERENCES `File` (`ID`)
     ON DELETE NO ACTION
@@ -142,12 +142,12 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `InOutput`
+-- Table `Inoutput`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `InOutput` ;
+DROP TABLE IF EXISTS `Inoutput` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `InOutput` (
+CREATE TABLE IF NOT EXISTS `Inoutput` (
   `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Keypart` TEXT NOT NULL,
   `Content` LONGTEXT NOT NULL,
@@ -166,18 +166,18 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `UserEvent`
+-- Table `Userevent`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `UserEvent` ;
+DROP TABLE IF EXISTS `Userevent` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `UserEvent` (
+CREATE TABLE IF NOT EXISTS `Userevent` (
   `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Content` LONGTEXT NOT NULL,
   `Invocation_InvocationID` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`ID`),
-  INDEX `fk_UserEvent_Invocation1_idx` (`Invocation_InvocationID` ASC),
-  CONSTRAINT `fk_UserEvent_Invocation1`
+  INDEX `fk_Userevent_Invocation1_idx` (`Invocation_InvocationID` ASC),
+  CONSTRAINT `fk_Userevent_Invocation1`
     FOREIGN KEY (`Invocation_InvocationID`)
     REFERENCES `Invocation` (`InvocationID`)
     ON DELETE NO ACTION
@@ -187,21 +187,21 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `HiwayEvent`
+-- Table `Hiwayevent`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `HiwayEvent` ;
+DROP TABLE IF EXISTS `Hiwayevent` ;
 
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `HiwayEvent` (
+CREATE TABLE IF NOT EXISTS `Hiwayevent` (
   `ID` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `Content` LONGTEXT NOT NULL,
   `Type` VARCHAR(200) NOT NULL,
-  `WorkflowRun_ID` BIGINT UNSIGNED NOT NULL,
+  `Workflowrun_ID` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`ID`),
-  INDEX `fk_HiwayEvent_WorkflowRun1_idx` (`WorkflowRun_ID` ASC),
-  CONSTRAINT `fk_HiwayEvent_WorkflowRun1`
-    FOREIGN KEY (`WorkflowRun_ID`)
-    REFERENCES `WorkflowRun` (`ID`)
+  INDEX `fk_Hiwayevent_Workflowrun1_idx` (`Workflowrun_ID` ASC),
+  CONSTRAINT `fk_Hiwayevent_Workflowrun1`
+    FOREIGN KEY (`Workflowrun_ID`)
+    REFERENCES `Workflowrun` (`ID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

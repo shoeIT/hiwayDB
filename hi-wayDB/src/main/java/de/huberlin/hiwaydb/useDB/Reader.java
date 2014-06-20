@@ -76,9 +76,10 @@ public class Reader {
 
 			} else if (lineIn.equalsIgnoreCase("db")) {
 
-				HiwayDBI testGet = new HiwayDB(
-						"jdbc:mysql://localhost/hiwaydb", "root", "keanu7.");
+			HiwayDBI testGet = new HiwayDB("jdbc:mysql://localhost/hiwaydb", "root", "keanu7.");
 
+			//HiwayDBI testGet = new HiwayDB();
+				
 				System.out.println("go...");
 
 			//	System.out.println("getLogEntriesForTask:");
@@ -103,10 +104,10 @@ public class Reader {
 				// }
 
 				System.out.println("getHostnames:");
-
-				for (String f : testGet.getHostNames()) {
-					System.out.println(f.toString());
-				}
+//
+//				for (String f : testGet.getHostNames()) {
+//					System.out.println(f.toString());
+//				}
 
 				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
 
@@ -199,11 +200,11 @@ public class Reader {
 					// e00_02_2r_variant-call-setup-09_001
 					// e11_11_1x_variant-call-09_003
 					//
-					// e11_16_1x2x3x5x6x7x_variant-call-09_005
+					// 
 					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
 					// String input =
 					// "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
-					String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e00_01_3r_variant-call-setup-09_001.log";
+					String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
 
 					System.out.println("Input: " + input);
 
