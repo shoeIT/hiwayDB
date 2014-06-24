@@ -78,7 +78,8 @@ public class DBConnection {
 						.buildSessionFactory(builder.build());
 				return sessionFactory;
 
-			} else {
+		} 
+							else {
 				java.io.File f = new java.io.File(configFile);
 
 				Configuration configuration = new Configuration().configure(f);
