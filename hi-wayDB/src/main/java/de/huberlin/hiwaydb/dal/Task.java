@@ -16,8 +16,8 @@ import javax.persistence.OneToMany;
 public class Task implements java.io.Serializable {
 
 	@Id
-	private long taskId;
-	private String taskName;
+	private long taskid;
+	private String taskname;
 	private String language;
 	
 	@OneToMany(mappedBy="task")
@@ -27,32 +27,32 @@ public class Task implements java.io.Serializable {
 	}
 
 	public Task(long taskId, String language) {
-		this.taskId = taskId;
+		this.taskid = taskId;
 		this.language = language;
 	}
 
 	public Task(long taskId, String taskName, String language,
 			Set<Invocation> invocations) {
-		this.taskId = taskId;
-		this.taskName = taskName;
+		this.taskid = taskId;
+		this.taskname = taskName;
 		this.language = language;
 		this.invocations = invocations;
 	}
 
 	public long getTaskId() {
-		return this.taskId;
+		return this.taskid;
 	}
 
 	public void setTaskId(long taskId) {
-		this.taskId = taskId;
+		this.taskid = taskId;
 	}
 
 	public String getTaskName() {
-		return this.taskName;
+		return this.taskname;
 	}
 
 	public void setTaskName(String taskName) {
-		this.taskName = taskName;
+		this.taskname = taskName;
 	}
 
 	public String getLanguage() {

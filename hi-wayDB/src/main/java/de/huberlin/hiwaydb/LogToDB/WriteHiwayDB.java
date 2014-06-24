@@ -32,15 +32,16 @@ public class WriteHiwayDB {
 	private Session session;
 	private String configFile;
 
-	public WriteHiwayDB(String configFile) {
-
-		DBConnection con = new DBConnection(configFile);
-
-		dbSessionFactory = con.getDBSession();
-	}
+//	public WriteHiwayDB(String configFile) {
+//
+//		DBConnection con = new DBConnection(configFile);
+//
+//		dbSessionFactory = con.getDBSession();
+//	}
 	
 	
 	public WriteHiwayDB(String dbURL, String username, String password, String file) {
+		System.out.println("MAKE CONNECTIONNNNNNNNNNNNNNNNNNN");
 
 		DBConnection con = new DBConnection(dbURL, username, password, file);
 
@@ -67,7 +68,7 @@ public class WriteHiwayDB {
 				runID = logEntryRow.getRunId().toString();
 
 				query = session
-						.createQuery("FROM Workflowrun E WHERE E.runId='"
+						.createQuery("FROM Workflowrun E WHERE E.runid='"
 								+ runID + "'");
 
 				resultsWfRun = query.list();
@@ -83,7 +84,7 @@ public class WriteHiwayDB {
 			if (logEntryRow.getTaskId() != null) {
 				taskID = logEntryRow.getTaskId();
 
-				query = session.createQuery("FROM Task E WHERE E.taskId ="
+				query = session.createQuery("FROM Task E WHERE E.taskid ="
 						+ taskID);
 				resultsTasks = query.list();
 			}
@@ -95,7 +96,7 @@ public class WriteHiwayDB {
 			}
 
 			query = session
-					.createQuery("FROM Invocation E WHERE E.invocationId ="
+					.createQuery("FROM Invocation E WHERE E.invocationid ="
 							+ invocID + " and E.workflowrun='"+wfId+"'");
 			List<Invocation> resultsInvoc = query.list();
 

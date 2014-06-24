@@ -3,6 +3,9 @@ package de.huberlin.hiwaydb.dal;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class DBConnection {
 
@@ -36,17 +39,40 @@ public class DBConnection {
 
 			if (password != null && dbURL != null && username != null) {
 				
-				java.io.File f = new java.io.File(configFile);
+				//java.io.File f = new java.io.File(configFile);
+				//java.io.File f = new java.io.File("c:\\home\\hiway\\hibernate.cfg.xml"); 
 
-				Configuration configuration = new Configuration().configure(f);
+				System.out.println("make connection!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				Configuration configuration = new Configuration();
+				//.configure(f);
 
 				configuration.setProperty("hibernate.connection.url",
-						this.dbURL);
+						"jdbc:mysql://localhost/hiwaydb");
 				configuration.setProperty("hibernate.connection.username",
-						this.username);
+						"root");
 				configuration.setProperty("hibernate.connection.password",
-						this.password);
-
+						//		"keanu7.");
+					"reverse");
+				configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLInnoDBDialect");
+				configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
+				//configuration.setProperty("hibernate.connection.password.driver_class", "com.mysql.jdbc.Driver");
+				configuration.setProperty("hibernate.connection.pool_size", "10");
+				
+//				configuration.setProperty("hibernate.c3p0.min_size","5");
+//				configuration.setProperty("hibernate.c3p0.max_size","20");
+//				configuration.setProperty("hibernate.c3p0.timeout","1800");
+//				configuration.setProperty("hibernate.c3p0.max_statements","50");
+				
+				
+				configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Hiwayevent.class);
+				configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.File.class);
+				configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Inoutput.class);
+				configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Invocation.class);
+				configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Task.class);
+				configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Userevent.class);
+				configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Workflowrun.class);
+				
+			
 				StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
 						.applySettings(configuration.getProperties());
 				SessionFactory sessionFactory = configuration
