@@ -47,12 +47,11 @@ public class DBConnection {
 				//.configure(f);
 
 				configuration.setProperty("hibernate.connection.url",
-						"jdbc:mysql://localhost/hiwaydb");
+						dbURL);
 				configuration.setProperty("hibernate.connection.username",
-						"root");
+						username);
 				configuration.setProperty("hibernate.connection.password",
-						//		"keanu7.");
-					"reverse");
+						password);
 				configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLInnoDBDialect");
 				configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
 				//configuration.setProperty("hibernate.connection.password.driver_class", "com.mysql.jdbc.Driver");

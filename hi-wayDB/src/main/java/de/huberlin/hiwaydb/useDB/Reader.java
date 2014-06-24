@@ -104,22 +104,22 @@ public class Reader {
 				// }
 
 				System.out.println("getHostnames:");
-//
-//				for (String f : testGet.getHostNames()) {
-//					System.out.println(f.toString());
-//				}
 
-				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
-
-				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
+				for (String f : testGet.getHostNames()) {
 					System.out.println(f.toString());
 				}
 
-				System.out.println("getTaskNames for ID :");
-				System.out.println("466017906: "
-						+ testGet.getTaskName(466017906));
-				System.out.println("1357269702: "
-						+ testGet.getTaskName(1357269702));
+//				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
+//
+//				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
+//					System.out.println(f.toString());
+//				}
+//
+//				System.out.println("getTaskNames for ID :");
+//				System.out.println("466017906: "
+//						+ testGet.getTaskName(466017906));
+//				System.out.println("1357269702: "
+//						+ testGet.getTaskName(1357269702));
 
 				// System.out.println("All Invocs:");
 				//
@@ -147,21 +147,21 @@ public class Reader {
 				// + " Date: " + f.getTimestamp());
 				// }
 
-				System.out.println("All for Task on Host:");
-				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
-						1722821279659l, "dbis13:8042")) {
-					System.out.println(f.toString());
-				}
-
-				Calendar cal = Calendar.getInstance();
-
-				cal.set(2004, Calendar.MAY, 12);
-
-				System.out.println("All for Task on Host Since:");
-				for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(
-						1722821279659l, "dbis12:8042", cal.getTimeInMillis())) {
-					System.out.println(f.toString());
-				}
+//				System.out.println("All for Task on Host:");
+//				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
+//						1722821279659l, "dbis13:8042")) {
+//					System.out.println(f.toString());
+//				}
+//
+//				Calendar cal = Calendar.getInstance();
+//
+//				cal.set(2004, Calendar.MAY, 12);
+//
+//				System.out.println("All for Task on Host Since:");
+//				for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(
+//						1722821279659l, "dbis12:8042", cal.getTimeInMillis())) {
+//					System.out.println(f.toString());
+//				}
 
 			} else {
 				WriteHiwayDB writer = null;
@@ -204,7 +204,7 @@ public class Reader {
 					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
 					// String input =
 					// "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
-					String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
+					String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\loglog.log";
 
 					System.out.println("Input: " + input);
 
