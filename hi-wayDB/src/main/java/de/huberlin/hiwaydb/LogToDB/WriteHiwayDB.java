@@ -184,8 +184,7 @@ public class WriteHiwayDB {
 				break;
 			case HiwayDBI.KEY_INVOC_TIME_SCHED:
 				valuePart = logEntryRow.getValueJsonObj();				
-				invoc.setScheduleTime( GetTimeStat(valuePart));
-				
+				invoc.setScheduleTime( GetTimeStat(valuePart));				
 				break;
 
 			case JsonReportEntry.KEY_INVOC_STDERR:
