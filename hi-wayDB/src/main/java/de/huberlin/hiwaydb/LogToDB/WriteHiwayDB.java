@@ -183,7 +183,9 @@ public class WriteHiwayDB {
 				wfRun.setWfTime(test);
 				break;
 			case HiwayDBI.KEY_INVOC_TIME_SCHED:
-				invoc.setScheduleTime(Long.parseLong(logEntryRow.getValueRawString(), 10));
+				valuePart = logEntryRow.getValueJsonObj();				
+				invoc.setScheduleTime( GetTimeStat(valuePart));
+				
 				break;
 
 			case JsonReportEntry.KEY_INVOC_STDERR:
@@ -215,6 +217,16 @@ public class WriteHiwayDB {
 			case JsonReportEntry.KEY_INVOC_STDOUT:
 				invoc.setStandardOut(logEntryRow.getValueRawString());
 				break;
+				
+			case "invoc-time-stagein":
+				valuePart = logEntryRow.getValueJsonObj();
+
+			
+				invoc.setRealTimeIn( GetTimeStat(valuePart));
+					
+				
+				//invoc.setRealTimeIn(realtimein)
+				break;
 								
 			case HiwayDBI.KEY_FILE_TIME_STAGEIN:
 				valuePart = logEntryRow.getValueJsonObj();
@@ -223,7 +235,7 @@ public class WriteHiwayDB {
 				break;
 			case HiwayDBI.KEY_FILE_TIME_STAGEOUT:
 				valuePart = logEntryRow.getValueJsonObj();
-				valuePart = logEntryRow.getValueJsonObj();
+				
 				
 				file.setRealTimeOut(GetTimeStat(valuePart));	
 				break;
@@ -241,7 +253,6 @@ public class WriteHiwayDB {
 				}
 				
 				break;
-
 			case "file-size-stagein":
 
 				file.setSize(Long.parseLong(
@@ -264,8 +275,11 @@ public class WriteHiwayDB {
 				session.save(he);
 
 				break;
+			case "reduction-time":
+				
+				break;
 			default:
-				throw new Exception("Der Typ ist nicht bekannt.");
+				throw new Exception("Der Typ ist nicht bekannt.:" + key);
 			}
 
 			tx.commit();

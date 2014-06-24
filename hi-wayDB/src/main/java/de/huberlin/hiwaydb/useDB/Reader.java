@@ -204,7 +204,7 @@ public class Reader {
 					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
 					// String input =
 					// "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
-					String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
+					String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\loglog.log";
 
 					System.out.println("Input: " + input);
 
