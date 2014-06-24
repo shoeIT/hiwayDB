@@ -42,7 +42,7 @@ public class DBConnection {
 				//java.io.File f = new java.io.File(configFile);
 				//java.io.File f = new java.io.File("c:\\home\\hiway\\hibernate.cfg.xml"); 
 
-				System.out.println("make connection, pw:" + password + " user: "  + username + " url: " + dbURL);
+				//System.out.println("make connection, pw:" + password + " user: "  + username + " url: " + dbURL);
 				Configuration configuration = new Configuration();
 				//.configure(f);
 

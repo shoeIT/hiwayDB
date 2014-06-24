@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,6 +24,7 @@ import de.huberlin.hiwaydb.dal.Inoutput;
 import de.huberlin.hiwaydb.dal.Invocation;
 import de.huberlin.hiwaydb.dal.Task;
 import de.huberlin.hiwaydb.dal.Workflowrun;
+import de.huberlin.hiwaydb.useDB.HiwayDB;
 import de.huberlin.hiwaydb.useDB.HiwayDBI;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
@@ -31,6 +34,7 @@ public class WriteHiwayDB {
 	private Transaction tx;
 	private Session session;
 	private String configFile;
+	private static final Log log = LogFactory.getLog(HiwayDB.class);
 
 //	public WriteHiwayDB(String configFile) {
 //
@@ -41,7 +45,7 @@ public class WriteHiwayDB {
 	
 	
 	public WriteHiwayDB(String dbURL, String username, String password, String file) {
-		System.out.println("MAKE CONNECTIONNNNNNNNNNNNNNNNNNN");
+		//System.out.println("MAKE CONNECTIONNNNNNNNNNNNNNNNNNN");
 
 		DBConnection con = new DBConnection(dbURL, username, password, file);
 
@@ -287,7 +291,8 @@ public class WriteHiwayDB {
 		} catch (Exception e) {
 			if (tx != null)
 				tx.rollback();
-			e.printStackTrace();
+			log.info(e);
+			//e.printStackTrace();
 			// throw e;
 			return -1;
 			// return 1;

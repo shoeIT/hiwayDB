@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,6 +24,9 @@ import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 public class HiwayDB implements HiwayDBI {
 	private String configFile = "hibernate.cfg.xml";
 
+	private static final Log log = LogFactory.getLog(HiwayDB.class);
+	
+	
 	private SessionFactory dbSessionFactory = null;
 	private Transaction tx;
 	private Session session;
@@ -46,7 +51,16 @@ public class HiwayDB implements HiwayDBI {
 	public void logToDB(JsonReportEntry entry) {
 		WriteHiwayDB writer = new WriteHiwayDB(this.dbURL, this.username, this.password, "hibernate.cfg.xml");
 
-		writer.lineToDB(entry);
+		int i = writer.lineToDB(entry);
+		
+	if(i == 1)
+	{
+		log.info("Write successful!!!");
+	}
+	else
+	{
+		log.info("Write NOT!!! successful");
+	}
 	}
 
 	@Override
