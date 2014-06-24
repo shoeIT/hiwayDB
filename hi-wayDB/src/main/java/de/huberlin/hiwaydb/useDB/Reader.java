@@ -76,7 +76,7 @@ public class Reader {
 
 			} else if (lineIn.equalsIgnoreCase("db")) {
 
-			HiwayDBI testGet = new HiwayDB("jdbc:mysql://localhost/hiwaydb", "root", "keanu7.");
+			HiwayDBI testGet = new HiwayDB( "root", "keanu7.","jdbc:mysql://localhost/hiwaydb");
 
 			//HiwayDBI testGet = new HiwayDB();
 				

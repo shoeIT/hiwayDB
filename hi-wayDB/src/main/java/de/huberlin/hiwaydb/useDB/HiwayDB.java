@@ -44,7 +44,7 @@ public class HiwayDB implements HiwayDBI {
 
 	@Override
 	public void logToDB(JsonReportEntry entry) {
-		WriteHiwayDB writer = new WriteHiwayDB("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
+		WriteHiwayDB writer = new WriteHiwayDB(this.dbURL, this.username, this.password, "hibernate.cfg.xml");
 
 		writer.lineToDB(entry);
 	}
@@ -52,7 +52,8 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Set<String> getHostNames() {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "keanu7.", "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
+			
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -104,7 +105,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesForTask(long taskId) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -125,7 +126,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -155,7 +156,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -187,7 +188,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public String getTaskName(long taskId) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -299,7 +300,7 @@ public class HiwayDB implements HiwayDBI {
 	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId,
 			String hostName) {	
 			if (dbSessionFactory == null) {
-				DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
+				DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
 				dbSessionFactory = con.getDBSession();
 			}
 
@@ -319,7 +320,7 @@ public class HiwayDB implements HiwayDBI {
 	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
 			String hostName, long timestamp) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
