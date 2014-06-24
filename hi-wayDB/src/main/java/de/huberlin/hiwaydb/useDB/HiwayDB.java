@@ -52,7 +52,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Set<String> getHostNames() {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "reverse", "hibernate.cfg.xml");
+			DBConnection con = new DBConnection("jdbc:mysql://localhost/hiwaydb", "root", "keanu7.", "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -72,7 +72,10 @@ public class HiwayDB implements HiwayDBI {
 
 		for (Invocation i : resultsInvoc) {
 			// System.out.println("in getHostnames: " + i.getHostname());
-			tempResult.add(i.getHostname());
+			if(i.getHostname()!=null)
+			{
+				tempResult.add(i.getHostname());
+			}			
 		}
 
 		return tempResult;
