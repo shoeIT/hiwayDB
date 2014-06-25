@@ -2,6 +2,7 @@ package de.huberlin.hiwaydb.useDB;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -342,8 +343,14 @@ public class HiwayDB implements HiwayDBI {
 
 		Query query = null;
 		List<Invocation> resultsInvoc = null;
+		
+		 Date seit = new Date(timestamp);
+		 java.text.SimpleDateFormat sdf = 
+		      new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.didon > " + timestamp +" and I.task = " + taskId);
+		 String currentTime = sdf.format(seit);
+
+		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.didon > '" + currentTime +"' and I.task = " + taskId);
 		
 		resultsInvoc = query.list();
 
