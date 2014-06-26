@@ -103,12 +103,12 @@ public class Reader {
 				// + f.getTaskId() + " RealTime:" + f.getRealTime());
 				// }
 
-				System.out.println("getHostnames:");
-
-				for (String f : testGet.getHostNames()) {
-					System.out.println(f.toString());
-				}
-
+//				System.out.println("getHostnames:");
+//
+//				for (String f : testGet.getHostNames()) {
+//					System.out.println(f.toString());
+//				}
+//
 //				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
 //
 //				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
@@ -116,10 +116,10 @@ public class Reader {
 //				}
 //
 //				System.out.println("getTaskNames for ID :");
-//				System.out.println("466017906: "
-//						+ testGet.getTaskName(466017906));
-//				System.out.println("1357269702: "
-//						+ testGet.getTaskName(1357269702));
+//				System.out.println("1477422485611: "
+//						+ testGet.getTaskName(1477422485611l));
+//				System.out.println("240495169287: "
+//						+ testGet.getTaskName(240495169287l));
 
 				// System.out.println("All Invocs:");
 				//
@@ -136,16 +136,21 @@ public class Reader {
 				// + f.getTaskId() + " | RealTime:" + f.getRealTime());
 				// }
 				//
-				// System.out.println("All for host since:");
-				//
-				// cal.set(2004, Calendar.MAY, 12);
-				//
-				// for (InvocStat f : testGet.getLogEntriesForHostSince(
-				// "dbis13:8042", cal.getTimeInMillis())) {
-				// System.out.println("Host: " + f.getHostName() + "TaskID: "
-				// + f.getTaskId() + " | RealTime:" + f.getRealTime()
-				// + " Date: " + f.getTimestamp());
-				// }
+				 System.out.println("All for host since:");
+				 Calendar cal = Calendar.getInstance();
+				 cal.set(2014, Calendar.JUNE, 22);
+				
+				 //_2014-06-20 17:03:58
+				 
+				// java.util.Date dt = new java.util.Date();
+
+				
+				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(1330859931l,
+				 "dbis12:8042", cal.getTimeInMillis())) {
+				 System.out.println("Host: " + f.getHostName() + "TaskID: "
+				 + f.getTaskId() + " | RealTime:" + f.getRealTime()
+				 + " Date: " + f.getTimestamp());
+				 }
 
 //				System.out.println("All for Task on Host:");
 //				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(

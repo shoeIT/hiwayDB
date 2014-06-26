@@ -230,6 +230,15 @@ public class WriteHiwayDB {
 				
 				//invoc.setRealTimeIn(realtimein)
 				break;
+			case "invoc-time-stageout":
+				valuePart = logEntryRow.getValueJsonObj();
+
+			
+				invoc.setRealTimeOut( GetTimeStat(valuePart));
+					
+				
+				//invoc.setRealTimeIn(realtimein)
+				break;
 								
 			case HiwayDBI.KEY_FILE_TIME_STAGEIN:
 				valuePart = logEntryRow.getValueJsonObj();

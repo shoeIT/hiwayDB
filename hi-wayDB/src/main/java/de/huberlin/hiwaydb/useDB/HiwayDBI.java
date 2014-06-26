@@ -2,6 +2,7 @@ package de.huberlin.hiwaydb.useDB;
 
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
 
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
