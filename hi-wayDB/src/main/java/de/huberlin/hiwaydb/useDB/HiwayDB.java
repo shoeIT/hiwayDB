@@ -26,8 +26,7 @@ public class HiwayDB implements HiwayDBI {
 	private String configFile = "hibernate.cfg.xml";
 
 	private static final Log log = LogFactory.getLog(HiwayDB.class);
-	
-	
+
 	private SessionFactory dbSessionFactory = null;
 	private Transaction tx;
 	private Session session;
@@ -50,25 +49,24 @@ public class HiwayDB implements HiwayDBI {
 
 	@Override
 	public void logToDB(JsonReportEntry entry) {
-		WriteHiwayDB writer = new WriteHiwayDB(this.dbURL, this.username, this.password, "hibernate.cfg.xml");
+		WriteHiwayDB writer = new WriteHiwayDB(this.dbURL, this.username,
+				this.password, "hibernate.cfg.xml");
 
 		int i = writer.lineToDB(entry);
-		
-	if(i == 1)
-	{
-		log.info("Write successful!!!");
-	}
-	else
-	{
-		log.info("Write NOT!!! successful");
-	}
+
+		if (i == 1) {
+			log.info("Write successful!!!");
+		} else {
+			log.info("Write NOT!!! successful");
+		}
 	}
 
 	@Override
 	public Set<String> getHostNames() {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
-			
+			DBConnection con = new DBConnection(this.dbURL, this.username,
+					this.password, "hibernate.cfg.xml");
+
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -88,39 +86,39 @@ public class HiwayDB implements HiwayDBI {
 
 		for (Invocation i : resultsInvoc) {
 			// System.out.println("in getHostnames: " + i.getHostname());
-			if(i.getHostname()!=null)
-			{
+			if (i.getHostname() != null) {
 				tempResult.add(i.getHostname());
-			}			
+			}
 		}
 
 		return tempResult;
 	}
 
-//	@Override
-//	public Collection<InvocStat> getLogEntries() {
-	//	if (dbSessionFactory == null) {
-//			DBConnection con = new DBConnection(configFile);
-//			dbSessionFactory = con.getDBSession();
-//		}
-//
-//		session = dbSessionFactory.openSession();
-//
-//		Query query = null;
-//		List<Invocation> resultsInvoc = null;
-//
-//		query = session.createQuery("FROM Invocation I");
-//		// join I.invocationId
-//		resultsInvoc = query.list();
-//
-//		return createInvocStat(resultsInvoc);
-//
-//	}
+	// @Override
+	// public Collection<InvocStat> getLogEntries() {
+	// if (dbSessionFactory == null) {
+	// DBConnection con = new DBConnection(configFile);
+	// dbSessionFactory = con.getDBSession();
+	// }
+	//
+	// session = dbSessionFactory.openSession();
+	//
+	// Query query = null;
+	// List<Invocation> resultsInvoc = null;
+	//
+	// query = session.createQuery("FROM Invocation I");
+	// // join I.invocationId
+	// resultsInvoc = query.list();
+	//
+	// return createInvocStat(resultsInvoc);
+	//
+	// }
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTask(long taskId) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,
+					this.password, "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -141,7 +139,8 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,
+					this.password, "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -171,7 +170,8 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,
+					this.password, "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -203,7 +203,8 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public String getTaskName(long taskId) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,
+					this.password, "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -234,108 +235,92 @@ public class HiwayDB implements HiwayDBI {
 
 			InvocStat invoc = new InvocStat();
 
-			invoc.setHostName(tempInvoc.getHostname());
-			invoc.setTaskId(tempInvoc.getTask().getTaskId());
-			invoc.setRealTime(tempInvoc.getRealTime(), tempInvoc.getDidOn()
-					.getTime());
+			if (tempInvoc.getHostname() != null
+					&& tempInvoc.getTask().getTaskId() != 0
+					&& tempInvoc.getRealTime() != null) {
+				invoc.setHostName(tempInvoc.getHostname());
+				invoc.setTaskId(tempInvoc.getTask().getTaskId());
+				invoc.setRealTime(tempInvoc.getRealTime(), tempInvoc.getDidOn()
+						.getTime());
 
-			Set<FileStat> iFiles = new HashSet<FileStat>();
-			Set<FileStat> oFiles = new HashSet<FileStat>();
+				Set<FileStat> iFiles = new HashSet<FileStat>();
+				Set<FileStat> oFiles = new HashSet<FileStat>();
 
-			// Files
-			for (File f : tempInvoc.getFiles()) {
+				// Files
+				for (File f : tempInvoc.getFiles()) {
 
-				FileStat ioFile;
+					FileStat ioFile;
 
-				ioFile = new FileStat();
-				ioFile.setFileName(f.getName());
-			
+					ioFile = new FileStat();
+					ioFile.setFileName(f.getName());
 
-				if (f.getRealTimeIn() != null) {
-					iFiles.add(ioFile);
-					ioFile.setRealTime(f.getRealTimeIn());
+					if (f.getRealTimeIn() != null) {
+						iFiles.add(ioFile);
+						ioFile.setRealTime(f.getRealTimeIn());
+					}
+
+					if (f.getRealTimeOut() != null) {
+						oFiles.add(ioFile);
+						ioFile.setRealTime(f.getRealTimeOut());
+					}
+
+					invoc.setInputfiles(iFiles);
+					invoc.setOutputfiles(oFiles);
+
+					resultList.add(invoc);
 				}
-
-				
-				if (f.getRealTimeOut() != null) {
-					oFiles.add(ioFile);
-					ioFile.setRealTime(f.getRealTimeOut());
-				}
-
-				invoc.setInputfiles(iFiles);
-				invoc.setOutputfiles(oFiles);
-
-				resultList.add(invoc);
 			}
 		}
 		return resultList;
 	}
 
-	
-	//@Override
-//	public Collection<InvocStat> getLogEntriesForHost(String hostName) {
-//		if (dbSessionFactory == null) {
-//			DBConnection con = new DBConnection(configFile);
-//			dbSessionFactory = con.getDBSession();
-//		}
-//
-//		session = dbSessionFactory.openSession();
-//
-//		Query query = null;
-//		List<Invocation> resultsInvoc = null;
-//
-//		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"'");
-//		
-//		resultsInvoc = query.list();
-//
-//		return createInvocStat(resultsInvoc);
-//	}
+	// @Override
+	// public Collection<InvocStat> getLogEntriesForHost(String hostName) {
+	// if (dbSessionFactory == null) {
+	// DBConnection con = new DBConnection(configFile);
+	// dbSessionFactory = con.getDBSession();
+	// }
+	//
+	// session = dbSessionFactory.openSession();
+	//
+	// Query query = null;
+	// List<Invocation> resultsInvoc = null;
+	//
+	// query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+
+	// hostName+"'");
+	//
+	// resultsInvoc = query.list();
+	//
+	// return createInvocStat(resultsInvoc);
+	// }
 
-//	@Override
-//	public Collection<InvocStat> getLogEntriesForHostSince(String hostName,
-//			long timestamp) {
-//		if (dbSessionFactory == null) {
-//			DBConnection con = new DBConnection(configFile);
-//			dbSessionFactory = con.getDBSession();
-//		}
-//
-//		session = dbSessionFactory.openSession();
-//
-//		Query query = null;
-//		List<Invocation> resultsInvoc = null;
-//
-//		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.didOn > " + timestamp);
-//		
-//		resultsInvoc = query.list();
-//
-//		return createInvocStat(resultsInvoc);
-//	}
+	// @Override
+	// public Collection<InvocStat> getLogEntriesForHostSince(String hostName,
+	// long timestamp) {
+	// if (dbSessionFactory == null) {
+	// DBConnection con = new DBConnection(configFile);
+	// dbSessionFactory = con.getDBSession();
+	// }
+	//
+	// session = dbSessionFactory.openSession();
+	//
+	// Query query = null;
+	// List<Invocation> resultsInvoc = null;
+	//
+	// query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+
+	// hostName+"' and I.didOn > " + timestamp);
+	//
+	// resultsInvoc = query.list();
+	//
+	// return createInvocStat(resultsInvoc);
+	// }
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId,
-			String hostName) {	
-			if (dbSessionFactory == null) {
-				DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
-				dbSessionFactory = con.getDBSession();
-			}
-
-			session = dbSessionFactory.openSession();
-
-			Query query = null;
-			List<Invocation> resultsInvoc = null;
-
-			query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.task = " + taskId);
-			
-			resultsInvoc = query.list();
-
-			return createInvocStat(resultsInvoc);
-	}
-
-	@Override
-	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
-			String hostName, long timestamp) {
+			String hostName) {
 		if (dbSessionFactory == null) {
-			DBConnection con = new DBConnection(this.dbURL, this.username,this.password, "hibernate.cfg.xml");
+			DBConnection con = new DBConnection(this.dbURL, this.username,
+					this.password, "hibernate.cfg.xml");
 			dbSessionFactory = con.getDBSession();
 		}
 
@@ -343,15 +328,39 @@ public class HiwayDB implements HiwayDBI {
 
 		Query query = null;
 		List<Invocation> resultsInvoc = null;
-		
-		 Date seit = new Date(timestamp);
-		 java.text.SimpleDateFormat sdf = 
-		      new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-		 String currentTime = sdf.format(seit);
+		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"
+				+ hostName + "' and I.task = " + taskId);
 
-		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"+ hostName+"' and I.didon > '" + currentTime +"' and I.task = " + taskId);
-		
+		resultsInvoc = query.list();
+
+		return createInvocStat(resultsInvoc);
+	}
+
+	@Override
+	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
+			String hostName, long timestamp) {
+		if (dbSessionFactory == null) {
+			DBConnection con = new DBConnection(this.dbURL, this.username,
+					this.password, "hibernate.cfg.xml");
+			dbSessionFactory = con.getDBSession();
+		}
+
+		session = dbSessionFactory.openSession();
+
+		Query query = null;
+		List<Invocation> resultsInvoc = null;
+
+		Date seit = new Date(timestamp);
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss");
+
+		String currentTime = sdf.format(seit);
+
+		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"
+				+ hostName + "' and I.didon > '" + currentTime
+				+ "' and I.task = " + taskId);
+
 		resultsInvoc = query.list();
 
 		return createInvocStat(resultsInvoc);

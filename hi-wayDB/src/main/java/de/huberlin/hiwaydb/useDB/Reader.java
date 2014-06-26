@@ -103,11 +103,11 @@ public class Reader {
 				// + f.getTaskId() + " RealTime:" + f.getRealTime());
 				// }
 
-//				System.out.println("getHostnames:");
-//
-//				for (String f : testGet.getHostNames()) {
-//					System.out.println(f.toString());
-//				}
+				System.out.println("getHostnames:");
+
+				for (String f : testGet.getHostNames()) {
+					System.out.println(f.toString());
+				}
 //
 //				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
 //

@@ -66,11 +66,11 @@ public class WriteHiwayDB {
 			List<File> resultsFile = null;
 		
 			String runID = null;
-			Long wfId = 0l
+			Long wfId = null;
 					;
 			if (logEntryRow.getRunId() != null) {
 				runID = logEntryRow.getRunId().toString();
-
+				
 				query = session
 						.createQuery("FROM Workflowrun E WHERE E.runid='"
 								+ runID + "'");
@@ -80,8 +80,14 @@ public class WriteHiwayDB {
 			
 			Workflowrun wfRun = null;
 			if (resultsWfRun != null && !resultsWfRun.isEmpty()) {
+		
 				wfRun = resultsWfRun.get(0);
 				wfId = wfRun.getId();
+				log.info("WF run ist nicht empty:" + wfId);
+			}
+			else
+			{
+				log.info("WF run LEeeeeeeeeeeeeeeeer" + wfId);
 			}
 
 			long taskID = 0;
@@ -247,8 +253,7 @@ public class WriteHiwayDB {
 				break;
 			case HiwayDBI.KEY_FILE_TIME_STAGEOUT:
 				valuePart = logEntryRow.getValueJsonObj();
-				
-				
+							
 				file.setRealTimeOut(GetTimeStat(valuePart));	
 				break;
 				
