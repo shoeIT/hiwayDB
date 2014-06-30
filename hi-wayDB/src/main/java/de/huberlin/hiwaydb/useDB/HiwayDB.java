@@ -248,19 +248,20 @@ public class HiwayDB implements HiwayDBI {
 				// Files
 				for (File f : tempInvoc.getFiles()) {
 
-					FileStat ioFile;
-
-					ioFile = new FileStat();
-					ioFile.setFileName(f.getName());
+					FileStat iFile = new FileStat();
+					iFile.setFileName(f.getName());
+					
+					FileStat oFile = new FileStat();
+					oFile.setFileName(f.getName());
 
 					if (f.getRealTimeIn() != null) {
-						iFiles.add(ioFile);
-						ioFile.setRealTime(f.getRealTimeIn());
+						iFile.setRealTime(f.getRealTimeIn());
+						iFiles.add(iFile);
 					}
 
 					if (f.getRealTimeOut() != null) {
-						oFiles.add(ioFile);
-						ioFile.setRealTime(f.getRealTimeOut());
+						oFile.setRealTime(f.getRealTimeOut());
+						oFiles.add(oFile);
 					}
 
 					invoc.setInputfiles(iFiles);
