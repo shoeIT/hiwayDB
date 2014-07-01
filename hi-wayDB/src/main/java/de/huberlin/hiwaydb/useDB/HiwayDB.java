@@ -230,11 +230,10 @@ public class HiwayDB implements HiwayDBI {
 		Set<InvocStat> resultList = new HashSet<InvocStat>();
 		Invocation tempInvoc;
 
-		for (int i = 0; i < invocations.size(); i++) {
-			tempInvoc = invocations.get(i);
+		for (Invocation invocDB : invocations) {
+			tempInvoc = invocDB;
 
 			InvocStat invoc = new InvocStat(tempInvoc.getTask().getTaskId());
-
 
 			log.info("Invoc: " + tempInvoc.getInvocationId()  + " Host:" +  tempInvoc.getHostname() + 
 					" Task:" + tempInvoc.getTask().getTaskId() + " Time: " +  tempInvoc.getRealTime()
@@ -243,6 +242,7 @@ public class HiwayDB implements HiwayDBI {
 			if (tempInvoc.getHostname() != null
 					&& tempInvoc.getTask().getTaskId() != 0
 					&& tempInvoc.getRealTime() != null) {
+				
 				invoc.setHostName(tempInvoc.getHostname());
 					invoc.setRealTime(tempInvoc.getRealTime(), tempInvoc.getTimestamp());
 
