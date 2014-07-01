@@ -35,14 +35,14 @@ package de.huberlin.hiwaydb.useDB;
 public class FileStat {
 
 	private String fileName;
-	private long realTime;
-	private long size;
+	private Long realTime;
+	private Long size;
 
 	
 	public FileStat() {
 	}
 
-	public FileStat(long size, long realTime, String fileName) {
+	public FileStat(Long size, Long realTime, String fileName) {
 		this.size = size;
 		this.realTime = realTime;
 		this.fileName = fileName;
@@ -56,11 +56,11 @@ public class FileStat {
 		return this.fileName;
 	}
 
-	public long getRealTime() {
+	public Long getRealTime() {
 		return this.realTime;
 	}
 
-	public long getSize() {
+	public Long getSize() {
 		return this.size;
 	}
 
@@ -68,11 +68,11 @@ public class FileStat {
 		this.fileName = fileName;
 	}
 
-	public void setRealTime(long d) {
+	public void setRealTime(Long d) {
 		this.realTime = d;
 	}
 
-	public void setSize(long size) {
+	public void setSize(Long size) {
 		this.size = size;
 	}
 

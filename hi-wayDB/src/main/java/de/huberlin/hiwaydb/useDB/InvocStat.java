@@ -42,7 +42,7 @@ public class InvocStat {
 	private String hostName;
 	private Map<String, FileStat> inputFiles;
 	private Map<String, FileStat> outputFiles;
-	private long realTime;
+	private Long realTime;
 
 	private long taskId;
 	private long timestamp;
@@ -56,7 +56,7 @@ public class InvocStat {
 		outputFiles = new HashMap<>();
 	}
 
-	public InvocStat(long timestamp, long realTime, long taskId, String hostName) {
+	public InvocStat(long timestamp, Long realTime, long taskId, String hostName) {
 		this(taskId);
 		this.timestamp = timestamp;
 		this.realTime = realTime;
@@ -99,7 +99,7 @@ public class InvocStat {
 		return outputFiles.values();
 	}
 
-	public long getRealTime() {
+	public Long getRealTime() {
 		return this.realTime;
 	}
 
@@ -127,7 +127,7 @@ public class InvocStat {
 		}
 	}
 
-	public void setRealTime(long d, long timestamp) {
+	public void setRealTime(Long d, long timestamp) {
 		this.realTime = d;
 		setTimestamp(timestamp);
 	}
