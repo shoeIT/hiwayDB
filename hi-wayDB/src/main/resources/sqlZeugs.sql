@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `Invocation` (
   `realtimeout` BIGINT UNSIGNED NULL,
   `Workflowrun_id` BIGINT UNSIGNED NOT NULL,
   `Task_taskid` BIGINT UNSIGNED NOT NULL,
+  `Timestamp` BIGINT UNSIGNED NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `InvocInRun` (`Invocationid` ASC, `Workflowrun_id` ASC),
   INDEX `fk_Invocation_Workflowrun1_idx` (`Workflowrun_id` ASC),

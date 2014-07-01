@@ -108,34 +108,34 @@ public class Reader {
 //				for (String f : testGet.getHostNames()) {
 //					System.out.println(f.toString());
 //				}
-////
-				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
-
-				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
-					System.out.println(f.toString());
-				}
-
-				System.out.println("getTaskNames for ID :");
-				System.out.println("240495169287: "
-						+ testGet.getTaskName(240495169287l));
-				System.out.println("240495169287: "
-						+ testGet.getTaskName(240495169287l));
-
-				 System.out.println("All Invocs:");
-				
-				 for (InvocStat f : testGet.getLogEntriesForTask(989639045l)) {
-				 System.out.println("Task: "
-				 + f.getTaskId() + " RealTime:" + f.getRealTime());
-				 
-				 for (FileStat fi :f.getInputFiles()){
-					 System.out.println("file in: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
-				 }
-				 
-				 
-				 for (FileStat fi :f.getOutputFiles()){
-					 System.out.println("file out: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
-				 }
-				 }
+//////
+//				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
+//
+//				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
+//					System.out.println(f.toString());
+//				}
+//
+//				System.out.println("getTaskNames for ID :");
+//				System.out.println("240495169287: "
+//						+ testGet.getTaskName(240495169287l));
+//				System.out.println("240495169287: "
+//						+ testGet.getTaskName(240495169287l));
+//
+//				 System.out.println("All Invocs:");
+//				
+//				 for (InvocStat f : testGet.getLogEntriesForTask(989639045l)) {
+//				 System.out.println("Task: "
+//				 + f.getTaskId() + " RealTime:" + f.getRealTime());
+//				 
+//				 for (FileStat fi :f.getInputFiles()){
+//					 System.out.println("file in: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
+//				 }
+//				 
+//				 
+//				 for (FileStat fi :f.getOutputFiles()){
+//					 System.out.println("file out: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
+//				 }
+//				 }
 
 			//	System.out.println("All for host:");
 
@@ -145,17 +145,18 @@ public class Reader {
 				// + f.getTaskId() + " | RealTime:" + f.getRealTime());
 				// }
 				//
-				 System.out.println("All for host since:");
+				
 				 Calendar cal = Calendar.getInstance();
 				 cal.set(2014, Calendar.JUNE, 22);
 				
+				 System.out.println("All for host since: 1403599949182 " );
 				 //_2014-06-20 17:03:58
 				 
 				// java.util.Date dt = new java.util.Date();
 
 				
-				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(1330859931l,
-				 "dbis12:8042", cal.getTimeInMillis())) {
+				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(989639045l,
+				 "hiway", 1403599949181l)) {
 				 System.out.println("Host: " + f.getHostName() + "TaskID: "
 				 + f.getTaskId() + " | RealTime:" + f.getRealTime()
 				 + " Date: " + f.getTimestamp());
@@ -226,7 +227,7 @@ public class Reader {
 
 						fFilePath = Paths.get(input);
 
-						int result = 0;
+						String result = "";
 						int i = 0;
 						try (Scanner scanner = new Scanner(fFilePath,
 								ENCODING.name())) {
@@ -242,8 +243,7 @@ public class Reader {
 
 									try {
 										result = writer
-												.lineToDB(new JsonReportEntry(
-														line));
+												.lineToDB(new JsonReportEntry(														line));
 									} catch (JSONException e) {
 										System.out
 												.println("FEHLER!!!!!!!!!!!!: "
@@ -265,7 +265,7 @@ public class Reader {
 									}
 								}
 
-								if (result == -1)
+								if (!result.isEmpty())
 									break;
 							}
 						}

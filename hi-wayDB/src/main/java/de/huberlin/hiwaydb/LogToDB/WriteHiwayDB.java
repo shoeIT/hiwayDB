@@ -53,7 +53,7 @@ public class WriteHiwayDB {
 		dbSessionFactory = con.getDBSession();
 	}
 
-	public int lineToDB(JsonReportEntry logEntryRow) {
+	public String lineToDB(JsonReportEntry logEntryRow) {
 
 		try {
 
@@ -84,13 +84,9 @@ public class WriteHiwayDB {
 		
 				wfRun = resultsWfRun.get(0);
 				wfId = wfRun.getId();
-				log.info("WF run ist nicht empty:" + wfId);
+				//log.info("WF run ist nicht empty:" + wfId);
 			}
-			else
-			{
-				log.info("WF run LEeeeeeeeeeeeeeeeer" + wfId);
-			}
-
+		
 			long taskID = 0;
 			if (logEntryRow.getTaskId() != null) {
 				taskID = logEntryRow.getTaskId();
@@ -149,7 +145,7 @@ public class WriteHiwayDB {
 			File file = null;
 			if (resultsFile != null && !resultsFile.isEmpty()) {
 				file = resultsFile.get(0);
-				System.out.println("File haben wir:" + file.getName() + file.getId());
+				//System.out.println("File haben wir:" + file.getName() + file.getId());
 			}
 
 			// tx = session.beginTransaction();
@@ -175,6 +171,7 @@ public class WriteHiwayDB {
 
 			if (invocID != 0 && (invoc == null)) {
 				invoc = new Invocation();
+				invoc.setTimestamp(timestampTemp);
 				invoc.setInvocationId(invocID);
 				invoc.setTask(task);
 				invoc.setWorkflowrun(wfRun);
@@ -315,14 +312,36 @@ public class WriteHiwayDB {
 
 			tx.commit();
 
-			return 1;
-		} catch (Exception e) {
+			return "";
+		}catch (org.hibernate.exception.ConstraintViolationException e) {
+
+			System.out.println("name: " + e.getConstraintName());
+			String message =  e.getSQLException().getMessage();
+			
+			if(message.contains("RundID_UNIQUE"))
+			{
+				System.out.println("runIDUnique");
+			}
+			else if((message.contains("JustOneFile")))
+					{
+				System.out.println("runIDUnique");
+			}
+			
+			if (tx != null)
+				tx.rollback();
+			return message;
+
+		}		
+		catch (Exception e) {
 			if (tx != null)
 				tx.rollback();
 			log.info(e);
+			
+			
+			
 			//e.printStackTrace();
 			// throw e;
-			return -1;
+			return "Fehler: " + e.getMessage();
 			// return 1;
 
 		} finally {
