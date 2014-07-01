@@ -156,7 +156,7 @@ public class Reader {
 
 				
 				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(989639045l,
-				 "hiway", 1403599949181l)) {
+				 "hiway", 1403599949113l)) {
 				 System.out.println("Host: " + f.getHostName() + "TaskID: "
 				 + f.getTaskId() + " | RealTime:" + f.getRealTime()
 				 + " Date: " + f.getTimestamp());

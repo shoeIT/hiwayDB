@@ -358,9 +358,15 @@ public class HiwayDB implements HiwayDBI {
 
 		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"
 				+ hostName + "' and I.Timestamp >" + timestamp
-				+ " and I.task = " + taskId);
+				+" and I.task = " + taskId);
+		
+		log.info("Suche mit Query: FROM Invocation I  WHERE I.hostname ='"
+				+ hostName + "' and I.Timestamp >" + timestamp
+				+" and I.task = " + taskId);
 
+	
 		resultsInvoc = query.list();
+		log.info("Ergebnisse Size: " + resultsInvoc.size());
 
 		return createInvocStat(resultsInvoc);
 	}
