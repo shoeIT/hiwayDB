@@ -235,6 +235,11 @@ public class HiwayDB implements HiwayDBI {
 
 			InvocStat invoc = new InvocStat(tempInvoc.getTask().getTaskId());
 
+
+			log.info("Invoc: " + tempInvoc.getInvocationId()  + " Host:" +  tempInvoc.getHostname() + 
+					" Task:" + tempInvoc.getTask().getTaskId() + " Time: " +  tempInvoc.getRealTime()
+					+ " Time: " +tempInvoc.getTimestamp() );
+			
 			if (tempInvoc.getHostname() != null
 					&& tempInvoc.getTask().getTaskId() != 0
 					&& tempInvoc.getRealTime() != null) {
@@ -266,6 +271,7 @@ public class HiwayDB implements HiwayDBI {
 					invoc.setInputfiles(iFiles);
 					invoc.setOutputfiles(oFiles);
 
+					log.info("Invoc mit Timestamp: "  + invoc.getTimestamp() + " geadded!");
 					resultList.add(invoc);
 				}
 			}
@@ -358,9 +364,15 @@ public class HiwayDB implements HiwayDBI {
 
 		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"
 				+ hostName + "' and I.Timestamp >" + timestamp
-				+ " and I.task = " + taskId);
+				+" and I.task = " + taskId);
+		
+		log.info("Suche mit Query: FROM Invocation I  WHERE I.hostname ='"
+				+ hostName + "' and I.Timestamp >" + timestamp
+				+" and I.task = " + taskId);
 
+	
 		resultsInvoc = query.list();
+		log.info("Ergebnisse Size: " + resultsInvoc.size());
 
 		return createInvocStat(resultsInvoc);
 	}
