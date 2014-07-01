@@ -260,17 +260,20 @@ public class HiwayDB implements HiwayDBI {
 
 					if (f.getRealTimeIn() != null) {
 						iFile.setRealTime(f.getRealTimeIn());
+						iFile.setSize(f.getSize());
 						iFiles.add(iFile);
 					}
 
 					if (f.getRealTimeOut() != null) {
 						oFile.setRealTime(f.getRealTimeOut());
+						oFile.setSize(f.getSize());
 						oFiles.add(oFile);
-					}
-
-					invoc.setInputfiles(iFiles);
-					invoc.setOutputfiles(oFiles);					
+					}									
 				}
+				
+				invoc.setInputfiles(iFiles);
+				invoc.setOutputfiles(oFiles);	
+				
 				log.info("Invoc mit Timestamp: "  + invoc.getTimestamp() + " geadded!");
 				resultList.add(invoc);
 			}
