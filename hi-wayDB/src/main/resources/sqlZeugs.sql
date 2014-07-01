@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS `File` (
   `Invocation_id` BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_File_Invocation1_idx` (`Invocation_id` ASC),
+  UNIQUE INDEX `JustOneFile` (`name` ASC, `Invocation_id` ASC),
   CONSTRAINT `fk_File_Invocation1`
     FOREIGN KEY (`Invocation_id`)
     REFERENCES `Invocation` (`id`)
