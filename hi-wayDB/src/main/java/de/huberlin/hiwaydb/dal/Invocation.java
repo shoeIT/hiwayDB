@@ -32,6 +32,7 @@ public class Invocation implements java.io.Serializable {
 	private String standardout;
 	private String standarderror;
 
+	private Long Timestamp;
 	private Long realtime;
 	private Long realtimein;
 	private Long realtimeout;
@@ -57,7 +58,7 @@ public class Invocation implements java.io.Serializable {
 			String hostname, Long scheduleTime, String standardOut,
 			String standardError, Set<Inoutput> inoutputs, Set<File> files,
 			Set<Userevent> userevents, Long realTime, Long realtimein,
-			Long realtimeout, Date didon) {
+			Long realtimeout, Date didon, Long timestamp) {
 		this.invocationid = invocationid;
 		this.task = task;
 		this.workflowrun = workflowrun;
@@ -72,6 +73,7 @@ public class Invocation implements java.io.Serializable {
 		this.realtimein = realtimein;
 		this.realtimeout = realtimeout;
 		this.didon = didon;
+		this.Timestamp = timestamp;
 	}
 
 	public Long getId() {
@@ -168,6 +170,14 @@ public class Invocation implements java.io.Serializable {
 
 	public void setRealTime(Long realTime) {
 		this.realtime = realTime;
+	}
+	
+	public Long getTimestamp() {
+		return this.Timestamp;
+	}
+
+	public void setTimestamp(Long timestamp) {
+		this.Timestamp = timestamp;
 	}
 
 	public Long getRealTimeIn() {

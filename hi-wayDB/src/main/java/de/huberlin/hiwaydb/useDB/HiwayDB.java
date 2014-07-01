@@ -52,12 +52,12 @@ public class HiwayDB implements HiwayDBI {
 		WriteHiwayDB writer = new WriteHiwayDB(this.dbURL, this.username,
 				this.password, "hibernate.cfg.xml");
 
-		int i = writer.lineToDB(entry);
+		String i = writer.lineToDB(entry);
 
-		if (i == 1) {
-			log.info("Write successful!!!");
+		if (i.isEmpty()) {
+			//log.info("Write successful!!!");
 		} else {
-			log.info("Write NOT!!! successful");
+			log.info("Fehler: " + i);
 		}
 	}
 
@@ -239,8 +239,7 @@ public class HiwayDB implements HiwayDBI {
 					&& tempInvoc.getTask().getTaskId() != 0
 					&& tempInvoc.getRealTime() != null) {
 				invoc.setHostName(tempInvoc.getHostname());
-					invoc.setRealTime(tempInvoc.getRealTime(), tempInvoc.getDidOn()
-						.getTime());
+					invoc.setRealTime(tempInvoc.getRealTime(), tempInvoc.getTimestamp());
 
 				Set<FileStat> iFiles = new HashSet<FileStat>();
 				Set<FileStat> oFiles = new HashSet<FileStat>();
@@ -350,16 +349,16 @@ public class HiwayDB implements HiwayDBI {
 
 		Query query = null;
 		List<Invocation> resultsInvoc = null;
-
-		Date seit = new Date(timestamp);
-		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
-				"yyyy-MM-dd HH:mm:ss");
-
-		String currentTime = sdf.format(seit);
+//
+//		Date seit = new Date(timestamp);
+//		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+//				"yyyy-MM-dd HH:mm:ss");
+//
+//		String currentTime = sdf.format(seit);
 
 		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"
-				+ hostName + "' and I.didon > '" + currentTime
-				+ "' and I.task = " + taskId);
+				+ hostName + "' and I.Timestamp >" + timestamp
+				+ " and I.task = " + taskId);
 
 		resultsInvoc = query.list();
 
