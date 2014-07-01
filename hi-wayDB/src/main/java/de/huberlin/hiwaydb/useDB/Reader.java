@@ -102,31 +102,40 @@ public class Reader {
 				// System.out.println("Task: "
 				// + f.getTaskId() + " RealTime:" + f.getRealTime());
 				// }
-
-				System.out.println("getHostnames:");
-
-				for (String f : testGet.getHostNames()) {
-					System.out.println(f.toString());
-				}
 //
-//				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
+//				System.out.println("getHostnames:");
 //
-//				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
+//				for (String f : testGet.getHostNames()) {
 //					System.out.println(f.toString());
 //				}
-//
-//				System.out.println("getTaskNames for ID :");
-//				System.out.println("1477422485611: "
-//						+ testGet.getTaskName(1477422485611l));
-//				System.out.println("240495169287: "
-//						+ testGet.getTaskName(240495169287l));
+////
+				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
 
-				// System.out.println("All Invocs:");
-				//
-				// for (InvocStat f : testGet.getLogEntries()) {
-				// System.out.println("Task: "
-				// + f.getTaskId() + " RealTime:" + f.getRealTime());
-				// }
+				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
+					System.out.println(f.toString());
+				}
+
+				System.out.println("getTaskNames for ID :");
+				System.out.println("240495169287: "
+						+ testGet.getTaskName(240495169287l));
+				System.out.println("240495169287: "
+						+ testGet.getTaskName(240495169287l));
+
+				 System.out.println("All Invocs:");
+				
+				 for (InvocStat f : testGet.getLogEntriesForTask(989639045l)) {
+				 System.out.println("Task: "
+				 + f.getTaskId() + " RealTime:" + f.getRealTime());
+				 
+				 for (FileStat fi :f.getInputFiles()){
+					 System.out.println("file in: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
+				 }
+				 
+				 
+				 for (FileStat fi :f.getOutputFiles()){
+					 System.out.println("file out: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
+				 }
+				 }
 
 			//	System.out.println("All for host:");
 
@@ -208,8 +217,8 @@ public class Reader {
 					// 
 					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
 					// String input =
-					// "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
-					String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\loglog.log";
+			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
+				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\loglog.log";
 
 					System.out.println("Input: " + input);
 

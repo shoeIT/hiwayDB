@@ -233,14 +233,13 @@ public class HiwayDB implements HiwayDBI {
 		for (int i = 0; i < invocations.size(); i++) {
 			tempInvoc = invocations.get(i);
 
-			InvocStat invoc = new InvocStat();
+			InvocStat invoc = new InvocStat(tempInvoc.getTask().getTaskId());
 
 			if (tempInvoc.getHostname() != null
 					&& tempInvoc.getTask().getTaskId() != 0
 					&& tempInvoc.getRealTime() != null) {
 				invoc.setHostName(tempInvoc.getHostname());
-				invoc.setTaskId(tempInvoc.getTask().getTaskId());
-				invoc.setRealTime(tempInvoc.getRealTime(), tempInvoc.getDidOn()
+					invoc.setRealTime(tempInvoc.getRealTime(), tempInvoc.getDidOn()
 						.getTime());
 
 				Set<FileStat> iFiles = new HashSet<FileStat>();
@@ -249,19 +248,20 @@ public class HiwayDB implements HiwayDBI {
 				// Files
 				for (File f : tempInvoc.getFiles()) {
 
-					FileStat ioFile;
-
-					ioFile = new FileStat();
-					ioFile.setFileName(f.getName());
+					FileStat iFile = new FileStat();
+					iFile.setFileName(f.getName());
+					
+					FileStat oFile = new FileStat();
+					oFile.setFileName(f.getName());
 
 					if (f.getRealTimeIn() != null) {
-						iFiles.add(ioFile);
-						ioFile.setRealTime(f.getRealTimeIn());
+						iFile.setRealTime(f.getRealTimeIn());
+						iFiles.add(iFile);
 					}
 
 					if (f.getRealTimeOut() != null) {
-						oFiles.add(ioFile);
-						ioFile.setRealTime(f.getRealTimeOut());
+						oFile.setRealTime(f.getRealTimeOut());
+						oFiles.add(oFile);
 					}
 
 					invoc.setInputfiles(iFiles);

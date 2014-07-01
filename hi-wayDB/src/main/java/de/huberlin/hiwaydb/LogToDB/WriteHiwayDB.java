@@ -3,6 +3,7 @@ package de.huberlin.hiwaydb.LogToDB;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class WriteHiwayDB {
 			Query query = null;
 			List<Task> resultsTasks = null;
 			List<Workflowrun> resultsWfRun = null;
-			List<File> resultsFile = null;
+			List<File> resultsFile =  new ArrayList();
 		
 			String runID = null;
 			Long wfId = null;
@@ -116,9 +117,23 @@ public class WriteHiwayDB {
 			if (logEntryRow.getFile() != null) {
 				filename = logEntryRow.getFile();
 
-				query = session.createQuery("FROM File E WHERE E.name='"
-						+ filename + "' AND E.invocation=" + invocID);
-				resultsFile = query.list();
+
+//				query = session.createQuery("FROM File E WHERE E.name='"
+//						+ filename + "' AND E.invocation" + invocID);
+				
+				query = session.createQuery("FROM File E WHERE E.name='"+ filename + "'");
+							
+				
+				List<File> resultsFileTemp = query.list();
+			
+								
+				for (File f : resultsFileTemp)
+				{
+					if(f.getInvocation().getInvocationId()==invocID)
+					{
+						resultsFile.add(f);
+					}
+				}
 			}
 
 			
@@ -134,6 +149,7 @@ public class WriteHiwayDB {
 			File file = null;
 			if (resultsFile != null && !resultsFile.isEmpty()) {
 				file = resultsFile.get(0);
+				System.out.println("File haben wir:" + file.getName() + file.getId());
 			}
 
 			// tx = session.beginTransaction();
@@ -238,11 +254,9 @@ public class WriteHiwayDB {
 				break;
 			case "invoc-time-stageout":
 				valuePart = logEntryRow.getValueJsonObj();
-
-			
+	
 				invoc.setRealTimeOut( GetTimeStat(valuePart));
-					
-				
+									
 				//invoc.setRealTimeIn(realtimein)
 				break;
 								
