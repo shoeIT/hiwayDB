@@ -336,9 +336,7 @@ public class WriteHiwayDB {
 			if (tx != null)
 				tx.rollback();
 			log.info(e);
-			
-			
-			
+					
 			//e.printStackTrace();
 			// throw e;
 			return "Fehler: " + e.getMessage();
