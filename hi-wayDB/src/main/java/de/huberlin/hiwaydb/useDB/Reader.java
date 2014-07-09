@@ -74,9 +74,12 @@ public class Reader {
 					// 
 					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
 					// String input =
+				//i1_s368_r1_placementAware
 			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
-				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\loglog.log";
+				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\i1_s368_r1_placementAware.log";
 
+				
+				
 					System.out.println("Input: " + input);
 
 					if (input.endsWith(".log")) {
@@ -303,7 +306,8 @@ public class Reader {
 					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
 					// String input =
 			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
-				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\loglog.log";
+				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\i1_s368_r1_placementAware.log";
+
 
 					System.out.println("Input: " + input);
 

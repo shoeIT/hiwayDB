@@ -49,7 +49,7 @@ public class WriteHiwayDB {
 	private static final Log log = LogFactory.getLog(HiwayDB.class);
 
 	CouchbaseClient client = null;
-	
+
 	private boolean noSql = false;
 
 	// public WriteHiwayDB(String configFile) {
@@ -79,17 +79,15 @@ public class WriteHiwayDB {
 			System.err.println("Error connecting to Couchbase: "
 					+ e.getMessage());
 			System.exit(0);
+		}
+		// finally {
+		// // Shutting down properly
+		// client.shutdown();
+		// }
 	}
-//			finally {
-//			// Shutting down properly
-//			client.shutdown();
-//		}
-	}
-	
-	public void shutdown()
-	{
-		if(client!=null)
-		{
+
+	public void shutdown() {
+		if (client != null) {
 			client.shutdown();
 		}
 	}
@@ -100,9 +98,8 @@ public class WriteHiwayDB {
 
 			System.out.println(logEntryRow.toString());
 
-			
 			String runID = null;
-			
+
 			if (logEntryRow.getRunId() != null) {
 				runID = logEntryRow.getRunId().toString();
 			}
@@ -124,256 +121,216 @@ public class WriteHiwayDB {
 			if (logEntryRow.getFile() != null) {
 				filename = logEntryRow.getFile();
 			}
-			
-			JSONObject document = null;
-			InvocDoc actualDocument = null;
+
+			InvocDoc invocDocument = null;
+			WfRunDoc wfRunDocument = null;
+
 			Gson gson = new Gson();
-			WfRunDoc  wfRunDocument = null;
-			
+
 			if (runID != null) {
-				
+
 				String wfRunDoc = (String) client.get(runID);
-				
-				if(wfRunDoc != null)
-				{
+
+				if (wfRunDoc != null) {
 					wfRunDocument = gson.fromJson(wfRunDoc, WfRunDoc.class);
-					
-					//System.out.println("Haben das doc schon: ID" + actualDocument.getRunId() + "_" + actualDocument.getInvocId());
-				}	
-				else
-				{
+
+					// System.out.println("Haben das doc schon: ID" +
+					// actualDocument.getRunId() + "_" +
+					// actualDocument.getInvocId());
+				} else {
 					wfRunDocument = new WfRunDoc();
 					wfRunDocument.setRunId(runID);
-					
-					client.set(runID, gson.toJson(wfRunDocument));
-					System.out.println("WFRun: " + runID + " gespeichert");
-				}			
-			}
-			
 
-		
+					// client.set(runID, gson.toJson(wfRunDocument));
+					System.out.println("WFRun: " + runID + " gespeichert");
+				}
+			}
+
 			String documentId = runID + "_" + invocID;
 
 			String documentJSON = (String) client.get(documentId);
-					
+
 			String key = logEntryRow.getKey();
 
-			if(invocID!=0)
-			{
-				
-				if (documentJSON != null) {
-								
-					actualDocument = gson.fromJson(documentJSON, InvocDoc.class);
-					
-					System.out.println("Haben das doc schon: ID" + actualDocument.getRunId() + "_" + actualDocument.getInvocId());
-				}
-				else
-				{
-					
-					actualDocument = new InvocDoc();
-					HashSet<String> test =  new HashSet<String>();
-					
-					Map<String, String> input = new HashMap<String, String>();
-					
-					input.put("key1", "value1");
-					input.put("key2", "value2");
-					input.put("key3", "value3");
-								
-					Map<String, HashMap<String,Long>> files = new HashMap<String, HashMap<String,Long>>();
-							
-					HashMap<String, Long> oneFile = new HashMap<String,Long>();
-					
-					oneFile.put("size", 1l);
-					oneFile.put("reltimein",33l);
-					oneFile.put("realtimeout", 433l);
-					
-					files.put("file1",oneFile);
-					
-					oneFile.put("size", 2l);
-					oneFile.put("reltimein",332l);
-					oneFile.put("realtimeout", 4323l);
-					
-					files.put("file2",oneFile);
-					
-				
-					actualDocument.setInvocId(invocID);
-					actualDocument.setRunId(runID);
-					actualDocument.setTaskId(taskID);
-					//actualDocument.setValue(logEntryRow.getValueJsonObj().toString());
-					actualDocument.setKey(key);
-					
-					actualDocument.setLang(logEntryRow.getLang());
-					actualDocument.setTaskname(logEntryRow.getTaskName());
-					actualDocument.setUserevents(test);
+			if (invocID != 0) {
 
-					actualDocument.setInput(input);
-					actualDocument.setFiles(files);
-					
-						
-//					
-//					
-//					Long[] file11 = {1l,2l,44l};
-//					Long[] file33 = {4l,6l,444l};
-//					 HashMap<String,Long[]> test444 = new HashMap<String,Long[]>();
-//					 test444.put("file1", file11);
-//					
-//					files2.add(test444);
-//					
-				//	actualDocument.setFiles2(files2);
-					//files.add(file1);files.add(file2);files.add(file3);
-			
-					
-					client.set(documentId, gson.toJson(actualDocument));
-					System.out.println("ID" + documentId + " gespeichert");
+				if (documentJSON != null) {
+
+					invocDocument = gson.fromJson(documentJSON, InvocDoc.class);
+
+				} else {
+
+					invocDocument = new InvocDoc();
+
+					invocDocument.setInvocId(invocID);
+					invocDocument.setRunId(runID);
+
+					System.out.println("NEUES Doc ID" + documentId
+							+ " angelegt.");
 				}
 			}
-			
 
+			Map<String, HashMap<String, Long>> files = null;
+			HashMap<String, Long> oneFile = null;
 			JSONObject valuePart;
-//			switch (key) {
-//			case HiwayDBI.KEY_INVOC_HOST:
-				//invoc.setHostname(logEntryRow.getValueRawString());
+			Map<String, String> hiwayEvents = wfRunDocument.getHiwayEvent();
+
+			if (invocDocument != null && invocID != 0) {
+				invocDocument.setTaskId(taskID);
+				invocDocument.setLang(logEntryRow.getLang());
+				invocDocument.setTaskname(logEntryRow.getTaskName());
+				files = invocDocument.getFiles();
+
+				if (filename != null) {
+					oneFile = files.get(filename);
+				}
+			}
+
+			if (oneFile == null) {
+				oneFile = new HashMap<String, Long>();
+			}
+
+			switch (key) {
+			case HiwayDBI.KEY_INVOC_HOST:
+				invocDocument.setHostname(logEntryRow.getValueRawString());
+
+				break;
+			case "wf-name":
+				wfRunDocument.setName(logEntryRow.getValueRawString());
+				break;
+			case "wf-time":
+				String val = logEntryRow.getValueRawString();
+				Long test = Long.parseLong(val, 10);
+				wfRunDocument.setWfTime(test);
 				
-//				break;
-//			case "wf-name":
-//				wfRun.setWfName(logEntryRow.getValueRawString());
-//				break;
-//			case "wf-time":
-//				String val = logEntryRow.getValueRawString();
-//				Long test = Long.parseLong(val, 10);
-//
-//				wfRun.setWfTime(test);
-//				break;
-//			case HiwayDBI.KEY_INVOC_TIME_SCHED:
-//				valuePart = logEntryRow.getValueJsonObj();
-//				invoc.setScheduleTime(GetTimeStat(valuePart));
-//				break;
-//
-//			case JsonReportEntry.KEY_INVOC_STDERR:
-//				invoc.setStandardError(logEntryRow.getValueRawString());
-//				break;
-//
-//			case "invoc-exec":
-//				valuePart = logEntryRow.getValueJsonObj();
-//
-//				Inoutput input = new Inoutput();
-//				input.setKeypart("invoc-exec");
-//				input.setInvocation(invoc);
-//				input.setContent(valuePart.toString());
-//				input.setType("input");
-//				session.save(input);
-//				break;
-//
-//			case JsonReportEntry.KEY_INVOC_OUTPUT:
-//				valuePart = logEntryRow.getValueJsonObj();
-//
-//				Inoutput output = new Inoutput();
-//				output.setKeypart("invoc-output");
-//				output.setInvocation(invoc);
-//				output.setContent(valuePart.toString());
-//				output.setType("output");
-//				session.save(output);
-//				break;
-//
-//			case JsonReportEntry.KEY_INVOC_STDOUT:
-//				invoc.setStandardOut(logEntryRow.getValueRawString());
-//				break;
-//
-//			case "invoc-time-stagein":
-//				valuePart = logEntryRow.getValueJsonObj();
-//
-//				invoc.setRealTimeIn(GetTimeStat(valuePart));
-//
-//				// invoc.setRealTimeIn(realtimein)
-//				break;
-//			case "invoc-time-stageout":
-//				valuePart = logEntryRow.getValueJsonObj();
-//
-//				invoc.setRealTimeOut(GetTimeStat(valuePart));
-//
-//				// invoc.setRealTimeIn(realtimein)
-//				break;
-//
-//			case HiwayDBI.KEY_FILE_TIME_STAGEIN:
-//				valuePart = logEntryRow.getValueJsonObj();
-//				file.setRealTimeIn(GetTimeStat(valuePart));
-//
-//				break;
-//			case HiwayDBI.KEY_FILE_TIME_STAGEOUT:
-//				valuePart = logEntryRow.getValueJsonObj();
-//
-//				file.setRealTimeOut(GetTimeStat(valuePart));
-//				break;
-//
-//			case JsonReportEntry.KEY_INVOC_TIME:
-//				valuePart = logEntryRow.getValueJsonObj();
-//
-//				try {
-//					invoc.setRealTime(GetTimeStat(valuePart));
-//				} catch (NumberFormatException e) {
-//					invoc.setRealTime(1l);
-//				}
-//
-//				break;
-//			case "file-size-stagein":
-//
-//				file.setSize(Long.parseLong(logEntryRow.getValueRawString(), 10));
-//
-//				break;
-//			case "file-size-stageout":
-//
-//				file.setSize(Long.parseLong(logEntryRow.getValueRawString(), 10));
-//
-//				break;
-//			case HiwayDBI.KEY_HIWAY_EVENT:
-//				valuePart = logEntryRow.getValueJsonObj();
-//
-//				Hiwayevent he = new Hiwayevent();
-//				he.setWorkflowrun(wfRun);
-//				he.setContent(valuePart.toString());
-//				he.setType(valuePart.get("type").toString());
-//				session.save(he);
-//
-//				break;
-//			case "reduction-time":
-//
-//				break;
-//			default:
-//				throw new Exception("Der Typ ist nicht bekannt.:" + key);
-//			}
-//
-//			tx.commit();
+				break;
+			case HiwayDBI.KEY_INVOC_TIME_SCHED:
+				valuePart = logEntryRow.getValueJsonObj();
+				invocDocument.setScheduleTime(GetTimeStat(valuePart));
+				break;
+			case JsonReportEntry.KEY_INVOC_STDERR:
+				invocDocument.setStandardError(logEntryRow.getValueRawString());
+				break;
+
+			case "invoc-exec":
+				valuePart = logEntryRow.getValueJsonObj();
+
+				Map<String, String> input = invocDocument.getInput();
+				input.put("invoc-exec", valuePart.toString());
+				invocDocument.setInput(input);
+				break;
+
+			case JsonReportEntry.KEY_INVOC_OUTPUT:
+				valuePart = logEntryRow.getValueJsonObj();
+
+				Map<String, String> output = invocDocument.getOutput();
+				output.put("invoc-output", valuePart.toString());
+				invocDocument.setOutput(output);
+				break;
+
+			case JsonReportEntry.KEY_INVOC_STDOUT:
+				invocDocument.setStandardOut(logEntryRow.getValueRawString());
+				break;
+
+			case "invoc-time-stagein":
+				valuePart = logEntryRow.getValueJsonObj();
+				invocDocument.setRealTimeIn(GetTimeStat(valuePart));
+				break;
+			case "invoc-time-stageout":
+				valuePart = logEntryRow.getValueJsonObj();
+				invocDocument.setRealTimeOut(GetTimeStat(valuePart));
+				break;
+
+			case HiwayDBI.KEY_FILE_TIME_STAGEIN:
+				valuePart = logEntryRow.getValueJsonObj();
+
+				oneFile.put("realTimeIn", GetTimeStat(valuePart));
+
+				files.put(filename, oneFile);
+				invocDocument.setFiles(files);
+
+				break;
+			case HiwayDBI.KEY_FILE_TIME_STAGEOUT:
+				valuePart = logEntryRow.getValueJsonObj();
+
+				oneFile.put("realTimeOut", GetTimeStat(valuePart));
+
+				files.put(filename, oneFile);
+				invocDocument.setFiles(files);
+
+				break;
+			case JsonReportEntry.KEY_INVOC_TIME:
+				valuePart = logEntryRow.getValueJsonObj();
+
+				try {
+					invocDocument.setRealTimeIn(GetTimeStat(valuePart));
+				} catch (NumberFormatException e) {
+					invocDocument.setRealTimeIn(1l);
+				}
+
+				break;
+			case "file-size-stagein":
+				oneFile.put("size",
+						Long.parseLong(logEntryRow.getValueRawString(), 10));
+
+				files.put(filename, oneFile);
+				invocDocument.setFiles(files);
+				break;
+			case "file-size-stageout":
+				oneFile.put("size",
+						Long.parseLong(logEntryRow.getValueRawString(), 10));
+
+				files.put(filename, oneFile);
+				invocDocument.setFiles(files);
+				break;
+			case HiwayDBI.KEY_HIWAY_EVENT:
+				valuePart = logEntryRow.getValueJsonObj();
+
+				hiwayEvents.put(valuePart.get("type").toString(),
+						valuePart.toString());
+				wfRunDocument.setHiwayEvent(hiwayEvents);
+
+				break;
+			case "reduction-time":
+				wfRunDocument.setReductionTime(Long.parseLong(
+						logEntryRow.getValueRawString(), 10));
+
+				break;
+			default:
+				throw new Exception("Der Typ ist nicht bekannt.:" + key);
+			}
+
+			if (invocDocument != null) {
+				client.set(documentId, gson.toJson(invocDocument));
+			}
+
+			client.set(runID, gson.toJson(wfRunDocument));
 
 			return "";
+
 		} catch (Exception e) {
-			
+
 			log.info(e);
 
-			 e.printStackTrace();
+			e.printStackTrace();
 			// throw e;
 			return "Fehler: " + e.getMessage();
 			// return 1;
 
 		} finally {
-			//client.shutdown();
+			// client.shutdown();
 		}
 	}
 
 	public String lineToDB(JsonReportEntry logEntryRow) {
 
-			
-		
 		try {
-			
-			if(noSql)
-			{
+
+			if (noSql) {
 				return lineToCouchbase(logEntryRow);
 			}
-			
-			
+
 			System.out.println(logEntryRow.toString());
-			
-		
 
 			session = dbSessionFactory.openSession();
 			tx = session.beginTransaction();
@@ -646,10 +603,9 @@ public class WriteHiwayDB {
 			// return 1;
 
 		} finally {
-			if(session!=null)
-			{
+			if (session != null) {
 				session.close();
-			}			
+			}
 		}
 	}
 

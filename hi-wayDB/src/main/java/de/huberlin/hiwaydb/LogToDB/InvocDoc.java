@@ -18,14 +18,19 @@ public class InvocDoc {
 	private String taskname;
 	private Long taskId;
 	private String lang;
-	private String key;
-	private String value;
+
+	private String hostname;
+	private Long scheduleTime;
+	private String standardError;
+	private String standardOut;
+	
+	private Long realTimeIn;
+	private Long realTimeOut;
 	
 	private Set<String> userevents = new HashSet<String>(0);
 	private Map<String, String>  input = new HashMap<String, String> (0);
-	private Set<Pair<String,String>> output = new HashSet<Pair<String,String>>(0);
-	
-	private 	Map<String, HashMap<String,Long>> files = new HashMap<String, HashMap<String,Long>>();
+	private Map<String, String> output = new HashMap<String, String> (0);
+	private Map<String, HashMap<String,Long>> files = new HashMap<String, HashMap<String,Long>>();
 	
 
 	public 	Map<String, HashMap<String,Long>> getFiles() {
@@ -36,23 +41,12 @@ public class InvocDoc {
 		this.files = files;
 	}
 	
-private 	ArrayList<HashMap<String, Long[]>> files2 = new ArrayList<HashMap<String, Long[]>>(0);
 	
-
-	public 	ArrayList<HashMap<String, Long[]>> getFiles2() {
-		return this.files2;
-	}
-
-	public void setFiles2(	ArrayList<HashMap<String, Long[]>> files2) {
-		this.files2 = files2;
-	}
-	
-	
-	public Set<Pair<String,String>> getOutput() {
+	public Map<String, String> getOutput() {
 		return this.output;
 	}
 
-	public void setOutput(Set<Pair<String,String>> output) {
+	public void setOutput(Map<String, String> output) {
 		this.output = output;
 	}
 
@@ -72,22 +66,6 @@ private 	ArrayList<HashMap<String, Long[]>> files2 = new ArrayList<HashMap<Strin
 		this.userevents = userevents;
 	}
 
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
-	}
 
 	public String getLang() {
 		return lang;
@@ -135,6 +113,54 @@ private 	ArrayList<HashMap<String, Long[]>> files2 = new ArrayList<HashMap<Strin
 
 	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
+	}
+
+	public Long getScheduleTime() {
+		return scheduleTime;
+	}
+
+	public void setScheduleTime(Long scheduleTime) {
+		this.scheduleTime = scheduleTime;
+	}
+
+	public String getStandardError() {
+		return standardError;
+	}
+
+	public void setStandardError(String standardError) {
+		this.standardError = standardError;
+	}
+
+	public String getStandardOut() {
+		return standardOut;
+	}
+
+	public void setStandardOut(String standardOut) {
+		this.standardOut = standardOut;
+	}
+
+	public Long getRealTimeIn() {
+		return realTimeIn;
+	}
+
+	public void setRealTimeIn(Long realTimeIn) {
+		this.realTimeIn = realTimeIn;
+	}
+
+	public Long getRealTimeOut() {
+		return realTimeOut;
+	}
+
+	public void setRealTimeOut(Long realTimeOut) {
+		this.realTimeOut = realTimeOut;
 	}
 
 }
