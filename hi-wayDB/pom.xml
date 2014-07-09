@@ -11,6 +11,7 @@
 
 
 	<dependencies>
+<<<<<<< HEAD
 	<dependency>
 	<groupId>commons-logging</groupId>
 	<artifactId>commons-logging</artifactId>
@@ -32,6 +33,23 @@
 	<version>2.2.4</version>
 </dependency>
   
+=======
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>4.3.0.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>com.couchbase.client</groupId>
+			<artifactId>couchbase-client</artifactId>
+			<version>1.4.1</version>
+		</dependency>
+>>>>>>> branch 'master' of https://github.com/shoeIT/hiwayDB.git
 
 		<dependency>
 			<groupId>de.huberlin.wbi.cuneiform</groupId>
@@ -68,11 +86,22 @@
 	</dependencies>
 	<repositories>
 		<repository>
-			<id>raps</id>
-			<name>raps-releases</name>
-			<url>http://raps:28082/artifactory/brandjoe</url>
+			<id>BiobankCloud-releases</id>
+			<name>BiobankCloud-releases</name>
+			<url>https://klette.informatik.hu-berlin.de/artifactory/BiobankCloud-releases</url>
 			<releases>
 				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>BiobankCloud-snapshot</id>
+			<name>BiobankCloud-snapshot</name>
+			<url>https://klette.informatik.hu-berlin.de/artifactory/BiobankCloud-snapshot</url>
+			<releases>
+				<enabled>false</enabled>
 			</releases>
 			<snapshots>
 				<enabled>true</enabled>
