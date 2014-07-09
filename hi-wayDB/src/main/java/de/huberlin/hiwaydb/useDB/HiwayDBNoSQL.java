@@ -39,7 +39,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 //	List<URI> uris = new ArrayList<URI>();
 //	uris.add(URI.create("http://127.0.0.1:8091/pools"));
 //
-//	writer = new WriteHiwayDB(uris,	"hiwaydb", "");
+//	writer = new WriteHiwayDB(uris,	"hiwaydb",d "");
 	
 	public HiwayDBNoSQL(String bucket, String password, List<URI> dbURLs) {
 		this.bucket = bucket;
