@@ -15,6 +15,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import net.spy.memcached.internal.OperationFuture;
 
 import org.json.JSONException;
 
@@ -49,30 +53,110 @@ public class Reader {
 
 			if (lineIn.equalsIgnoreCase("c")) {
 				
+				
 				System.out.println("couchbase connecten...");
+				
+				
+				WriteHiwayDB writer = null;
+				
+				List<URI> uris = new ArrayList<URI>();
+				uris.add(URI.create("http://127.0.0.1:8091/pools"));
 
-				// (Subset) of nodes in the cluster to establish a connection
-				List<URI> hosts = Arrays.asList(new URI(
-						"http://127.0.0.1:8091/pools"));
+				writer = new WriteHiwayDB(uris,	"hiwaydb", "");
+				
+				
 
-				// Name of the Bucket to connect to
-				String bucket = "default";
+					// String input = "D:\\Temp\\" + args[0];
+					// e00_01_3r_variant-call-setup-09_001
+					// e00_02_2r_variant-call-setup-09_001
+					// e11_11_1x_variant-call-09_003
+					//
+					// 
+					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
+					// String input =
+			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
+				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\loglog.log";
 
-				// Password of the bucket (empty) string if none
-				String password = "";
+					System.out.println("Input: " + input);
 
-				// Connect to the Cluster
-				CouchbaseClient client = new CouchbaseClient(hosts, bucket,
-						password);
+					if (input.endsWith(".log")) {
 
-				// Store a Document
-				client.set("my-first-document", "Hello Couchbase!").get();
+						fFilePath = Paths.get(input);
 
-				// Retreive the Document and print it
-				System.out.println(client.get("my-first-document"));
+						String result = "";
+						int i = 0;
+						try (Scanner scanner = new Scanner(fFilePath,
+								ENCODING.name())) {
+							while (scanner.hasNextLine()) {
+								i++;
+								System.out.println("line " + i);
 
-				// Shutting down properly
-				client.shutdown();
+								String line = scanner.nextLine();
+
+								line = line.replaceAll("\0", "");
+
+								if (!line.isEmpty()) {
+
+									try {
+										result = writer.lineToDB(new JsonReportEntry(line));
+									} catch (JSONException e) {
+										System.out
+												.println("JSON Exception FEHLER!!!!!!!!!!!!: "
+														+ e);
+										//jsonFehler.add("Z" + i + " | "+ e.getMessage());
+									} catch (org.hibernate.exception.ConstraintViolationException e) {
+										System.out
+												.println(" Hibernate FEHLER!!!!!!!!!!!!: "
+														+ e);
+										//fehler.add("Z" + i + " | "+ e.getMessage());
+									} catch (Exception e) {
+										System.out
+												.println("FEHLER!!!!!!!!!!!!: "+ e);
+									//fehler.add("Z" + i + " | "+ e.getMessage());
+									}
+								}
+
+								if (!result.isEmpty())
+									break;
+							}
+						}
+					} else {
+						System.out
+								.println("Eingabe: keine Logdatei, String direkt uebergeben.");
+						writer.lineToDB(new JsonReportEntry(args[0].toString()));
+					}
+					
+					writer.shutdown();
+				  
+
+					
+				
+//					CouchbaseClient client = null;
+//					List<URI> uris = new ArrayList<URI>();
+//					uris.add(URI.create("http://127.0.0.1:8091/pools"));
+//
+//					try {
+//					  client = new CouchbaseClient(uris, "hiwaydblog", "");
+//					  
+//					  try {
+//						    OperationFuture<Boolean> future = client.set("key", "value");
+//						    boolean result = future.get();
+//						    
+//						    
+//						} catch (IllegalStateException ex) {
+//						    // outpacing the network, probably back off and retry
+//						    // or backpressure to upper layers
+//						} catch(RuntimeException ex) {
+//						    if (ex.getCause() instanceof TimeoutException) {
+//						       // operation timed out 
+//						    }
+//						} catch(ExecutionException ex) {
+//						    // operation was cancelled or an exception was raised somewhere in the
+//						    // internal code path
+//						}
+				  
+				  
+				//} 				
 
 			} else if (lineIn.equalsIgnoreCase("db")) {
 
