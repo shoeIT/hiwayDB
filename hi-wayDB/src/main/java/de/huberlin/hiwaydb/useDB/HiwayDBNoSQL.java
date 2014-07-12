@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -15,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 
 import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.protocol.views.ComplexKey;
 import com.couchbase.client.protocol.views.Query;
 import com.couchbase.client.protocol.views.View;
 import com.couchbase.client.protocol.views.ViewResponse;
@@ -97,21 +99,19 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// Iterate over the found documents
 		for(ViewRow row : result) {
 		  // Use Google GSON to parse the JSON into a HashMap
+			 System.out.println("resrow: "+ row.getValue()) ;
 		  HashMap<String, String> parsedDoc = gson.fromJson((String)row.getDocument(), HashMap.class);
-		 
-		  tempResult.add(parsedDoc.get("hostname"));
-		  // Create a HashMap which will be stored in the beers list.
-		  HashMap<String, String> hostname = new HashMap<String, String>();
-		  hostname.put("id", row.getId());
-		  hostname.put("name", parsedDoc.get("hostname"));
-		  hostnames.add(hostname);
+//		 System.out.println("ID: " + row.getId() + " host"  + parsedDoc.get("hostname")) ;
+//		  tempResult.add(parsedDoc.get("hostname"));
+//		  // Create a HashMap which will be stored in the beers list.
+//		  HashMap<String, String> hostname = new HashMap<String, String>();
+//		  hostname.put("id", row.getId());
+//		  hostname.put("name", parsedDoc.get("hostname"));
+//		  hostnames.add(hostname);
 		}
+				
+		//shutdown();
 		
-		
-		shutdown();
-		
-	
-
 		return tempResult;
 	}
 
@@ -193,6 +193,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 					invocDocument.setInvocId(invocID);
 					invocDocument.setRunId(runID);
+					invocDocument.setTimestamp(timestampTemp);
 
 					System.out.println("NEUES Doc ID" + documentId
 							+ " angelegt.");
@@ -390,7 +391,85 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
 			String hostName, long timestamp) {
-		// TODO Auto-generated method stub
-		return null;
+		View view = client.getView("dev_Invoc", "LogEntriesForTaskOnHostSince");
+
+		Gson gson = new Gson();
+		// Set up the Query object
+		Query query = new Query();
+		
+		//["dbis14",3246099067099]
+		query.setIncludeDocs(true).setKey(ComplexKey.of(hostName,taskId));
+		// We the full documents and only the top 20
+		//.setLimit(20);
+
+		// Query the Cluster
+		ViewResponse result = client.query(view, query);
+
+		// This ArrayList will contain all found beers
+		ArrayList<HashMap<String, String>> hostnames = new ArrayList<HashMap<String, String>>();
+
+		InvocDoc invocDocument= new InvocDoc();
+		Set<InvocStat> tempResult = new HashSet<InvocStat>();
+		InvocStat temp = null;
+		
+		//shutdown();
+		return createInvocStat(result);
 	}
+	
+	private Set<InvocStat> createInvocStat(ViewResponse result)
+	{
+		InvocDoc invocDocument= new InvocDoc();
+		Set<InvocStat> tempResult = new HashSet<InvocStat>();
+		Gson gson = new Gson();
+		
+		
+		InvocStat temp = null;
+		// Iterate over the found documents
+		for(ViewRow row : result) {
+		 
+			 System.out.println("resrow: "+ row.getValue()) ;
+			 invocDocument = gson.fromJson((String)row.getDocument(), InvocDoc.class);
+		 
+			 temp= new InvocStat(invocDocument.getTaskId());
+			 temp.setHostName(invocDocument.getHostname());
+						 
+			 Map<String, HashMap<String, Long>> output = invocDocument.getFiles();
+			 List<FileStat> fileStatout = new ArrayList<FileStat>();
+			 List<FileStat> fileStatin = new ArrayList<FileStat>();
+			 FileStat file = null;
+			 Long in = 0l;
+			 Long out = 0l;
+			 
+			for(Entry<String, HashMap<String, Long>> val : output.entrySet())
+			{
+				file = new FileStat();
+				file.setFileName(val.getKey());
+				in = val.getValue().get("realTimeIn");
+				out =val.getValue().get("realTimeOut");
+			
+				file.setSize(val.getValue().get("size"));
+				
+				if(in!=null && !in.equals(""))
+				{
+					file.setRealTime(in);
+					fileStatin.add(file);
+				}	
+				
+				if(out!=null && !out.equals(""))
+				{
+					file.setRealTime(out);
+					fileStatout.add(file);
+				}	
+				
+			}
+			 temp.setOutputfiles(fileStatout);
+			 temp.setInputfiles(fileStatin);
+			 tempResult.add(temp);
+			 
+		}
+				
+		//shutdown();
+		return tempResult;
+		}
+	
 }

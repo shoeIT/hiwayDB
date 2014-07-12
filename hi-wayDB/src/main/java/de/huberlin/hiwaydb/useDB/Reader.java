@@ -208,21 +208,30 @@ public class Reader {
 				// }
 				//
 				
-//				 Calendar cal = Calendar.getInstance();
-//				 cal.set(2014, Calendar.JUNE, 22);
-//				
-//				 System.out.println("All for host since: 1403599949182 " );
-//				 //_2014-06-20 17:03:58
-//				 
-//				// java.util.Date dt = new java.util.Date();
-//
-//				
-//				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(989639045l,
-//				 "hiway", 1403599949113l)) {
-//				 System.out.println("Host: " + f.getHostName() + "TaskID: "
-//				 + f.getTaskId() + " | RealTime:" + f.getRealTime()
-//				 + " Date: " + f.getTimestamp());
-//				 }
+				 Calendar cal = Calendar.getInstance();
+				 cal.set(2014, Calendar.JUNE, 22);
+				
+				 System.out.println("All for host since: 1403599949182 " );
+				 //_2014-06-20 17:03:58
+				 
+				// java.util.Date dt = new java.util.Date();
+
+				//["dbis14",3246099067099]
+				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(3246099067099l,
+				 "dbis14",3246099067099l)) {
+				 System.out.println("Host: " + f.getHostName() + "TaskID: "
+				 + f.getTaskId()
+				+ " | RealTime:" + f.getRealTime());
+				 //+ " Date: " + f.getTimestamp());
+				 for (FileStat fi :f.getInputFiles()){
+					 System.out.println("file in: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
+				 }
+				 
+				 
+				 for (FileStat fi :f.getOutputFiles()){
+					 System.out.println("file out: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
+				 }
+				 }
 
 //				System.out.println("All for Task on Host:");
 //				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
