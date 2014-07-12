@@ -29,7 +29,6 @@ import com.couchbase.client.CouchbaseClient;
 import com.google.gson.Gson;
 import com.sun.tools.javac.util.Pair;
 
-import de.huberlin.hiwaydb.dal.DBConnection;
 import de.huberlin.hiwaydb.dal.File;
 import de.huberlin.hiwaydb.dal.Hiwayevent;
 import de.huberlin.hiwaydb.dal.Inoutput;
@@ -63,9 +62,9 @@ public class WriteHiwayDB {
 			String file) {
 		// System.out.println("MAKE CONNECTIONNNNNNNNNNNNNNNNNNN");
 
-		DBConnection con = new DBConnection(dbURL, username, password, file);
+		//DBConnection con = new DBConnection(dbURL, username, password, file);
 
-		dbSessionFactory = con.getDBSession();
+		//dbSessionFactory = con.getDBSession();
 	}
 
 	public WriteHiwayDB(List<URI> uris, String bucketName, String password) {

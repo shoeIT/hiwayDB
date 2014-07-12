@@ -67,7 +67,7 @@
 		</dependency>
 	</dependencies>
 	<repositories>
-		<repository>
+		<!--<repository>
 			<id>BiobankCloud-releases</id>
 			<name>BiobankCloud-releases</name>
 			<url>https://klette.informatik.hu-berlin.de/artifactory/BiobankCloud-releases</url>
@@ -88,7 +88,7 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-		</repository>
+		</repository>-->
 	</repositories>
 	<build>
 		<plugins>
