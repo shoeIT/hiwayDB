@@ -25,7 +25,6 @@ import org.json.JSONException;
 import com.couchbase.client.CouchbaseClient;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
-import de.huberlin.hiwaydb.LogToDB.WriteHiwayDB;
 import de.huberlin.hiwaydb.dal.File;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
@@ -57,12 +56,12 @@ public class Reader {
 				System.out.println("couchbase connecten...");
 				
 				
-				WriteHiwayDB writer = null;
+				HiwayDBI writer = null;
 				
 				List<URI> uris = new ArrayList<URI>();
 				uris.add(URI.create("http://127.0.0.1:8091/pools"));
 
-				writer = new WriteHiwayDB(uris,	"hiwaydb", "");
+				writer = new HiwayDBNoSQL("hiwaydb",	"", uris);
 				
 				
 
@@ -101,7 +100,7 @@ public class Reader {
 								if (!line.isEmpty()) {
 
 									try {
-										result = writer.lineToDB(new JsonReportEntry(line));
+										writer.logToDB(new JsonReportEntry(line));
 									} catch (JSONException e) {
 										System.out
 												.println("JSON Exception FEHLER!!!!!!!!!!!!: "
@@ -126,10 +125,10 @@ public class Reader {
 					} else {
 						System.out
 								.println("Eingabe: keine Logdatei, String direkt uebergeben.");
-						writer.lineToDB(new JsonReportEntry(args[0].toString()));
+						writer.logToDB(new JsonReportEntry(args[0].toString()));
 					}
 					
-					writer.shutdown();
+				//	writer.shutdown();
 				  					
 
 			} else if (lineIn.equalsIgnoreCase("cRead")) {
@@ -165,12 +164,12 @@ public class Reader {
 				// + f.getTaskId() + " RealTime:" + f.getRealTime());
 				// }
 //
-				System.out.println("getHostnames:");
-
-				for (String f : testGet.getHostNames()) {
-					System.out.println(f.toString());
-				}
-//////
+//				System.out.println("getHostnames:");
+//
+//				for (String f : testGet.getHostNames()) {
+//					System.out.println(f.toString());
+//				}
+////////
 //				System.out.println("TaskIDs for Workflow:variant-call-09.cf");
 //
 //				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
@@ -216,21 +215,23 @@ public class Reader {
 				 
 				// java.util.Date dt = new java.util.Date();
 
-				//["dbis14",3246099067099]
-				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(3246099067099l,
-				 "dbis14",3246099067099l)) {
+				//["dbis14",3246099067099,1404103422872]
+				 //["dbis11",324609906700,0], ["dbis11",324609906700,0]
+				
+				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(324609906700l,
+				 "dbis11",1404101397760l)) {
 				 System.out.println("Host: " + f.getHostName() + "TaskID: "
 				 + f.getTaskId()
-				+ " | RealTime:" + f.getRealTime());
+				+ " | RealTime:" + f.getRealTime() + " FilesIn: " + f.getInputFiles().size() + " FilesOut:" +f.getOutputFiles().size());
 				 //+ " Date: " + f.getTimestamp());
-				 for (FileStat fi :f.getInputFiles()){
-					 System.out.println("file in: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
-				 }
-				 
-				 
-				 for (FileStat fi :f.getOutputFiles()){
-					 System.out.println("file out: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
-				 }
+//				 for (FileStat fi :f.getInputFiles()){
+//					 System.out.println("file in: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
+//				 }
+//				 
+//				 
+//				 for (FileStat fi :f.getOutputFiles()){
+//					 System.out.println("file out: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
+//				 }
 				 }
 
 //				System.out.println("All for Task on Host:");
@@ -356,7 +357,7 @@ public class Reader {
 
 				}
 			else {
-				WriteHiwayDB writer = null;
+				HiwayDB writer = null;
 
 //				if (args.length == 0) {
 //					System.out.println("keine Eingabe...lese StandardIn");
@@ -384,8 +385,7 @@ public class Reader {
 //						writer = new WriteHiwayDB("hibernate.cfg.xml");
 //					}
 				
-				writer = new WriteHiwayDB("jdbc:mysql://localhost/hiwaydb",
-						"root", "keanu7.", "hibernate.cfg.xml");
+				writer = new HiwayDB("root", "keanu7.","jdbc:mysql://localhost/hiwaydb"	);
 
 					// String input = "D:\\Temp\\" + args[0];
 					// e00_01_3r_variant-call-setup-09_001
@@ -420,8 +420,7 @@ public class Reader {
 								if (!line.isEmpty()) {
 
 									try {
-										result = writer
-												.lineToDB(new JsonReportEntry(														line));
+										writer.logToDB((new JsonReportEntry(line)));
 									} catch (JSONException e) {
 										System.out
 												.println("FEHLER!!!!!!!!!!!!: "
@@ -450,7 +449,7 @@ public class Reader {
 					} else {
 						System.out
 								.println("Eingabe: keine Logdatei, String direkt uebergeben.");
-						writer.lineToDB(new JsonReportEntry(args[0].toString()));
+						writer.logToDB((new JsonReportEntry(args[0].toString())));
 					}
 				}
 				System.out.println("juchei fertig...");

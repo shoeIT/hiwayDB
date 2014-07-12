@@ -186,6 +186,10 @@ public class HiwayDBNoSQL implements HiwayDBI {
 				if (documentJSON != null) {
 
 					invocDocument = gson.fromJson(documentJSON, InvocDoc.class);
+					
+					invocDocument.setInvocId(invocID);
+					invocDocument.setRunId(runID);
+					invocDocument.setTimestamp(timestampTemp);
 
 				} else {
 
@@ -392,15 +396,16 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
 			String hostName, long timestamp) {
 		View view = client.getView("dev_Invoc", "LogEntriesForTaskOnHostSince");
-
+      
 		Gson gson = new Gson();
 		// Set up the Query object
 		Query query = new Query();
 		
 		//["dbis14",3246099067099]
-		query.setIncludeDocs(true).setKey(ComplexKey.of(hostName,taskId));
+		query.setIncludeDocs(true).setRange(ComplexKey.of(hostName,taskId,timestamp),ComplexKey.of(hostName,taskId,999999999999999999l));
 		// We the full documents and only the top 20
 		//.setLimit(20);
+		//["dbis11",324609906700,1404101397760]
 
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
@@ -427,7 +432,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// Iterate over the found documents
 		for(ViewRow row : result) {
 		 
-			 System.out.println("resrow: "+ row.getValue()) ;
+			// System.out.println("resrow: "+ row.getValue()) ;
 			 invocDocument = gson.fromJson((String)row.getDocument(), InvocDoc.class);
 		 
 			 temp= new InvocStat(invocDocument.getTaskId());
@@ -469,6 +474,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		}
 				
 		//shutdown();
+		 System.out.println("COUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuut:" +tempResult.size());
 		return tempResult;
 		}
 	
