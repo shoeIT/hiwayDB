@@ -3,7 +3,6 @@ package de.huberlin.hiwaydb.useDB;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,12 +24,6 @@ import com.google.gson.Gson;
 
 import de.huberlin.hiwaydb.LogToDB.InvocDoc;
 import de.huberlin.hiwaydb.LogToDB.WfRunDoc;
-import de.huberlin.hiwaydb.dal.File;
-import de.huberlin.hiwaydb.dal.Hiwayevent;
-import de.huberlin.hiwaydb.dal.Inoutput;
-import de.huberlin.hiwaydb.dal.Invocation;
-import de.huberlin.hiwaydb.dal.Task;
-import de.huberlin.hiwaydb.dal.Workflowrun;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public class HiwayDBNoSQL implements HiwayDBI {
@@ -102,9 +95,10 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// Iterate over the found documents
 		for (ViewRow row : result) {
 			// Use Google GSON to parse the JSON into a HashMap
-			System.out.println("resrow: " + row.getValue());
+			//System.out.println("resrow: " + row.getValue());
 			HashMap<String, String> parsedDoc = gson.fromJson(
 					(String) row.getDocument(), HashMap.class);
+			tempResult.add(row.getValue());
 
 		}
 
