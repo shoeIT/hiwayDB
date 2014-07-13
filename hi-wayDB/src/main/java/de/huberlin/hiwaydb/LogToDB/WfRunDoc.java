@@ -1,7 +1,9 @@
 package de.huberlin.hiwaydb.LogToDB;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class WfRunDoc {
 
@@ -11,6 +13,7 @@ public class WfRunDoc {
 	private Long reductionTime;
 	
 	private Map<String, String>  hiwayEvent = new HashMap<String, String> (0);
+	private Set<Long> taskIDs = new HashSet<Long>(0);
 
 	public String getName() {
 		return name;
@@ -52,4 +55,12 @@ public class WfRunDoc {
 		this.reductionTime = reductionTime;
 	}
 
+	public Set<Long> getTaskIDs() {
+		return taskIDs;
+	}
+
+	public void setTaskIDs(Set<Long> taskIDs) {
+		this.taskIDs = taskIDs;
+	}
+	
 }

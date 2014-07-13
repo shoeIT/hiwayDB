@@ -45,11 +45,11 @@ public class InvocStat {
 	private Long realTime;
 
 	private long taskId;
-	private long timestamp;
+	private Long timestamp;
 
 	
 	public InvocStat(long taskId) {
-		this.timestamp = -1;
+		this.timestamp = -1l;
 		this.taskId = taskId;
 		
 		inputFiles = new HashMap<>();
@@ -127,7 +127,7 @@ public class InvocStat {
 		}
 	}
 
-	public void setRealTime(Long d, long timestamp) {
+	public void setRealTime(Long d, Long timestamp) {
 		this.realTime = d;
 		setTimestamp(timestamp);
 	}
@@ -136,7 +136,7 @@ public class InvocStat {
 		this.taskId = taskId;
 	}
 
-	private void setTimestamp(long timestamp) {
+	private void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
 	}
 
@@ -145,7 +145,9 @@ public class InvocStat {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{Timestamp: " + this.timestamp + " | Host: " + this.hostName
-				+ " | TaskID: " + this.taskId + " | Time: " + this.realTime + " }");
+				+ " | TaskID: " + this.taskId + " | Time: " + this.realTime + 
+				" FilesIn: " + this.getInputFiles().size() + " FilesOut:" +this.getOutputFiles().size()+
+				" }");
 
 		return sb.toString();
 	}

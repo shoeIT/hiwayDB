@@ -26,6 +26,7 @@ public class InvocDoc {
 	
 	private Long realTimeIn;
 	private Long realTimeOut;
+	private Long realTime;
 	
 	private Set<String> userevents = new HashSet<String>(0);
 	private Map<String, String>  input = new HashMap<String, String> (0);
@@ -161,6 +162,14 @@ public class InvocDoc {
 
 	public void setRealTimeOut(Long realTimeOut) {
 		this.realTimeOut = realTimeOut;
+	}
+
+	public Long getRealTime() {
+		return realTime;
+	}
+
+	public void setRealTime(Long realTime) {
+		this.realTime = realTime;
 	}
 
 }

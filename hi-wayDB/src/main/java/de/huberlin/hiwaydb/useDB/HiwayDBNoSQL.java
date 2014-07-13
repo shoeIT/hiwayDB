@@ -41,11 +41,14 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	private String password;
 	private String bucket;
 	CouchbaseClient client = null;
+	Gson gson;
 
 	public HiwayDBNoSQL(String bucket, String password, List<URI> dbURLs) {
 		this.bucket = bucket;
 		this.password = password;
 		this.dbURLs = dbURLs;
+
+		gson = new Gson();
 
 		getConnection();
 
@@ -97,21 +100,16 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 		Set<String> tempResult = new HashSet();
 		// Iterate over the found documents
-		for(ViewRow row : result) {
-		  // Use Google GSON to parse the JSON into a HashMap
-			 System.out.println("resrow: "+ row.getValue()) ;
-		  HashMap<String, String> parsedDoc = gson.fromJson((String)row.getDocument(), HashMap.class);
-//		 System.out.println("ID: " + row.getId() + " host"  + parsedDoc.get("hostname")) ;
-//		  tempResult.add(parsedDoc.get("hostname"));
-//		  // Create a HashMap which will be stored in the beers list.
-//		  HashMap<String, String> hostname = new HashMap<String, String>();
-//		  hostname.put("id", row.getId());
-//		  hostname.put("name", parsedDoc.get("hostname"));
-//		  hostnames.add(hostname);
+		for (ViewRow row : result) {
+			// Use Google GSON to parse the JSON into a HashMap
+			System.out.println("resrow: " + row.getValue());
+			HashMap<String, String> parsedDoc = gson.fromJson(
+					(String) row.getDocument(), HashMap.class);
+
 		}
-				
-		//shutdown();
-		
+
+		// shutdown();
+
 		return tempResult;
 	}
 
@@ -120,7 +118,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 			client.shutdown();
 		}
 	}
-		
+
 	private String lineToDB(JsonReportEntry logEntryRow) {
 
 		try {
@@ -131,11 +129,6 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 			if (logEntryRow.getRunId() != null) {
 				runID = logEntryRow.getRunId().toString();
-			}
-
-			long taskID = 0;
-			if (logEntryRow.getTaskId() != null) {
-				taskID = logEntryRow.getTaskId();
 			}
 
 			Long invocID = (long) 0;
@@ -153,6 +146,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 			InvocDoc invocDocument = null;
 			WfRunDoc wfRunDocument = null;
+			Set<Long> taskIDsforWfRun = new HashSet<Long>();
 
 			Gson gson = new Gson();
 
@@ -163,6 +157,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 				if (wfRunDoc != null) {
 					wfRunDocument = gson.fromJson(wfRunDoc, WfRunDoc.class);
 
+					taskIDsforWfRun = wfRunDocument.getTaskIDs();
 					// System.out.println("Haben das doc schon: ID" +
 					// actualDocument.getRunId() + "_" +
 					// actualDocument.getInvocId());
@@ -173,6 +168,12 @@ public class HiwayDBNoSQL implements HiwayDBI {
 					// client.set(runID, gson.toJson(wfRunDocument));
 					System.out.println("WFRun: " + runID + " gespeichert");
 				}
+			}
+
+			long taskID = 0;
+			if (logEntryRow.getTaskId() != null) {
+				taskID = logEntryRow.getTaskId();
+				taskIDsforWfRun.add(taskID);
 			}
 
 			String documentId = runID + "_" + invocID;
@@ -186,7 +187,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 				if (documentJSON != null) {
 
 					invocDocument = gson.fromJson(documentJSON, InvocDoc.class);
-					
+
 					invocDocument.setInvocId(invocID);
 					invocDocument.setRunId(runID);
 					invocDocument.setTimestamp(timestampTemp);
@@ -239,8 +240,11 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 				break;
 			case HiwayDBI.KEY_INVOC_TIME_SCHED:
-				valuePart = logEntryRow.getValueJsonObj();
-				invocDocument.setScheduleTime(GetTimeStat(valuePart));
+				// valuePart = logEntryRow.getValueJsonObj();
+				// invocDocument.setScheduleTime(GetTimeStat(valuePart));
+				invocDocument.setScheduleTime(Long.parseLong(
+						logEntryRow.getValueRawString(), 10));
+
 				break;
 			case JsonReportEntry.KEY_INVOC_STDERR:
 				invocDocument.setStandardError(logEntryRow.getValueRawString());
@@ -297,9 +301,9 @@ public class HiwayDBNoSQL implements HiwayDBI {
 				valuePart = logEntryRow.getValueJsonObj();
 
 				try {
-					invocDocument.setRealTimeIn(GetTimeStat(valuePart));
+					invocDocument.setRealTime(GetTimeStat(valuePart));
 				} catch (NumberFormatException e) {
-					invocDocument.setRealTimeIn(1l);
+					invocDocument.setRealTime(1l);
 				}
 
 				break;
@@ -363,8 +367,36 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 	@Override
 	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
-		// TODO Auto-generated method stub
-		return null;
+		if (client == null) {
+			getConnection();
+		}
+
+		View view = client.getView("dev_Invoc", "getTaskIdsForWorkflow");
+
+		// Set up the Query object
+		Query query = new Query();
+
+		query.setIncludeDocs(true).setKey("[\""+workflowName+"\"]");
+		// We the full documents and only the top 20
+		// .setLimit(20);
+		// ["dbis11",324609906700,1404101397760]
+
+		// Query the Cluster
+		ViewResponse result = client.query(view, query);
+
+		WfRunDoc wfRun = null;
+		for (ViewRow row : result) {
+
+			// System.out.println("resrow: "+ row.getValue()) ;
+			wfRun = gson.fromJson((String) row.getDocument(), WfRunDoc.class);
+
+		}
+		if(wfRun!=null)
+		{
+			return wfRun.getTaskIDs();
+		}
+		return  new HashSet<Long>()	;
+		
 	}
 
 	@Override
@@ -375,37 +407,63 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTask(long taskId) {
-		// TODO Auto-generated method stub
-		return null;
+
+		Set<Long> ids = new HashSet();
+		ids.add(taskId);
+
+		return getLogEntriesForTasks(ids);
 	}
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
-		// TODO Auto-generated method stub
-		return null;
+		if (client == null) {
+			getConnection();
+		}
+
+		View view = client.getView("dev_Invoc", "getLogEntriesForTasks");
+
+		// Set up the Query object
+		Query query = new Query();
+
+		// [[989639045],[324609906700]]
+		String keys = "[";
+		for (Long id : taskIds) {
+			keys += "[" + id.toString() + "],";
+		}
+		keys = keys.substring(0, keys.length() - 2);
+
+		keys += "]]";
+
+		query.setIncludeDocs(true).setKeys(keys);
+		// We the full documents and only the top 20
+		// .setLimit(20);
+		// ["dbis11",324609906700,1404101397760]
+
+		// Query the Cluster
+		ViewResponse result = client.query(view, query);
+
+		// shutdown();
+		return createInvocStat(result);
+
 	}
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId,
 			String hostName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		if (client == null) {
+			getConnection();
+		}
 
-	@Override
-	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
-			String hostName, long timestamp) {
-		View view = client.getView("dev_Invoc", "LogEntriesForTaskOnHostSince");
-      
-		Gson gson = new Gson();
+		View view = client.getView("dev_Invoc", "getLogEntriesForTaskOnHost");
+
 		// Set up the Query object
 		Query query = new Query();
-		
-		//["dbis14",3246099067099]
-		query.setIncludeDocs(true).setRange(ComplexKey.of(hostName,taskId,timestamp),ComplexKey.of(hostName,taskId,999999999999999999l));
+
+		// ["dbis14",3246099067099]
+		query.setIncludeDocs(true).setKey(ComplexKey.of(taskId, hostName));
 		// We the full documents and only the top 20
-		//.setLimit(20);
-		//["dbis11",324609906700,1404101397760]
+		// .setLimit(20);
+		// ["dbis11",324609906700,1404101397760]
 
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
@@ -413,69 +471,105 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// This ArrayList will contain all found beers
 		ArrayList<HashMap<String, String>> hostnames = new ArrayList<HashMap<String, String>>();
 
-		InvocDoc invocDocument= new InvocDoc();
+		InvocDoc invocDocument = new InvocDoc();
 		Set<InvocStat> tempResult = new HashSet<InvocStat>();
 		InvocStat temp = null;
-		
-		//shutdown();
+
+		// shutdown();
 		return createInvocStat(result);
 	}
-	
-	private Set<InvocStat> createInvocStat(ViewResponse result)
-	{
-		InvocDoc invocDocument= new InvocDoc();
+
+	@Override
+	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
+			String hostName, long timestamp) {
+
+		if (client == null) {
+			getConnection();
+		}
+
+		View view = client.getView("dev_Invoc", "LogEntriesForTaskOnHostSince");
+
+		// Set up the Query object
+		Query query = new Query();
+
+		// ["dbis14",3246099067099]
+		query.setIncludeDocs(true).setRange(
+				ComplexKey.of(taskId, hostName, timestamp),
+				ComplexKey.of(taskId, hostName, 999999999999999999l));
+		// We the full documents and only the top 20
+		// .setLimit(20);
+		// ["dbis11",324609906700,1404101397760]
+
+		// Query the Cluster
+		ViewResponse result = client.query(view, query);
+
+		// This ArrayList will contain all found beers
+		ArrayList<HashMap<String, String>> hostnames = new ArrayList<HashMap<String, String>>();
+
+		InvocDoc invocDocument = new InvocDoc();
+		Set<InvocStat> tempResult = new HashSet<InvocStat>();
+		InvocStat temp = null;
+
+		// shutdown();
+		return createInvocStat(result);
+	}
+
+	private Set<InvocStat> createInvocStat(ViewResponse result) {
+		InvocDoc invocDocument = new InvocDoc();
 		Set<InvocStat> tempResult = new HashSet<InvocStat>();
 		Gson gson = new Gson();
-		
-		
+
 		InvocStat temp = null;
 		// Iterate over the found documents
-		for(ViewRow row : result) {
-		 
+		for (ViewRow row : result) {
+
 			// System.out.println("resrow: "+ row.getValue()) ;
-			 invocDocument = gson.fromJson((String)row.getDocument(), InvocDoc.class);
-		 
-			 temp= new InvocStat(invocDocument.getTaskId());
-			 temp.setHostName(invocDocument.getHostname());
-						 
-			 Map<String, HashMap<String, Long>> output = invocDocument.getFiles();
-			 List<FileStat> fileStatout = new ArrayList<FileStat>();
-			 List<FileStat> fileStatin = new ArrayList<FileStat>();
-			 FileStat file = null;
-			 Long in = 0l;
-			 Long out = 0l;
-			 
-			for(Entry<String, HashMap<String, Long>> val : output.entrySet())
-			{
+			invocDocument = gson.fromJson((String) row.getDocument(),
+					InvocDoc.class);
+
+			temp = new InvocStat(invocDocument.getTaskId());
+			temp.setHostName(invocDocument.getHostname());
+			temp.setRealTime(invocDocument.getRealTime(),
+					invocDocument.getTimestamp());
+
+			Map<String, HashMap<String, Long>> output = invocDocument
+					.getFiles();
+			List<FileStat> fileStatout = new ArrayList<FileStat>();
+			List<FileStat> fileStatin = new ArrayList<FileStat>();
+			FileStat file = null;
+			Long in = 0l;
+			Long out = 0l;
+
+			for (Entry<String, HashMap<String, Long>> val : output.entrySet()) {
 				file = new FileStat();
 				file.setFileName(val.getKey());
 				in = val.getValue().get("realTimeIn");
-				out =val.getValue().get("realTimeOut");
-			
+				out = val.getValue().get("realTimeOut");
+
 				file.setSize(val.getValue().get("size"));
-				
-				if(in!=null && !in.equals(""))
-				{
+
+				if (in != null && !in.equals("")) {
 					file.setRealTime(in);
 					fileStatin.add(file);
-				}	
-				
-				if(out!=null && !out.equals(""))
-				{
+				}
+
+				if (out != null && !out.equals("")) {
 					file.setRealTime(out);
 					fileStatout.add(file);
-				}	
-				
+				}
+
 			}
-			 temp.setOutputfiles(fileStatout);
-			 temp.setInputfiles(fileStatin);
-			 tempResult.add(temp);
-			 
+			temp.setOutputfiles(fileStatout);
+			temp.setInputfiles(fileStatin);
+			tempResult.add(temp);
+
 		}
-				
-		//shutdown();
-		 System.out.println("COUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuut:" +tempResult.size());
+
+		// shutdown();
+		System.out
+				.println("COUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuut:"
+						+ tempResult.size());
 		return tempResult;
-		}
-	
+	}
+
 }
