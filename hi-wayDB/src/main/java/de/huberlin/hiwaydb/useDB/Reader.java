@@ -168,11 +168,7 @@ public class Reader {
 
 			
 
-//				System.out.println("getTaskNames for ID :");
-//				System.out.println("240495169287: "
-//						+ testGet.getTaskName(240495169287l));
-//				System.out.println("240495169287: "
-//						+ testGet.getTaskName(240495169287l));
+
 //
 //				 System.out.println("All Invocs:");
 //				
@@ -245,6 +241,12 @@ public class Reader {
 				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09-setup.cf")) {
 					System.out.println(f.toString());
 				}
+				
+				System.out.println("getTaskNames for ID :");
+				System.out.println("6: "
+						+ testGet.getTaskName(6l));
+				System.out.println("453506959: "
+						+ testGet.getTaskName(453506959l));
 
 			}
 			else if (lineIn.equalsIgnoreCase("db")) {

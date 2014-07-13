@@ -377,9 +377,6 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		Query query = new Query();
 
 		query.setIncludeDocs(true).setKey("[\""+workflowName+"\"]");
-		// We the full documents and only the top 20
-		// .setLimit(20);
-		// ["dbis11",324609906700,1404101397760]
 
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
@@ -401,8 +398,29 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 	@Override
 	public String getTaskName(long taskId) {
-		// TODO Auto-generated method stub
-		return null;
+		if (client == null) {
+			getConnection();
+		}
+
+		View view = client.getView("dev_Invoc", "getTaskname");
+
+		// Set up the Query object
+		Query query = new Query();
+
+		query.setIncludeDocs(false).setLimit(1).setKey("["+taskId+"]");
+
+		// Query the Cluster
+		ViewResponse result = client.query(view, query);
+
+		String name = "";
+		for (ViewRow row : result) {
+
+			// System.out.println("resrow: "+ row.getValue()) ;
+			//wfRun = gson.fromJson((String) row.getDocument(), WfRunDoc.class);
+			name = row.getValue();
+		}
+		
+		return  name;
 	}
 
 	@Override
