@@ -51,6 +51,8 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		try {
 			client = new CouchbaseClient(this.dbURLs, this.bucket,
 					this.password);
+			
+			log.info("connecting to Couchbase, bucket: "+ this.bucket);
 
 		} catch (Exception e) {
 			log.info("Error connecting to Couchbase: " + e.getMessage());
@@ -480,14 +482,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
 
-		// This ArrayList will contain all found beers
-		ArrayList<HashMap<String, String>> hostnames = new ArrayList<HashMap<String, String>>();
-
-		InvocDoc invocDocument = new InvocDoc();
-		Set<InvocStat> tempResult = new HashSet<InvocStat>();
-		InvocStat temp = null;
-
-		// shutdown();
+			// shutdown();
 		return createInvocStat(result);
 	}
 
@@ -515,14 +510,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
 
-		// This ArrayList will contain all found beers
-		ArrayList<HashMap<String, String>> hostnames = new ArrayList<HashMap<String, String>>();
-
-		InvocDoc invocDocument = new InvocDoc();
-		Set<InvocStat> tempResult = new HashSet<InvocStat>();
-		InvocStat temp = null;
-
-		// shutdown();
+			// shutdown();
 		return createInvocStat(result);
 	}
 

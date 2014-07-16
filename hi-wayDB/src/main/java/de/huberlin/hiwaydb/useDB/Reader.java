@@ -160,13 +160,7 @@ public class Reader {
 				 for (InvocStat f : testGet.getLogEntriesForTasks(tasks)) {
 				 System.out.println(f.toString());				 }
 
-				System.out.println("getHostnames:");
-
-				for (String f : testGet.getHostNames()) {
-					System.out.println(f.toString());
-				}
-
-			
+		
 
 
 //
@@ -247,6 +241,14 @@ public class Reader {
 						+ testGet.getTaskName(6l));
 				System.out.println("453506959: "
 						+ testGet.getTaskName(453506959l));
+				
+				System.out.println("getHostnames:");
+
+				for (String f : testGet.getHostNames()) {
+					System.out.println(f.toString());
+				}
+
+			
 
 			}
 			else if (lineIn.equalsIgnoreCase("db")) {
