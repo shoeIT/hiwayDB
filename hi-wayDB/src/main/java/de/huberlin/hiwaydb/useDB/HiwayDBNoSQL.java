@@ -50,10 +50,11 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	private void getConnection() {
 		try {
 			
-			client = new CouchbaseClient(this.dbURLs, this.bucket,
-					this.password);
+			log.info("connecting to Couchbase, bucket: "+ this.bucket +" pwd:" +this.password  );
+			log.info("weiter..." );
 			
-			log.info("connecting to Couchbase, bucket: "+ this.bucket);
+			client = new CouchbaseClient(this.dbURLs, this.bucket,this.password);
+		
 
 		} catch (Exception e) {
 			log.info("Error connecting to Couchbase: " + e.getMessage());
