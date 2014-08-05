@@ -8,7 +8,7 @@ delete from hiwaydb.task where taskid > 0;
 delete from hiwaydb.workflowrun where id > 0;
 
 
-CREATE TABLE `hiwaydb`.`accesstime` (
+CREATE TABLE `hiwaydb`.`Accesstime` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `funktion` VARCHAR(100) NULL,
   `input` VARCHAR(100) NULL,
