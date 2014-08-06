@@ -464,7 +464,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	}
 
 	@Override
-	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId,
+	public Collection<InvocStat> getLogEntriesForTaskOnHost(long taskId,
 			String hostName) {
 		if (client == null) {
 			getConnection();
@@ -489,7 +489,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	}
 
 	@Override
-	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
+	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(long taskId,
 			String hostName, long timestamp) {
 
 		if (client == null) {
@@ -529,7 +529,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 			invocDocument = gson.fromJson((String) row.getDocument(),
 					InvocDoc.class);
 
-			temp = new InvocStat(invocDocument.getTaskId());
+			temp = new InvocStat("terst",invocDocument.getTaskId());
 			temp.setHostName(invocDocument.getHostname());
 			temp.setRealTime(invocDocument.getRealTime(),
 					invocDocument.getTimestamp());

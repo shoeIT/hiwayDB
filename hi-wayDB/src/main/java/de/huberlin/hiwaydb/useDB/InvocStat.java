@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class InvocStat {
 
@@ -44,20 +45,23 @@ public class InvocStat {
 	private Map<String, FileStat> outputFiles;
 	private Long realTime;
 
-	private long taskId;
+	private final long taskId;
 	private Long timestamp;
+	private final String runId;
 
 	
-	public InvocStat(long taskId) {
+	public InvocStat(String runId, long taskId) {
 		this.timestamp = -1l;
 		this.taskId = taskId;
+		this.runId = runId;
 		
 		inputFiles = new HashMap<>();
 		outputFiles = new HashMap<>();
 	}
 
-	public InvocStat(long timestamp, Long realTime, long taskId, String hostName) {
-		this(taskId);
+	public InvocStat(long timestamp, Long realTime, String runId, long taskId, String hostName) {
+		this(runId,taskId);
+		
 		this.timestamp = timestamp;
 		this.realTime = realTime;
 		this.hostName = hostName;
@@ -132,9 +136,9 @@ public class InvocStat {
 		setTimestamp(timestamp);
 	}
 
-	private void setTaskId(long taskId) {
-		this.taskId = taskId;
-	}
+//	private void setTaskId(long taskId) {
+//		this.taskId = taskId;
+//	}
 
 	private void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
@@ -145,11 +149,19 @@ public class InvocStat {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{Timestamp: " + this.timestamp + " | Host: " + this.hostName
-				+ " | TaskID: " + this.taskId + " | Time: " + this.realTime + 
+				+ " | TaskID: " + this.taskId + " | Time: " + this.realTime + " | RunID: " + this.runId + 
 				" FilesIn: " + this.getInputFiles().size() + " FilesOut:" +this.getOutputFiles().size()+
 				" }");
 
 		return sb.toString();
 	}
+
+	public String getRunId() {
+		return runId;
+	}
+
+//	public void setRunId(UUID runId) {
+//		this.runId = runId;
+//	}
 
 }

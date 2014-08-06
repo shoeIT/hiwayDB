@@ -261,23 +261,20 @@ public class Reader {
 
 					System.out.println("getLogEntriesForTask:");
 
-					 for (InvocStat f : testGet.getLogEntriesForTask(1317103212))
+					 for (InvocStat f : testGet.getLogEntriesForTask(324609906700l))
 					 {
-					 System.out.println("Task: "
-					 + f.getTaskId() + " RealTime:" + f.getRealTime());
+					 System.out.println(f.toString());
 					 }
 					
 
 					System.out.println("getLogEntriesForTask mit Set:");
 	
 					Set<Long> tasks = new HashSet<Long>();
-				tasks.add((long) 466017906);
-					tasks.add(1317103212l);
-					tasks.add(121135303675312l);
-
+				tasks.add(2084368153987l);
+					tasks.add(324609906700l);
+				
 					 for (InvocStat f : testGet.getLogEntriesForTasks(tasks)) {
-					 System.out.println("Task: "
-					 + f.getTaskId() + " RealTime:" + f.getRealTime());
+					 System.out.println(f.toString());
 					}
 	//
 					System.out.println("getHostnames:");

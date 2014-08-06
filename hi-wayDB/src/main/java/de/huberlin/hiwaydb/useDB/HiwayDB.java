@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.print.attribute.standard.DateTimeAtCompleted;
 
@@ -86,7 +87,7 @@ public class HiwayDB implements HiwayDBI {
 
 		resultsInvoc = query.list();
 
-		Set<String> tempResult = new HashSet();
+		Set<String> tempResult = new HashSet<String>();
 
 		for (Invocation i : resultsInvoc) {
 			// System.out.println("in getHostnames: " + i.getHostname());
@@ -198,8 +199,7 @@ public class HiwayDB implements HiwayDBI {
 	    at.setInput("");
 		session = dbSessionFactory.openSession();
 		tx = session.beginTransaction();
-		session = dbSessionFactory.openSession();
-
+		
 		Query query = null;
 		List<Workflowrun> resultsWF = null;
 
@@ -245,7 +245,7 @@ public class HiwayDB implements HiwayDBI {
 	    at.setInput("");
 		session = dbSessionFactory.openSession();
 		tx = session.beginTransaction();
-		session = dbSessionFactory.openSession();
+		
 
 		Query query = null;
 		List<Task> resultsInvoc = null;
@@ -278,9 +278,32 @@ public class HiwayDB implements HiwayDBI {
 
 		for (int i = 0; i < invocations.size(); i++) {
 			tempInvoc = invocations.get(i);
+			
+			
+//			if (dbSessionFactory == null) {
+//				dbSessionFactory = getSQLSession();
+//			}
+//
+//			session = dbSessionFactory.openSession();
+			
+//			Query query = null;
+//			List<Workflowrun> resultsRun = null;
+//
+//			query = session.createQuery("FROM Workflowrun T  WHERE T.id =" + tempInvoc.getWorkflowrun().get());
+//			// join I.invocationId
+//			resultsRun = query.list();
+//			
+//			
+//			String testuu = "00000000-9aa1-4a3c-9ad6-00000000000";
+//			
+//			if(!resultsRun.isEmpty())
+//			{
+//				testuu = resultsRun.get(0).getRunId();
+//			}
 
-			InvocStat invoc = new InvocStat(tempInvoc.getTask().getTaskId());
-
+			InvocStat invoc = new InvocStat(tempInvoc.getWorkflowrun().getRunId(),tempInvoc.getTask().getTaskId());
+			
+			
 			log.info("Invoc: " + tempInvoc.getInvocationId() + " Host:"
 					+ tempInvoc.getHostname() + " Task:"
 					+ tempInvoc.getTask().getTaskId() + " Time: "
@@ -331,7 +354,7 @@ public class HiwayDB implements HiwayDBI {
 	}
 
 	@Override
-	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId,
+	public Collection<InvocStat> getLogEntriesForTaskOnHost(long taskId,
 			String hostName) {
 		Long tick =System.currentTimeMillis();
 		if (dbSessionFactory == null) {
@@ -368,7 +391,7 @@ public class HiwayDB implements HiwayDBI {
 	}
 
 	@Override
-	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId,
+	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(long taskId,
 			String hostName, long timestamp) {
 		Long tick =System.currentTimeMillis();
 		if (dbSessionFactory == null) {

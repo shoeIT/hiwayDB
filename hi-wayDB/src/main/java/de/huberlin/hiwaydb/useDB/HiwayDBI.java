@@ -29,8 +29,8 @@ public interface HiwayDBI {
 	
 //	public Collection<InvocStat> getLogEntriesForHost(String hostName);
 //	public Collection<InvocStat> getLogEntriesForHostSince(String hostName, long timestamp);
-	public Collection<InvocStat> getLogEntriesForTaskOnHost(Long taskId, String hostName);
-	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(Long taskId, String hostName, long timestamp);
+	public Collection<InvocStat> getLogEntriesForTaskOnHost(long taskId, String hostName);
+	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(long taskId, String hostName, long timestamp);
 
 	public void logToDB(JsonReportEntry entry);	
 
