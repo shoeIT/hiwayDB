@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
+
 /** Assumes UTF-8 encoding. JDK 7+. */
 public class ReadWithScanner {
 

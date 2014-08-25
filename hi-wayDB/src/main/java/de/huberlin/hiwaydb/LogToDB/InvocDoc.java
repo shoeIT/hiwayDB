@@ -1,14 +1,12 @@
 package de.huberlin.hiwaydb.LogToDB;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.tools.javac.util.Pair;
 
-import de.huberlin.hiwaydb.dal.Userevent;
+
 
 public class InvocDoc {
 

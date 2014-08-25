@@ -29,6 +29,14 @@ import de.huberlin.hiwaydb.dal.Workflowrun;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public class HiwayDB implements HiwayDBI {
+	
+	public static <T> List<T> castList(Class<? extends T> clazz, Collection<?> c) {
+	    List<T> r = new ArrayList<T>(c.size());
+	    for(Object o: c)
+	      r.add(clazz.cast(o));
+	    return r;
+	}
+	
 	private String configFile = "hibernate.cfg.xml";
 
 	private static final Log log = LogFactory.getLog(HiwayDB.class);
@@ -85,7 +93,7 @@ public class HiwayDB implements HiwayDBI {
 		// query = session
 		// .createQuery("select new list(hostname)  FROM Invocation I");
 
-		resultsInvoc = query.list();
+		resultsInvoc = castList(Invocation.class, query.list());
 
 		Set<String> tempResult = new HashSet<String>();
 
@@ -130,7 +138,7 @@ public class HiwayDB implements HiwayDBI {
 		query = session.createQuery("FROM Invocation I  WHERE I.task ="
 				+ taskId);
 		// join I.invocationId
-		resultsInvoc = query.list();
+		resultsInvoc = castList(Invocation.class, query.list());;
 		Long x = (long) resultsInvoc.size();
 
 		at.setReturnvolume(x);
@@ -172,7 +180,7 @@ public class HiwayDB implements HiwayDBI {
 				queryString.length() - 4));
 
 		// join I.invocationId
-		resultsInvoc = query.list();
+		resultsInvoc =castList(Invocation.class, query.list());
 		Long x = (long) resultsInvoc.size();
 
 		at.setReturnvolume(x);
@@ -377,7 +385,7 @@ public class HiwayDB implements HiwayDBI {
 		query = session.createQuery("FROM Invocation I  WHERE I.hostname ='"
 				+ hostName + "' and I.task = " + taskId);
 
-		resultsInvoc = query.list();
+		resultsInvoc = castList(Invocation.class, query.list());
 		Long x = (long) resultsInvoc.size();
 
 		at.setReturnvolume(x);
@@ -422,7 +430,7 @@ public class HiwayDB implements HiwayDBI {
 				+ hostName + "' and I.Timestamp >" + timestamp
 				+ " and I.task = " + taskId);
 
-		resultsInvoc = query.list();
+		resultsInvoc = castList(Invocation.class, query.list());;
 		log.info("Ergebnisse Size: " + resultsInvoc.size());
 
 		Long x = (long) resultsInvoc.size();
@@ -489,7 +497,7 @@ public class HiwayDB implements HiwayDBI {
 			query = session
 					.createQuery("FROM Invocation E WHERE E.invocationid ="
 							+ invocID + " and E.workflowrun='" + wfId + "'");
-			List<Invocation> resultsInvoc = query.list();
+			List<Invocation> resultsInvoc = castList(Invocation.class, query.list());
 
 			Long timestampTemp = logEntryRow.getTimestamp();
 

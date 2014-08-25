@@ -95,7 +95,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// This ArrayList will contain all found beers
 		ArrayList<HashMap<String, String>> hostnames = new ArrayList<HashMap<String, String>>();
 
-		Set<String> tempResult = new HashSet();
+		Set<String> tempResult = new HashSet<String>();
 		// Iterate over the found documents
 		for (ViewRow row : result) {
 			// Use Google GSON to parse the JSON into a HashMap
@@ -424,7 +424,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesForTask(long taskId) {
 
-		Set<Long> ids = new HashSet();
+		Set<Long> ids = new HashSet<Long>();
 		ids.add(taskId);
 
 		return getLogEntriesForTasks(ids);

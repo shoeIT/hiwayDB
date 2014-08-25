@@ -22,10 +22,6 @@ import net.spy.memcached.internal.OperationFuture;
 
 import org.json.JSONException;
 
-import com.couchbase.client.CouchbaseClient;
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
-
-import de.huberlin.hiwaydb.dal.File;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public class Reader {
