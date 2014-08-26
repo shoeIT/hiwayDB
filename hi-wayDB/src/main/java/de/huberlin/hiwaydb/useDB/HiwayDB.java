@@ -42,7 +42,7 @@ public class HiwayDB implements HiwayDBI {
 	private static final Log log = LogFactory.getLog(HiwayDB.class);
 
 	private SessionFactory dbSessionFactory = null;
-	private Transaction tx;
+	
 	private Session session;
 
 	private String dbURL;
@@ -555,13 +555,22 @@ public class HiwayDB implements HiwayDBI {
 	}
 
 	private String lineToDB(JsonReportEntry logEntryRow) {
-
+		
+		Long tick =System.currentTimeMillis();
+		session = dbSessionFactory.openSession();
+		Transaction tx = null;
 		try {
 
-			System.out.println(logEntryRow.toString());
-
-			session = dbSessionFactory.openSession();
+			System.out.println(logEntryRow.toString());			
 			tx = session.beginTransaction();
+			
+
+			Accesstime at = new Accesstime();
+			
+			at.setTick(tick);
+			at.setFunktion("JsonReportEntryToDB");
+		    at.setInput("");
+			
 			Query query = null;
 			List<Task> resultsTasks = null;
 			List<Workflowrun> resultsWfRun = null;
@@ -644,8 +653,6 @@ public class HiwayDB implements HiwayDBI {
 				// System.out.println("File haben wir:" + file.getName() +
 				// file.getId());
 			}
-
-			// tx = session.beginTransaction();
 
 			if (wfRun == null && runID != null) {
 
@@ -802,10 +809,17 @@ public class HiwayDB implements HiwayDBI {
 				throw new Exception("Der Typ ist nicht bekannt.:" + key);
 			}
 
+			
+			at.setReturnvolume((long)logEntryRow.toString().length());
+			Long tock = System.currentTimeMillis();
+			at.setTock(tock);
+			at.setTicktockdif(tock-tick);
+			session.save(at);			
 			tx.commit();
 
 			return "";
-		} catch (org.hibernate.exception.ConstraintViolationException e) {
+		} 
+		catch (org.hibernate.exception.ConstraintViolationException e) {
 
 			System.out.println("name: " + e.getConstraintName());
 			String message = e.getSQLException().getMessage();
