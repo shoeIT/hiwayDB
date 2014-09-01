@@ -12,6 +12,11 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 import org.json.JSONObject;
 
 import com.couchbase.client.CouchbaseClient;
@@ -24,6 +29,8 @@ import com.google.gson.Gson;
 
 import de.huberlin.hiwaydb.LogToDB.InvocDoc;
 import de.huberlin.hiwaydb.LogToDB.WfRunDoc;
+import de.huberlin.hiwaydb.dal.Accesstime;
+import de.huberlin.hiwaydb.dal.Invocation;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public class HiwayDBNoSQL implements HiwayDBI {
@@ -35,7 +42,9 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	private String bucket;
 	CouchbaseClient client = null;
 	Gson gson;
-
+	
+	private SessionFactory dbSessionFactory = null;
+	
 	public HiwayDBNoSQL(String bucket, String password, List<URI> dbURLs) {
 		this.bucket = bucket;
 		this.password = password;
@@ -65,6 +74,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	@Override
 	public void logToDB(JsonReportEntry entry) {
 
+		Long tick =System.currentTimeMillis();
 		String i = lineToDB(entry);
 
 		if (i.isEmpty()) {
@@ -72,14 +82,20 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		} else {
 			log.info("Fehler: " + i);
 		}
+		
+Long tock = System.currentTimeMillis();
+		
+		saveAccessTime(tick,tock,(long)entry.toString().length(),"JsonReportEntryToDB");	
 	}
 
 	@Override
 	public Set<String> getHostNames() {
+		Long tick =System.currentTimeMillis();
 		if (client == null) {
 			getConnection();
 		}
-
+		
+	
 		View view = client.getView("dev_Invoc", "getHostNames");
 
 		Gson gson = new Gson();
@@ -105,9 +121,11 @@ public class HiwayDBNoSQL implements HiwayDBI {
 			tempResult.add(row.getValue());
 
 		}
-
-		// shutdown();
-
+		
+		Long tock = System.currentTimeMillis();
+		
+		saveAccessTime(tick,tock,tempResult.size(),"getHostNames");	
+				
 		return tempResult;
 	}
 
@@ -235,13 +253,13 @@ public class HiwayDBNoSQL implements HiwayDBI {
 				String val = logEntryRow.getValueRawString();
 				Long test = Long.parseLong(val, 10);
 				wfRunDocument.setWfTime(test);
-
-				break;
+				break;				
+				
 			case HiwayDBI.KEY_INVOC_TIME_SCHED:
-				// valuePart = logEntryRow.getValueJsonObj();
-				// invocDocument.setScheduleTime(GetTimeStat(valuePart));
-				invocDocument.setScheduleTime(Long.parseLong(
-						logEntryRow.getValueRawString(), 10));
+				 valuePart = logEntryRow.getValueJsonObj();
+				 invocDocument.setScheduleTime(GetTimeStat(valuePart));
+//				invocDocument.setScheduleTime(Long.parseLong(
+//						logEntryRow.getValueRawString(), 10));
 
 				break;
 			case JsonReportEntry.KEY_INVOC_STDERR:
@@ -365,6 +383,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 	@Override
 	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
+		Long tick =System.currentTimeMillis();
 		if (client == null) {
 			getConnection();
 		}
@@ -386,16 +405,23 @@ public class HiwayDBNoSQL implements HiwayDBI {
 			wfRun = gson.fromJson((String) row.getDocument(), WfRunDoc.class);
 
 		}
+			
+		Long tock = System.currentTimeMillis();
 		if(wfRun!=null)
 		{
+			saveAccessTime(tick,tock,1,"getTaskIdsForWorkflow");
 			return wfRun.getTaskIDs();
 		}
+		
+		saveAccessTime(tick,tock,0,"getTaskIdsForWorkflow");
+		
 		return  new HashSet<Long>()	;
 		
 	}
 
 	@Override
 	public String getTaskName(long taskId) {
+		Long tick =System.currentTimeMillis();
 		if (client == null) {
 			getConnection();
 		}
@@ -417,13 +443,22 @@ public class HiwayDBNoSQL implements HiwayDBI {
 			//wfRun = gson.fromJson((String) row.getDocument(), WfRunDoc.class);
 			name = row.getValue();
 		}
-		
+		Long tock = System.currentTimeMillis();
+
+		if(result.size()> 0)
+		{
+			saveAccessTime(tick,tock,1,"getTaskIdsForWorkflow");
+		}
+		else
+		{
+			saveAccessTime(tick,tock,0,"getTaskIdsForWorkflow");
+		}
 		return  name;
 	}
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTask(long taskId) {
-
+       
 		Set<Long> ids = new HashSet<Long>();
 		ids.add(taskId);
 
@@ -432,6 +467,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
+		Long tick =System.currentTimeMillis();
 		if (client == null) {
 			getConnection();
 		}
@@ -458,6 +494,11 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
 
+		Long tock = System.currentTimeMillis();
+
+		
+		saveAccessTime(tick,tock,1,"getLogEntriesForTasks");
+		
 		// shutdown();
 		return createInvocStat(result);
 
@@ -466,6 +507,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesForTaskOnHost(long taskId,
 			String hostName) {
+		Long tick =System.currentTimeMillis();
 		if (client == null) {
 			getConnection();
 		}
@@ -484,6 +526,11 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
 
+
+		Long tock = System.currentTimeMillis();
+
+		
+		saveAccessTime(tick,tock,result.size(),"getLogEntriesForTaskOnHost");
 			// shutdown();
 		return createInvocStat(result);
 	}
@@ -491,7 +538,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(long taskId,
 			String hostName, long timestamp) {
-
+		Long tick =System.currentTimeMillis();
 		if (client == null) {
 			getConnection();
 		}
@@ -511,6 +558,11 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
+		
+Long tock = System.currentTimeMillis();
+
+		
+		saveAccessTime(tick,tock,result.size(),"LogEntriesForTaskOnHostSince");
 
 			// shutdown();
 		return createInvocStat(result);
@@ -529,13 +581,17 @@ public class HiwayDBNoSQL implements HiwayDBI {
 			invocDocument = gson.fromJson((String) row.getDocument(),
 					InvocDoc.class);
 
-			temp = new InvocStat("terst",invocDocument.getTaskId());
+			temp = new InvocStat(invocDocument.getRunId(),invocDocument.getTaskId());
+			
+			if (invocDocument.getHostname() != null
+					&& invocDocument.getTaskId() != 0
+					&& invocDocument.getRealTime() != null) {
 			temp.setHostName(invocDocument.getHostname());
 			temp.setRealTime(invocDocument.getRealTime(),
 					invocDocument.getTimestamp());
 
-			Map<String, HashMap<String, Long>> output = invocDocument
-					.getFiles();
+			Map<String, HashMap<String, Long>> output = invocDocument.getFiles();
+			
 			List<FileStat> fileStatout = new ArrayList<FileStat>();
 			List<FileStat> fileStatin = new ArrayList<FileStat>();
 			FileStat file = null;
@@ -563,7 +619,9 @@ public class HiwayDBNoSQL implements HiwayDBI {
 			}
 			temp.setOutputfiles(fileStatout);
 			temp.setInputfiles(fileStatin);
+
 			tempResult.add(temp);
+			}
 
 		}
 
@@ -572,6 +630,89 @@ public class HiwayDBNoSQL implements HiwayDBI {
 				.println("COUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuut:"
 						+ tempResult.size());
 		return tempResult;
+	}
+	
+	private SessionFactory getSQLSession() {
+		try {
+			
+			
+			//"root", "keanu7.","jdbc:mysql://localhost/hiwaydb"
+			
+				Configuration configuration = new Configuration();
+				// .configure(f);
+
+				configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost/hiwaydb");
+				configuration.setProperty("hibernate.connection.username",
+						"root");
+				
+					configuration.setProperty("hibernate.connection.password",
+							"reverse");
+				
+				//<property name="hibernate.current_session_context_class">org.hibernate.context.ThreadLocal‌​SessionContext</property>
+
+			
+			//	configuration.setProperty("hibernate.current_session_context_class", "thread");
+				configuration.setProperty("hibernate.dialect",
+						"org.hibernate.dialect.MySQLInnoDBDialect");
+				configuration.setProperty("hibernate.connection.driver_class",
+						"com.mysql.jdbc.Driver");
+				// configuration.setProperty("hibernate.connection.password.driver_class",
+				// "com.mysql.jdbc.Driver");
+				configuration.setProperty("hibernate.connection.pool_size",
+						"10");
+
+				configuration
+				.addAnnotatedClass(de.huberlin.hiwaydb.dal.Accesstime.class);
+
+				StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
+						.applySettings(configuration.getProperties());
+				SessionFactory sessionFactory = configuration
+						.buildSessionFactory(builder.build());
+				return sessionFactory;
+
+		} catch (Throwable ex) {
+			System.err.println("Failed to create sessionFactory object." + ex);
+			throw new ExceptionInInitializerError(ex);
+		}
+
+	}
+	
+	private void saveAccessTime(long tick, long tock, long returnVolume, String funktion){
+		
+		if (dbSessionFactory == null) {
+			dbSessionFactory = getSQLSession();
+		}
+		
+		Session sess = dbSessionFactory.openSession();
+		Transaction tx = null;
+		
+		// Non-managed environment idiom with getCurrentSession()
+		try {
+			 tx = sess.beginTransaction();
+			 
+				Accesstime at = new Accesstime();
+				
+				at.setTick(tick);
+				at.setFunktion(funktion);
+			    at.setInput("noSQL");
+
+				at.setReturnvolume(returnVolume);
+				
+				at.setTock(tock);
+				at.setTicktockdif(tock-tick);
+			
+			sess.save(at);
+			
+		    tx.commit();
+		}
+		catch (RuntimeException e) {
+			 if (tx != null) tx.rollback();
+		    throw e; // or display error message
+		}
+		finally {
+		   sess.close();
+		}				
+		
 	}
 
 }

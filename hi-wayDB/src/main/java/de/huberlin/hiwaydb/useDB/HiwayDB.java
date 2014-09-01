@@ -90,7 +90,7 @@ public class HiwayDB implements HiwayDBI {
 			
 			at.setTick(tick);
 			at.setFunktion("getHostNames");
-		    at.setInput("");
+		    at.setInput("SQL");
 			
 			Query query = null;
 			List<Invocation> resultsInvoc = null;
@@ -112,6 +112,7 @@ public class HiwayDB implements HiwayDBI {
 			Long tock = System.currentTimeMillis();
 			at.setTock(tock);
 			at.setTicktockdif(tock-tick);
+			
 			sess.save(at);
 			
 		    tx.commit();
@@ -151,7 +152,7 @@ public class HiwayDB implements HiwayDBI {
 			
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTask");
-		    at.setInput("");
+		    at.setInput("SQL");
 			
 			Query query = null;
 			
@@ -185,10 +186,7 @@ public class HiwayDB implements HiwayDBI {
 	@Override
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
 		Long tick =System.currentTimeMillis();
-		if (dbSessionFactory == null) {
-			dbSessionFactory = getSQLSession();
-		}
-		
+				
 		if (dbSessionFactory == null) {
 			dbSessionFactory = getSQLSession();
 		}
@@ -204,7 +202,7 @@ public class HiwayDB implements HiwayDBI {
 			
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTasks");
-		    at.setInput("");
+		    at.setInput("SQL");
 			
 			Query query = null;
 			
@@ -261,7 +259,7 @@ public class HiwayDB implements HiwayDBI {
 			
 			at.setTick(tick);
 			at.setFunktion("getTaskIdsForWorkflow");
-		    at.setInput("");
+		    at.setInput("SQL");
 			
 			Query query = null;
 		
@@ -327,7 +325,7 @@ public class HiwayDB implements HiwayDBI {
 			
 			at.setTick(tick);
 			at.setFunktion("getTaskName");
-		    at.setInput("");
+		    at.setInput("SQL");
 			
 			Query query = null;
 			
@@ -465,7 +463,7 @@ public class HiwayDB implements HiwayDBI {
 			
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTaskOnHost");
-		    at.setInput("");
+		    at.setInput("SQL");
 			
 		       
 			Query query = null;
@@ -517,7 +515,7 @@ public class HiwayDB implements HiwayDBI {
 			
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTaskOnHostSince");
-		    at.setInput("");
+		    at.setInput("SQL");
 		
 			Query query = null;
 			
@@ -569,7 +567,7 @@ public class HiwayDB implements HiwayDBI {
 			
 			at.setTick(tick);
 			at.setFunktion("JsonReportEntryToDB");
-		    at.setInput("");
+		    at.setInput("SQL");
 			
 			Query query = null;
 			List<Task> resultsTasks = null;
