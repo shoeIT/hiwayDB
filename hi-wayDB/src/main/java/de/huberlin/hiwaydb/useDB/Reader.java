@@ -70,8 +70,8 @@ public class Reader {
 					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
 					// String input =
 				//i1_s368_r1_placementAware
-			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
-				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\e00_02_2r_variant-call-setup-09_002.log";
+			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\wordcount.cf.log";
+				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\i1_s368_r3_greedyQueue.log";
 
 				
 				
@@ -249,7 +249,7 @@ public class Reader {
 			}
 			else if (lineIn.equalsIgnoreCase("db")) {
 
-				HiwayDBI testGet = new HiwayDB( "root", "keanu7.","jdbc:mysql://localhost/hiwaydb");
+				HiwayDBI testGet = new HiwayDB( "root", "reverse","jdbc:mysql://localhost/hiwaydb");
 
 				//HiwayDBI testGet = new HiwayDB();
 					
@@ -370,7 +370,7 @@ public class Reader {
 //						writer = new WriteHiwayDB("hibernate.cfg.xml");
 //					}
 				
-				writer = new HiwayDB("root", "keanu7.","jdbc:mysql://localhost/hiwaydb"	);
+				writer = new HiwayDB("root", "reverse","jdbc:mysql://localhost/hiwaydb"	);
 
 					// String input = "D:\\Temp\\" + args[0];
 					// e00_01_3r_variant-call-setup-09_001
@@ -380,8 +380,8 @@ public class Reader {
 					// 
 					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
 					// String input =
-			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\wordcount.cf.log";
-				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\other files\\Logs\\i1_s368_r1_placementAware.log";
+			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\wordcount.cf.log"; i1_s368_r2_placementAware
+				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\i1_s368_r3_greedyQueue.log";
 
 
 					System.out.println("Input: " + input);

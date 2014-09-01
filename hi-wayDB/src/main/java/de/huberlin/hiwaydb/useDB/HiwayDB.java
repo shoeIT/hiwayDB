@@ -17,6 +17,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Projections;
 import org.json.JSONObject;
 
 import de.huberlin.hiwaydb.dal.Accesstime;
@@ -48,6 +49,7 @@ public class HiwayDB implements HiwayDBI {
 	private String dbURL;
 	private String password;
 	private String username;
+	private long dbVolume;
 
 	public HiwayDB(String username, String password, String dbURL) {
 		this.username = username;
@@ -55,6 +57,26 @@ public class HiwayDB implements HiwayDBI {
 		this.dbURL = dbURL;
 		
 		dbSessionFactory = getSQLSession();
+		
+		Session sess = dbSessionFactory.openSession();
+		Transaction tx = null;
+		
+		// Non-managed environment idiom with getCurrentSession()
+		try {
+			 tx = sess.beginTransaction();
+		
+			 dbVolume = (long) sess.createCriteria(Invocation.class).setProjection(Projections.rowCount()).uniqueResult();
+			
+		    tx.commit();
+		}
+		catch (RuntimeException e) {
+			 if (tx != null) tx.rollback();
+		    throw e; // or display error message
+		}
+		finally {
+		    sess.close();
+		}
+		
 	}
 
 	
@@ -91,6 +113,7 @@ public class HiwayDB implements HiwayDBI {
 			at.setTick(tick);
 			at.setFunktion("getHostNames");
 		    at.setInput("SQL");
+		    at.setDbvolume(dbVolume);
 			
 			Query query = null;
 			List<Invocation> resultsInvoc = null;
@@ -153,7 +176,7 @@ public class HiwayDB implements HiwayDBI {
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTask");
 		    at.setInput("SQL");
-			
+		    at.setDbvolume(dbVolume);
 			Query query = null;
 			
 			query =sess.createQuery("FROM Invocation I  WHERE I.task ="
@@ -203,6 +226,7 @@ public class HiwayDB implements HiwayDBI {
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTasks");
 		    at.setInput("SQL");
+		    at.setDbvolume(dbVolume);
 			
 			Query query = null;
 			
@@ -260,6 +284,7 @@ public class HiwayDB implements HiwayDBI {
 			at.setTick(tick);
 			at.setFunktion("getTaskIdsForWorkflow");
 		    at.setInput("SQL");
+		    at.setDbvolume(dbVolume);
 			
 			Query query = null;
 		
@@ -326,6 +351,7 @@ public class HiwayDB implements HiwayDBI {
 			at.setTick(tick);
 			at.setFunktion("getTaskName");
 		    at.setInput("SQL");
+		    at.setDbvolume(dbVolume);
 			
 			Query query = null;
 			
@@ -464,6 +490,7 @@ public class HiwayDB implements HiwayDBI {
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTaskOnHost");
 		    at.setInput("SQL");
+		    at.setDbvolume(dbVolume);
 			
 		       
 			Query query = null;
@@ -516,6 +543,7 @@ public class HiwayDB implements HiwayDBI {
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTaskOnHostSince");
 		    at.setInput("SQL");
+		    at.setDbvolume(dbVolume);
 		
 			Query query = null;
 			
@@ -568,6 +596,7 @@ public class HiwayDB implements HiwayDBI {
 			at.setTick(tick);
 			at.setFunktion("JsonReportEntryToDB");
 		    at.setInput("SQL");
+		    at.setDbvolume(dbVolume);
 			
 			Query query = null;
 			List<Task> resultsTasks = null;

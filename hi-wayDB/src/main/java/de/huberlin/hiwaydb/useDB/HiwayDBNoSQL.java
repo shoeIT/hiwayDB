@@ -42,6 +42,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	private String bucket;
 	CouchbaseClient client = null;
 	Gson gson;
+	private long dbVolume;
 	
 	private SessionFactory dbSessionFactory = null;
 	
@@ -53,6 +54,21 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		gson = new Gson();
 
 		getConnection();
+		
+		View view = client.getView("dev_Invoc", "InvocCount");
+
+		
+		Query query = new Query();
+
+		
+		// Query the Cluster
+		ViewResponse result = client.query(view, query);
+
+	for (ViewRow row : result) {
+			// Use Google GSON to parse the JSON into a HashMap
+			//System.out.println("resrow: " + row.getValue());
+			dbVolume = Long.parseLong(row.getValue(), 10);
+		}
 
 	}
 
@@ -695,6 +711,7 @@ Long tock = System.currentTimeMillis();
 				at.setTick(tick);
 				at.setFunktion(funktion);
 			    at.setInput("noSQL");
+			    at.setDbvolume(dbVolume);
 
 				at.setReturnvolume(returnVolume);
 				
