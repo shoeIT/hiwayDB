@@ -57,7 +57,7 @@ public class Reader {
 				List<URI> uris = new ArrayList<URI>();
 				uris.add(URI.create("http://127.0.0.1:8091/pools"));
 
-				writer = new HiwayDBNoSQL("hiwaydb",	"", uris);
+				writer = new HiwayDBNoSQL("hiwaydb",	"", uris,"","","");
 				
 				
 
@@ -133,7 +133,7 @@ public class Reader {
 				List<URI> uris = new ArrayList<URI>();
 				uris.add(URI.create("http://127.0.0.1:8091/pools"));
 				
-			HiwayDBI testGet = new HiwayDBNoSQL("hiwaydb","",uris);
+			HiwayDBI testGet = new HiwayDBNoSQL("hiwaydb","",uris,"","","");
 
 			//HiwayDBI testGet = new HiwayDB();
 				

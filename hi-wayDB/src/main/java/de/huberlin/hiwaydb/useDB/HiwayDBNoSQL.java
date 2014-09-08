@@ -40,16 +40,27 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	private List<URI> dbURLs;
 	private String password;
 	private String bucket;
+	
+
+	private String dbURLSQL;
+	private String passwordSQL;
+	private String usernameSQL;
+	
 	CouchbaseClient client = null;
 	Gson gson;
 	private long dbVolume;
 	
 	private SessionFactory dbSessionFactory = null;
 	
-	public HiwayDBNoSQL(String bucket, String password, List<URI> dbURLs) {
+	public HiwayDBNoSQL(String bucket, String password, List<URI> dbURLs, 
+			String usernameSQL, String passwordSQL, String dbURLSQL ) {
 		this.bucket = bucket;
 		this.password = password;
 		this.dbURLs = dbURLs;
+		
+		this.usernameSQL = usernameSQL;
+		this.passwordSQL = passwordSQL;
+		this.dbURLSQL = dbURLSQL;
 
 		gson = new Gson();
 
@@ -663,13 +674,13 @@ Long tock = System.currentTimeMillis();
 				// .configure(f);
 
 							
-					configuration.setProperty("hibernate.connection.url", "jdbc:mysql://192.168.127.43/hiwaydb");
+					configuration.setProperty("hibernate.connection.url", this.dbURLSQL);
 			//configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost/hiwaydb");
 				configuration.setProperty("hibernate.connection.username",
-						"root");
+						this.usernameSQL);
 				
 					configuration.setProperty("hibernate.connection.password",
-							"reverse");
+							this.passwordSQL);
 				
 				//<property name="hibernate.current_session_context_class">org.hibernate.context.ThreadLocal‌​SessionContext</property>
 
