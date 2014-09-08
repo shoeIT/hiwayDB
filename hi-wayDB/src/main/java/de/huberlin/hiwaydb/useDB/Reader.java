@@ -71,7 +71,7 @@ public class Reader {
 					// String input =
 				//i1_s368_r1_placementAware
 			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\wordcount.cf.log";
-				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\i1_s368_r3_greedyQueue.log";
+				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\wordcount.cf.log";
 
 				
 				
@@ -139,24 +139,24 @@ public class Reader {
 				
 				System.out.println("go...");
 
-				System.out.println("getLogEntriesForTask:");
-
-				 for (InvocStat f : testGet.getLogEntriesForTask(324609906700l))
-				 {
-				 System.out.println(f.toString());
-				 }
-				
-
-				System.out.println("getLogEntriesForTask mit Set:");
-
-				Set<Long> tasks = new HashSet<Long>();
-				tasks.add(989639045l);
-				tasks.add(324609906700l);
-			
-				 for (InvocStat f : testGet.getLogEntriesForTasks(tasks)) {
-				 System.out.println(f.toString());				 }
-
-		
+//				System.out.println("getLogEntriesForTask:");
+//
+//				 for (InvocStat f : testGet.getLogEntriesForTask(324609906700l))
+//				 {
+//				 System.out.println(f.toString());
+//				 }
+//				
+//
+//				System.out.println("getLogEntriesForTask mit Set:");
+//
+//				Set<Long> tasks = new HashSet<Long>();
+//				tasks.add(989639045l);
+//				tasks.add(324609906700l);
+//			
+//				 for (InvocStat f : testGet.getLogEntriesForTasks(tasks)) {
+//				 System.out.println(f.toString());				 }
+//
+//		
 
 
 //

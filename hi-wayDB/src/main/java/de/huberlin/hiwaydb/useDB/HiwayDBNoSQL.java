@@ -409,7 +409,9 @@ Long tock = System.currentTimeMillis();
 		// Set up the Query object
 		Query query = new Query();
 
-		query.setIncludeDocs(true).setKey("[\""+workflowName+"\"]");
+		//query.setIncludeDocs(true).setKey("[\""+workflowName+"\"]");
+		
+		query.setIncludeDocs(true).setKey(workflowName);
 
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
@@ -638,13 +640,16 @@ Long tock = System.currentTimeMillis();
 
 			tempResult.add(temp);
 			}
+			else
+			{
+			System.out.println("DOCccuuuuuuuuuuuuuument !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11wird NICHT genutzt ID:" +invocDocument.getInvocId());
+						
+			}
 
 		}
 
 		// shutdown();
-		System.out
-				.println("COUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuut:"
-						+ tempResult.size());
+	//	System.out.println("COUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuut:"		+ tempResult.size());
 		return tempResult;
 	}
 	
@@ -657,7 +662,9 @@ Long tock = System.currentTimeMillis();
 				Configuration configuration = new Configuration();
 				// .configure(f);
 
-				configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost/hiwaydb");
+							
+					configuration.setProperty("hibernate.connection.url", "jdbc:mysql://192.168.127.43/hiwaydb");
+			//configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost/hiwaydb");
 				configuration.setProperty("hibernate.connection.username",
 						"root");
 				
