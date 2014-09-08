@@ -24,6 +24,21 @@ ENGINE = InnoDB;
 
 SHOW WARNINGS;
 
+DROP TABLE IF EXISTS `Accesstime` ;
+
+CREATE TABLE `hiwaydb`.`Accesstime` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `funktion` VARCHAR(100) NULL,
+  `input` VARCHAR(100) NULL,
+  `tick` BIGINT UNSIGNED NULL,
+  `tock` BIGINT UNSIGNED NULL,
+  `ticktockdif` BIGINT UNSIGNED NULL,
+  `dbvolume` BIGINT UNSIGNED NULL,
+  `returnvolume` BIGINT UNSIGNED NULL,
+   `debug` VARCHAR(500) NULL,
+  PRIMARY KEY (`id`));
+
+
 -- -----------------------------------------------------
 -- Table `Task`
 -- -----------------------------------------------------
