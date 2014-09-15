@@ -74,7 +74,11 @@ public class HiwayDB implements HiwayDBI {
 		    throw e; // or display error message
 		}
 		finally {
-		    //sess.close();
+		    if(sess.isOpen())
+		    {
+		    	sess.close();
+		    }
+			
 		}
 		
 	}
@@ -464,7 +468,10 @@ public class HiwayDB implements HiwayDBI {
 				resultList.add(invoc);
 			}
 		}
-		sess.close();
+		if (sess.isOpen()) {
+			sess.close();
+		}
+		
 		return resultList;
 	}
 
@@ -872,7 +879,7 @@ public class HiwayDB implements HiwayDBI {
 			// return 1;
 
 		} finally {
-			if (session != null) {
+			if (session.isOpen()) {
 				session.close();
 			}
 		}
