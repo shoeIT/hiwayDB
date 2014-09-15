@@ -133,7 +133,8 @@ public class Reader {
 				List<URI> uris = new ArrayList<URI>();
 				uris.add(URI.create("http://127.0.0.1:8091/pools"));
 				
-			HiwayDBI testGet = new HiwayDBNoSQL("hiwaydb","",uris,"","","");
+						
+				HiwayDBI testGet = new HiwayDBNoSQL("hiwaydb","",uris,"root", "reverse","jdbc:mysql://localhost/hiwaydb");
 
 			//HiwayDBI testGet = new HiwayDB();
 				
@@ -184,21 +185,21 @@ public class Reader {
 				// + f.getTaskId() + " | RealTime:" + f.getRealTime());
 				// }
 				//
-				
-				 Calendar cal = Calendar.getInstance();
-				 cal.set(2014, Calendar.JUNE, 22);
-				
-				 System.out.println("All for host since: 1403599949182 " );
-				 //_2014-06-20 17:03:58
-				 
-				// java.util.Date dt = new java.util.Date();
-
-				//["dbis14",3246099067099,1404103422872]
-				 //["dbis11",324609906700,0], ["dbis11",324609906700,0]
-				
-				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(324609906700l,
-				 "dbis11",1404101397760l)) {
-				 System.out.println(f.toString());
+//				
+//				 Calendar cal = Calendar.getInstance();
+//				 cal.set(2014, Calendar.JUNE, 22);
+//				
+//				 System.out.println("All for host since: 1403599949182 " );
+//				 //_2014-06-20 17:03:58
+//				 
+//				// java.util.Date dt = new java.util.Date();
+//
+//				//["dbis14",3246099067099,1404103422872]
+//				 //["dbis11",324609906700,0], ["dbis11",324609906700,0]
+//				
+//				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(324609906700l,
+//				 "dbis11",1404101397760l)) {
+//				 System.out.println(f.toString());
 				 //+ " Date: " + f.getTimestamp());
 //				 for (FileStat fi :f.getInputFiles()){
 //					 System.out.println("file in: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
@@ -208,13 +209,13 @@ public class Reader {
 //				 for (FileStat fi :f.getOutputFiles()){
 //					 System.out.println("file out: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
 //				 }
-				 }
-
-				System.out.println("All for Task on Host:");
-				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
-						324609906700l, "dbis11")) {
-					System.out.println(f.toString());
-				}
+//				 }
+//
+//				System.out.println("All for Task on Host:");
+//				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
+//						324609906700l, "dbis11")) {
+//					System.out.println(f.toString());
+//				}
 //
 //				Calendar cal = Calendar.getInstance();
 //
@@ -226,17 +227,17 @@ public class Reader {
 //					System.out.println(f.toString());
 //				}
 				
-				System.out.println("TaskIDs for Workflow:variant-call-09-setup.cf");
-
-				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09-setup.cf")) {
-					System.out.println(f.toString());
-				}
-				
-				System.out.println("getTaskNames for ID :");
-				System.out.println("6: "
-						+ testGet.getTaskName(6l));
-				System.out.println("453506959: "
-						+ testGet.getTaskName(453506959l));
+//				System.out.println("TaskIDs for Workflow:variant-call-09-setup.cf");
+//
+//				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09-setup.cf")) {
+//					System.out.println(f.toString());
+//				}
+//				
+//				System.out.println("getTaskNames for ID :");
+//				System.out.println("6: "
+//						+ testGet.getTaskName(6l));
+//				System.out.println("453506959: "
+//						+ testGet.getTaskName(453506959l));
 				
 				System.out.println("getHostnames:");
 

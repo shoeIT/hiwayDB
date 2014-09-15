@@ -145,11 +145,20 @@ Long tock = System.currentTimeMillis();
 			//System.out.println("resrow: " + row.getValue());
 			HashMap<String, String> parsedDoc = gson.fromJson(
 					(String) row.getDocument(), HashMap.class);
-			tempResult.add(row.getValue());
-
+			String x = row.getValue();
+			if(x != null && !x.equals(null))
+			{
+				tempResult.add(row.getValue());
+			}	
 		}
 		
 		Long tock = System.currentTimeMillis();
+		
+		for(String s : tempResult)
+		{
+			System.out.println(s);
+			log.info("Hostname: " + s);
+		}
 		
 		saveAccessTime(tick,tock,tempResult.size(),"getHostNames");	
 				

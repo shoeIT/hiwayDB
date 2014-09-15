@@ -74,7 +74,7 @@ public class HiwayDB implements HiwayDBI {
 		    throw e; // or display error message
 		}
 		finally {
-		    sess.close();
+		    //sess.close();
 		}
 		
 	}
