@@ -87,13 +87,12 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		try {
 			
 			log.info("connecting to Couchbase, bucket: "+ this.bucket +" pwd:" +this.password  );
-			log.info("weiter..." );
-			
+					
 			client = new CouchbaseClient(this.dbURLs, this.bucket,this.password);
 		
 
 		} catch (Exception e) {
-			log.info("Error connecting to Couchbase: " + e.getMessage());
+			log.info("hiwayDBNoSQL |Error connecting to Couchbase: " + e.getMessage());
 			// System.exit(0);
 		}
 	}
@@ -107,7 +106,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		if (i.isEmpty()) {
 			// log.info("Write successful!!!");
 		} else {
-			log.info("Fehler: " + i);
+			log.info("hiwayDBNoSQL |Fehler: " + i);
 		}
 		
 Long tock = System.currentTimeMillis();
@@ -154,11 +153,11 @@ Long tock = System.currentTimeMillis();
 		
 		Long tock = System.currentTimeMillis();
 		
-		for(String s : tempResult)
-		{
-			System.out.println(s);
-			log.info("Hostname: " + s);
-		}
+//		for(String s : tempResult)
+//		{
+//			System.out.println(s);
+//			log.info("Hostname: " + s);
+//		}
 		
 		saveAccessTime(tick,tock,tempResult.size(),"getHostNames");	
 				
@@ -175,7 +174,7 @@ Long tock = System.currentTimeMillis();
 
 		try {
 
-			System.out.println(logEntryRow.toString());
+			log.info("hiwayDBNoSQL | lineToDB:" + logEntryRow.toString());
 
 			String runID = null;
 
@@ -218,7 +217,7 @@ Long tock = System.currentTimeMillis();
 					wfRunDocument.setRunId(runID);
 
 					// client.set(runID, gson.toJson(wfRunDocument));
-					System.out.println("WFRun: " + runID + " gespeichert");
+					//System.out.println("WFRun: " + runID + " gespeichert");
 				}
 			}
 
@@ -252,8 +251,7 @@ Long tock = System.currentTimeMillis();
 					invocDocument.setRunId(runID);
 					invocDocument.setTimestamp(timestampTemp);
 
-					System.out.println("NEUES Doc ID" + documentId
-							+ " angelegt.");
+					//System.out.println("NEUES Doc ID" + documentId	+ " angelegt.");
 				}
 			}
 
@@ -303,10 +301,10 @@ Long tock = System.currentTimeMillis();
 				break;
 
 			case "invoc-exec":
-				valuePart = logEntryRow.getValueJsonObj();
+				//valuePart = logEntryRow.getValueJsonObj();
 
 				Map<String, String> input = invocDocument.getInput();
-				input.put("invoc-exec", valuePart.toString());
+				input.put("invoc-exec", logEntryRow.getValueRawString());
 				invocDocument.setInput(input);
 				break;
 
@@ -662,7 +660,7 @@ Long tock = System.currentTimeMillis();
 			}
 			else
 			{
-			System.out.println("DOCccuuuuuuuuuuuuuument !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11wird NICHT genutzt ID:" +invocDocument.getInvocId());
+			//System.out.println("DOCccuuuuuuuuuuuuuument !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11wird NICHT genutzt ID:" +invocDocument.getInvocId());
 						
 			}
 

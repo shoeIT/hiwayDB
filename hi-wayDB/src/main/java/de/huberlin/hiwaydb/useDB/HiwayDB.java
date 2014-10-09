@@ -1,5 +1,9 @@
 package de.huberlin.hiwaydb.useDB;
 
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,21 +34,19 @@ import de.huberlin.hiwaydb.dal.Workflowrun;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public class HiwayDB implements HiwayDBI {
-	
+
 	public static <T> List<T> castList(Class<? extends T> clazz, Collection<?> c) {
-	    List<T> r = new ArrayList<T>(c.size());
-	    for(Object o: c)
-	      r.add(clazz.cast(o));
-	    return r;
+		List<T> r = new ArrayList<T>(c.size());
+		for (Object o : c)
+			r.add(clazz.cast(o));
+		return r;
 	}
-	
+
 	private String configFile = "hibernate.cfg.xml";
 
 	private static final Log log = LogFactory.getLog(HiwayDB.class);
 
 	private SessionFactory dbSessionFactory = null;
-	
-	private Session session;
 
 	private String dbURL;
 	private String password;
@@ -55,74 +57,71 @@ public class HiwayDB implements HiwayDBI {
 		this.username = username;
 		this.password = password;
 		this.dbURL = dbURL;
-		
+
 		dbSessionFactory = getSQLSession();
-		
-		Session sess = dbSessionFactory.openSession();
+
+		Session session = dbSessionFactory.openSession();
 		Transaction tx = null;
 		
-		// Non-managed environment idiom with getCurrentSession()
 		try {
-			 tx = sess.beginTransaction();
-		
-			 dbVolume = (long) sess.createCriteria(Invocation.class).setProjection(Projections.rowCount()).uniqueResult();
-			
-		    tx.commit();
+			tx = session.beginTransaction();
+
+			dbVolume = (long) session.createCriteria(Invocation.class)
+					.setProjection(Projections.rowCount()).uniqueResult();
+
+			tx.commit();
+		} catch (RuntimeException e) {
+			if (tx != null)
+				tx.rollback();
+			throw e; // or display error message
+		} finally {
+			if (session.isOpen()) {
+				session.close();
+			}
+
 		}
-		catch (RuntimeException e) {
-			 if (tx != null) tx.rollback();
-		    throw e; // or display error message
-		}
-		finally {
-		    if(sess.isOpen())
-		    {
-		    	sess.close();
-		    }
-			
-		}
-		
+
 	}
 
-	
 	@Override
 	public void logToDB(JsonReportEntry entry) {
-		
-		String i = lineToDB(entry);
 
-		if (i.isEmpty()) {
-			// log.info("Write successful!!!");
-		} else {
-			log.info("Fehler: " + i);
-		}
+	lineToDB(entry);
+//
+//		if (i.isEmpty()) {
+//			// log.info("Write successful!!!");
+//		} else {
+//			log.info("hiwayDB |Fehler: " + i);
+//		}
 	}
 
 	@Override
 	public Set<String> getHostNames() {
-		Long tick =System.currentTimeMillis();
+		Long tick = System.currentTimeMillis();
 		if (dbSessionFactory == null) {
 			dbSessionFactory = getSQLSession();
 		}
-		
+
 		Set<String> tempResult = new HashSet<String>();
-		
+
 		Session sess = dbSessionFactory.openSession();
 		Transaction tx = null;
-		
+
 		// Non-managed environment idiom with getCurrentSession()
 		try {
-			 tx = sess.beginTransaction();
-			
+			tx = sess.beginTransaction();
+
 			Accesstime at = new Accesstime();
-			
+
 			at.setTick(tick);
 			at.setFunktion("getHostNames");
-		    at.setInput("SQL");
-		    at.setDbvolume(dbVolume);
-			
+			at.setInput("SQL");
+			at.setDbvolume(dbVolume);
+
 			Query query = null;
 			List<Invocation> resultsInvoc = null;
 
-			query =sess.createQuery("FROM Invocation I");
+			query = sess.createQuery("FROM Invocation I");
 
 			resultsInvoc = castList(Invocation.class, query.list());
 
@@ -132,177 +131,170 @@ public class HiwayDB implements HiwayDBI {
 					tempResult.add(i.getHostname());
 				}
 			}
-			
+
 			Long x = (long) tempResult.size();
 
 			at.setReturnvolume(x);
 			Long tock = System.currentTimeMillis();
 			at.setTock(tock);
-			at.setTicktockdif(tock-tick);
-			
+			at.setTicktockdif(tock - tick);
+
 			sess.save(at);
-			
-		    tx.commit();
+
+			tx.commit();
+		} catch (RuntimeException e) {
+			if (tx != null)
+				tx.rollback();
+			throw e; // or display error message
+		} finally {
+			// ////// sess.close();
 		}
-		catch (RuntimeException e) {
-			 if (tx != null) tx.rollback();
-		    throw e; // or display error message
-		}
-		finally {
-		   //////// sess.close();
-		}
-			
-		
+
 		return tempResult;
-		
+
 	}
 
-	
 	@Override
 	public Collection<InvocStat> getLogEntriesForTask(long taskId) {
-		Long tick =System.currentTimeMillis();
+		Long tick = System.currentTimeMillis();
 		if (dbSessionFactory == null) {
 			dbSessionFactory = getSQLSession();
 		}
-		
-			
+
 		Session sess = dbSessionFactory.openSession();
-		
+
 		List<Invocation> resultsInvoc = new ArrayList<Invocation>();
-		
+
 		Transaction tx = null;
-		
+
 		try {
-			 tx = sess.beginTransaction();
+			tx = sess.beginTransaction();
 
 			Accesstime at = new Accesstime();
-			
+
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTask");
-		    at.setInput("SQL");
-		    at.setDbvolume(dbVolume);
+			at.setInput("SQL");
+			at.setDbvolume(dbVolume);
 			Query query = null;
-			
-			query =sess.createQuery("FROM Invocation I  WHERE I.task ="
+
+			query = sess.createQuery("FROM Invocation I  WHERE I.task ="
 					+ taskId);
-			
-			resultsInvoc = castList(Invocation.class, query.list());;
+
+			resultsInvoc = castList(Invocation.class, query.list());
+			;
 			Long x = (long) resultsInvoc.size();
 
 			at.setReturnvolume(x);
 			Long tock = System.currentTimeMillis();
 			at.setTock(tock);
-			at.setTicktockdif(tock-tick);
+			at.setTicktockdif(tock - tick);
 			sess.save(at);
-			
-		    tx.commit();
-		}
-		catch (RuntimeException e) {
-			 if (tx != null) tx.rollback();
-		    throw e; // or display error message
-		}
-		finally {
-		   //////// sess.close();
+
+			tx.commit();
+		} catch (RuntimeException e) {
+			if (tx != null)
+				tx.rollback();
+			throw e; // or display error message
+		} finally {
+			// ////// sess.close();
 		}
 
-	
-		return createInvocStat(resultsInvoc,sess);
+		return createInvocStat(resultsInvoc, sess);
 
 	}
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
-		Long tick =System.currentTimeMillis();
-				
+		Long tick = System.currentTimeMillis();
+
 		if (dbSessionFactory == null) {
 			dbSessionFactory = getSQLSession();
 		}
 		List<Invocation> resultsInvoc = new ArrayList<Invocation>();
-		
+
 		Session sess = dbSessionFactory.openSession();
 		Transaction tx = null;
-		
+
 		try {
-			 tx = sess.beginTransaction();
+			tx = sess.beginTransaction();
 
 			Accesstime at = new Accesstime();
-			
+
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTasks");
-		    at.setInput("SQL");
-		    at.setDbvolume(dbVolume);
-			
+			at.setInput("SQL");
+			at.setDbvolume(dbVolume);
+
 			Query query = null;
-			
+
 			String queryString = "FROM Invocation I  WHERE ";
 
 			for (Long l : taskIds) {
 				queryString += " I.task = " + l.toString() + " or ";
 			}
 
-			System.out.println(queryString.substring(0, queryString.length() - 4));
+			// System.out.println(queryString.substring(0, queryString.length()
+			// - 4));
 
-			query =sess.createQuery(queryString.substring(0,
+			query = sess.createQuery(queryString.substring(0,
 					queryString.length() - 4));
 
 			// join I.invocationId
-			resultsInvoc =castList(Invocation.class, query.list());
+			resultsInvoc = castList(Invocation.class, query.list());
 			Long x = (long) resultsInvoc.size();
 
 			at.setReturnvolume(x);
 			Long tock = System.currentTimeMillis();
 			at.setTock(tock);
-			at.setTicktockdif(tock-tick);
+			at.setTicktockdif(tock - tick);
 			sess.save(at);
 
-		    tx.commit();
-		}
-		catch (RuntimeException e) {
-			 if (tx != null) tx.rollback();
-		    throw e; // or display error message
-		}
-		finally {
-		   //////// sess.close();
+			tx.commit();
+		} catch (RuntimeException e) {
+			if (tx != null)
+				tx.rollback();
+			throw e; // or display error message
+		} finally {
+			// ////// sess.close();
 		}
 
-		return createInvocStat(resultsInvoc,sess);
+		return createInvocStat(resultsInvoc, sess);
 
 	}
 
 	@Override
 	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
-		Long tick =System.currentTimeMillis();
+		Long tick = System.currentTimeMillis();
 		if (dbSessionFactory == null) {
 			dbSessionFactory = getSQLSession();
 		}
 
 		Set<Long> tempResult = new HashSet<Long>();
-		
+
 		Session sess = dbSessionFactory.openSession();
 		Transaction tx = null;
 		try {
-			 tx = sess.beginTransaction();
+			tx = sess.beginTransaction();
 
 			Accesstime at = new Accesstime();
-			
+
 			at.setTick(tick);
 			at.setFunktion("getTaskIdsForWorkflow");
-		    at.setInput("SQL");
-		    at.setDbvolume(dbVolume);
-			
+			at.setInput("SQL");
+			at.setDbvolume(dbVolume);
+
 			Query query = null;
-		
 
 			query = sess.createQuery("FROM Workflowrun W WHERE W.wfname ='"
 					+ workflowName + "'");
 
 			List<Workflowrun> resultsWF = new ArrayList<Workflowrun>();
-			
+
 			// query = session
 			// .createQuery("select new list(hostname)  FROM Invocation I");
 
 			resultsWF = query.list();
-		
 
 			for (Workflowrun w : resultsWF) {
 				// System.out.println("in getHostnames: " + i.getHostname());
@@ -316,50 +308,46 @@ public class HiwayDB implements HiwayDBI {
 			at.setReturnvolume(x);
 			Long tock = System.currentTimeMillis();
 			at.setTock(tock);
-			at.setTicktockdif(tock-tick);
+			at.setTicktockdif(tock - tick);
 			sess.save(at);
 
-		    tx.commit();
-		}
-		catch (RuntimeException e) {
-			 if (tx != null) tx.rollback();
-		    throw e; // or display error message
-		}
-		finally {
-		   //////// sess.close();
+			tx.commit();
+		} catch (RuntimeException e) {
+			if (tx != null)
+				tx.rollback();
+			throw e; // or display error message
+		} finally {
+			// ////// sess.close();
 		}
 
-		
 		return tempResult;
 	}
 
 	@Override
 	public String getTaskName(long taskId) {
-		Long tick =System.currentTimeMillis();
+		Long tick = System.currentTimeMillis();
 		if (dbSessionFactory == null) {
 			dbSessionFactory = getSQLSession();
 		}
 
-		
 		List<Task> resultsInvoc = new ArrayList<Task>();
 
 		Session sess = dbSessionFactory.openSession();
 		Transaction tx = null;
-		
-		try {
-			 tx = sess.beginTransaction();
 
-		
+		try {
+			tx = sess.beginTransaction();
+
 			Accesstime at = new Accesstime();
-			
+
 			at.setTick(tick);
 			at.setFunktion("getTaskName");
-		    at.setInput("SQL");
-		    at.setDbvolume(dbVolume);
-			
+			at.setInput("SQL");
+			at.setDbvolume(dbVolume);
+
 			Query query = null;
-			
-			query =sess.createQuery("FROM Task T  WHERE T.taskid =" + taskId);
+
+			query = sess.createQuery("FROM Task T  WHERE T.taskid =" + taskId);
 			// join I.invocationId
 			resultsInvoc = query.list();
 
@@ -368,17 +356,16 @@ public class HiwayDB implements HiwayDBI {
 			at.setReturnvolume(x);
 			Long tock = System.currentTimeMillis();
 			at.setTock(tock);
-			at.setTicktockdif(tock-tick);
+			at.setTicktockdif(tock - tick);
 			sess.save(at);
-			
-		    tx.commit();
-		}
-		catch (RuntimeException e) {
-			 if (tx != null) tx.rollback();
-		    throw e; // or display error message
-		}
-		finally {
-		   //////// sess.close();
+
+			tx.commit();
+		} catch (RuntimeException e) {
+			if (tx != null)
+				tx.rollback();
+			throw e; // or display error message
+		} finally {
+			// ////// sess.close();
 		}
 
 		if (!resultsInvoc.isEmpty()) {
@@ -389,41 +376,42 @@ public class HiwayDB implements HiwayDBI {
 
 	}
 
-	private Collection<InvocStat> createInvocStat(List<Invocation> invocations, Session sess) {
+	private Collection<InvocStat> createInvocStat(List<Invocation> invocations,
+			Session sess) {
 
 		Set<InvocStat> resultList = new HashSet<InvocStat>();
 		Invocation tempInvoc;
 
 		for (int i = 0; i < invocations.size(); i++) {
 			tempInvoc = invocations.get(i);
-			
-			
-//			if (dbSessionFactory == null) {
-//				dbSessionFactory = getSQLSession();
-//			}
-//
-//			session = dbSessionFactory.openSession();
-			
-//			Query query = null;
-//			List<Workflowrun> resultsRun = null;
-//
-//			query = session.createQuery("FROM Workflowrun T  WHERE T.id =" + tempInvoc.getWorkflowrun().get());
-//			// join I.invocationId
-//			resultsRun = query.list();
-//			
-//			
-//			String testuu = "00000000-9aa1-4a3c-9ad6-00000000000";
-//			
-//			if(!resultsRun.isEmpty())
-//			{
-//				testuu = resultsRun.get(0).getRunId();
-//			}
 
-			InvocStat invoc = new InvocStat(tempInvoc.getWorkflowrun().getRunId(),tempInvoc.getTask().getTaskId());
-			
-			
-			log.info("Invoc: " + tempInvoc.getInvocationId() + " Host:"
-					+ tempInvoc.getHostname() + " Task:"
+			// if (dbSessionFactory == null) {
+			// dbSessionFactory = getSQLSession();
+			// }
+			//
+			// session = dbSessionFactory.openSession();
+
+			// Query query = null;
+			// List<Workflowrun> resultsRun = null;
+			//
+			// query = session.createQuery("FROM Workflowrun T  WHERE T.id =" +
+			// tempInvoc.getWorkflowrun().get());
+			// // join I.invocationId
+			// resultsRun = query.list();
+			//
+			//
+			// String testuu = "00000000-9aa1-4a3c-9ad6-00000000000";
+			//
+			// if(!resultsRun.isEmpty())
+			// {
+			// testuu = resultsRun.get(0).getRunId();
+			// }
+
+			InvocStat invoc = new InvocStat(tempInvoc.getWorkflowrun()
+					.getRunId(), tempInvoc.getTask().getTaskId());
+
+			log.info("hiwayDB |Invoc: " + tempInvoc.getInvocationId()
+					+ " Host:" + tempInvoc.getHostname() + " Task:"
 					+ tempInvoc.getTask().getTaskId() + " Time: "
 					+ tempInvoc.getRealTime() + " Time: "
 					+ tempInvoc.getTimestamp());
@@ -463,22 +451,22 @@ public class HiwayDB implements HiwayDBI {
 				invoc.setInputfiles(iFiles);
 				invoc.setOutputfiles(oFiles);
 
-				log.info("Invoc mit Timestamp: " + invoc.getTimestamp()
-						+ " geadded!");
+				log.info("hiwayDB |Invoc mit Timestamp: "
+						+ invoc.getTimestamp() + " geadded!");
 				resultList.add(invoc);
 			}
 		}
 		if (sess.isOpen()) {
 			sess.close();
 		}
-		
+
 		return resultList;
 	}
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTaskOnHost(long taskId,
 			String hostName) {
-		Long tick =System.currentTimeMillis();
+		Long tick = System.currentTimeMillis();
 		if (dbSessionFactory == null) {
 			dbSessionFactory = getSQLSession();
 		}
@@ -487,22 +475,20 @@ public class HiwayDB implements HiwayDBI {
 
 		Session sess = dbSessionFactory.openSession();
 		Transaction tx = null;
-		
-		try {
-			 tx = sess.beginTransaction();
 
+		try {
+			tx = sess.beginTransaction();
 
 			Accesstime at = new Accesstime();
-			
+
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTaskOnHost");
-		    at.setInput("SQL");
-		    at.setDbvolume(dbVolume);
-			
-		       
+			at.setInput("SQL");
+			at.setDbvolume(dbVolume);
+
 			Query query = null;
-			
-			query =sess.createQuery("FROM Invocation I  WHERE I.hostname ='"
+
+			query = sess.createQuery("FROM Invocation I  WHERE I.hostname ='"
 					+ hostName + "' and I.task = " + taskId);
 
 			resultsInvoc = castList(Invocation.class, query.list());
@@ -511,100 +497,99 @@ public class HiwayDB implements HiwayDBI {
 			at.setReturnvolume(x);
 			Long tock = System.currentTimeMillis();
 			at.setTock(tock);
-			at.setTicktockdif(tock-tick);
+			at.setTicktockdif(tock - tick);
 			sess.save(at);
-			
-		    tx.commit();
-		}
-		catch (RuntimeException e) {
-			 if (tx != null) tx.rollback();
-		    throw e; // or display error message
-		}
-		finally {
-		   //////// sess.close();
+
+			tx.commit();
+		} catch (RuntimeException e) {
+			if (tx != null)
+				tx.rollback();
+			throw e; // or display error message
+		} finally {
+			// ////// sess.close();
 		}
 
-		
-		
-		return createInvocStat(resultsInvoc,sess);
+		return createInvocStat(resultsInvoc, sess);
 	}
 
 	@Override
 	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(long taskId,
 			String hostName, long timestamp) {
-		Long tick =System.currentTimeMillis();
+		Long tick = System.currentTimeMillis();
 		if (dbSessionFactory == null) {
 			dbSessionFactory = getSQLSession();
 		}
 		List<Invocation> resultsInvoc = new ArrayList<Invocation>();
-		
+
 		Session sess = dbSessionFactory.openSession();
 		Transaction tx = null;
-		
-		try {
-			 tx = sess.beginTransaction();
 
+		try {
+			tx = sess.beginTransaction();
 
 			Accesstime at = new Accesstime();
-			
+
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTaskOnHostSince");
-		    at.setInput("SQL");
-		    at.setDbvolume(dbVolume);
-		
+			at.setInput("SQL");
+			at.setDbvolume(dbVolume);
+
 			Query query = null;
-			
-			query =  sess.createQuery("FROM Invocation I  WHERE I.hostname ='"
+
+			query = sess.createQuery("FROM Invocation I  WHERE I.hostname ='"
 					+ hostName + "' and I.Timestamp >" + timestamp
 					+ " and I.task = " + taskId);
 
-			log.info("Suche mit Query: FROM Invocation I  WHERE I.hostname ='"
-					+ hostName + "' and I.Timestamp >" + timestamp
-					+ " and I.task = " + taskId);
+			// log.info("Suche mit Query: FROM Invocation I  WHERE I.hostname ='"
+			// + hostName + "' and I.Timestamp >" + timestamp
+			// + " and I.task = " + taskId);
 
-			resultsInvoc = castList(Invocation.class, query.list());;
-			log.info("Ergebnisse Size: " + resultsInvoc.size());
+			resultsInvoc = castList(Invocation.class, query.list());
+			;
+			// log.info("Ergebnisse Size: " + resultsInvoc.size());
 
 			Long x = (long) resultsInvoc.size();
 
 			at.setReturnvolume(x);
 			Long tock = System.currentTimeMillis();
 			at.setTock(tock);
-			at.setTicktockdif(tock-tick);
-			 sess.save(at);
-			
-			  tx.commit();
-		}
-		catch (RuntimeException e) {
-			 if (tx != null) tx.rollback();
-		    throw e; // or display error message
-		}
-		finally {
-		   //////// sess.close();
+			at.setTicktockdif(tock - tick);
+			sess.save(at);
+
+			tx.commit();
+		} catch (RuntimeException e) {
+			if (tx != null)
+				tx.rollback();
+			throw e; // or display error message
+		} finally {
+			// ////// sess.close();
 		}
 
-				
-		return createInvocStat(resultsInvoc,sess);
+		return createInvocStat(resultsInvoc, sess);
 	}
 
-	private String lineToDB(JsonReportEntry logEntryRow) {
+	private void lineToDB(JsonReportEntry logEntryRow) {
+
+		Long tick = System.currentTimeMillis();
+				
+		Session oneSession = dbSessionFactory.openSession();
 		
-		Long tick =System.currentTimeMillis();
-		session = dbSessionFactory.openSession();
-		Transaction tx = null;
+		Transaction tx = oneSession.getTransaction();
 		try {
 
-			System.out.println(logEntryRow.toString());			
-			tx = session.beginTransaction();
+			log.info("hiwayDB | start adding Entry time: " + tick);
 			
-
+			tx = oneSession.beginTransaction();
+			
+			//log.info("hiwayDB | tx = " + tx.getLocalStatus() + "    Session: " + oneSession.getStatistics());
+		
 			Accesstime at = new Accesstime();
-			
+
 			at.setTick(tick);
 			at.setFunktion("JsonReportEntryToDB");
-		    at.setInput("SQL");
-		    at.setDbvolume(dbVolume);
-			
+			at.setInput("SQL");
+			at.setDbvolume(dbVolume);
+
 			Query query = null;
 			List<Task> resultsTasks = null;
 			List<Workflowrun> resultsWfRun = null;
@@ -612,13 +597,11 @@ public class HiwayDB implements HiwayDBI {
 
 			String runID = null;
 			Long wfId = null;
-			
+
 			if (logEntryRow.getRunId() != null) {
 				runID = logEntryRow.getRunId().toString();
 
-				query = session
-						.createQuery("FROM Workflowrun E WHERE E.runid='"
-								+ runID + "'");
+				query = oneSession.createQuery("FROM Workflowrun E WHERE E.runid='"+ runID + "'");
 
 				resultsWfRun = query.list();
 			}
@@ -635,8 +618,7 @@ public class HiwayDB implements HiwayDBI {
 			if (logEntryRow.getTaskId() != null) {
 				taskID = logEntryRow.getTaskId();
 
-				query = session.createQuery("FROM Task E WHERE E.taskid ="
-						+ taskID);
+				query = oneSession.createQuery("FROM Task E WHERE E.taskid ="+ taskID);
 				resultsTasks = query.list();
 			}
 
@@ -646,10 +628,9 @@ public class HiwayDB implements HiwayDBI {
 				invocID = logEntryRow.getInvocId();
 			}
 
-			query = session
-					.createQuery("FROM Invocation E WHERE E.invocationid ="
-							+ invocID + " and E.workflowrun='" + wfId + "'");
-			List<Invocation> resultsInvoc = castList(Invocation.class, query.list());
+			query = oneSession
+					.createQuery("FROM Invocation E WHERE E.invocationid ="+ invocID + " and E.workflowrun='" + wfId + "'");
+			List<Invocation> resultsInvoc = castList(Invocation.class,query.list());
 
 			Long timestampTemp = logEntryRow.getTimestamp();
 
@@ -660,8 +641,7 @@ public class HiwayDB implements HiwayDBI {
 				// query = session.createQuery("FROM File E WHERE E.name='"
 				// + filename + "' AND E.invocation" + invocID);
 
-				query = session.createQuery("FROM File E WHERE E.name='"
-						+ filename + "'");
+				query = oneSession.createQuery("FROM File E WHERE E.name='"	+ filename + "'");
 
 				List<File> resultsFileTemp = query.list();
 
@@ -692,7 +672,8 @@ public class HiwayDB implements HiwayDBI {
 
 				wfRun = new Workflowrun();
 				wfRun.setRunId(runID);
-				session.save(wfRun);
+				oneSession.save(wfRun);
+				log.info("hiwayDB | save WfRun: " + runID);
 			}
 
 			if (taskID != 0 && (task == null)) {
@@ -702,7 +683,8 @@ public class HiwayDB implements HiwayDBI {
 				task.setTaskName(logEntryRow.getTaskName());
 				task.setLanguage(logEntryRow.getLang());
 
-				session.save(task);
+				oneSession.save(task);
+				log.info("hiwayDB | save Task: " + taskID + " - " + task.getTaskName());
 				// System.out.println("Neuer.. Tasks in DB speichern ID: "
 				// + task.getTaskId());
 			}
@@ -713,7 +695,8 @@ public class HiwayDB implements HiwayDBI {
 				invoc.setInvocationId(invocID);
 				invoc.setTask(task);
 				invoc.setWorkflowrun(wfRun);
-				session.save(invoc);
+				oneSession.save(invoc);
+				log.info("hiwayDB | save Invoc: " + invocID);
 			}
 
 			if (file == null && filename != null) {
@@ -721,7 +704,8 @@ public class HiwayDB implements HiwayDBI {
 				file = new File();
 				file.setName(filename);
 				file.setInvocation(invoc);
-				session.save(file);
+				oneSession.save(file);
+				log.info("hiwayDB | save File: " + filename);
 			}
 
 			String key = logEntryRow.getKey();
@@ -731,6 +715,8 @@ public class HiwayDB implements HiwayDBI {
 			// public static final String KEY_INVOC_TIME_STAGEOUT =
 			// "invoc-time-stageout";
 
+			log.info("hiwayDB | save KEY: " + key);
+			
 			JSONObject valuePart;
 			switch (key) {
 			case HiwayDBI.KEY_INVOC_HOST:
@@ -755,14 +741,14 @@ public class HiwayDB implements HiwayDBI {
 				break;
 
 			case "invoc-exec":
-				valuePart = logEntryRow.getValueJsonObj();
+				// valuePart = logEntryRow.getValueRawString();
 
 				Inoutput input = new Inoutput();
 				input.setKeypart("invoc-exec");
 				input.setInvocation(invoc);
-				input.setContent(valuePart.toString());
+				input.setContent(logEntryRow.getValueRawString());
 				input.setType("input");
-				session.save(input);
+				oneSession.save(input);
 				break;
 
 			case JsonReportEntry.KEY_INVOC_OUTPUT:
@@ -773,7 +759,7 @@ public class HiwayDB implements HiwayDBI {
 				output.setInvocation(invoc);
 				output.setContent(valuePart.toString());
 				output.setType("output");
-				session.save(output);
+				oneSession.save(output);
 				break;
 
 			case JsonReportEntry.KEY_INVOC_STDOUT:
@@ -833,7 +819,7 @@ public class HiwayDB implements HiwayDBI {
 				he.setWorkflowrun(wfRun);
 				he.setContent(valuePart.toString());
 				he.setType(valuePart.get("type").toString());
-				session.save(he);
+				oneSession.save(he);
 
 				break;
 			case "reduction-time":
@@ -843,44 +829,54 @@ public class HiwayDB implements HiwayDBI {
 				throw new Exception("Der Typ ist nicht bekannt.:" + key);
 			}
 
-			
-			at.setReturnvolume((long)logEntryRow.toString().length());
+			at.setReturnvolume((long) logEntryRow.toString().length());
 			Long tock = System.currentTimeMillis();
 			at.setTock(tock);
-			at.setTicktockdif(tock-tick);
-			session.save(at);			
+			at.setTicktockdif(tock - tick);
+			 oneSession.save(at);
+			
+			//log.info("hiwayDB | Commit " + tx.getLocalStatus() + " und " + oneSession.getStatistics());	
 			tx.commit();
+			//log.info("hiwayDB | nach comit " + tx.getLocalStatus() + " und Session " + oneSession.isOpen()  +" stat " + oneSession.getStatistics());
+			//session.getTransaction().commit();
+				
+			
+		} catch (org.hibernate.exception.ConstraintViolationException e) {
 
-			return "";
-		} 
-		catch (org.hibernate.exception.ConstraintViolationException e) {
-
-			System.out.println("name: " + e.getConstraintName());
+			log.info("hiwayDB FEHLER | ConstraintViolationException: "+ e.getConstraintName());
 			String message = e.getSQLException().getMessage();
 
 			if (message.contains("RundID_UNIQUE")) {
-				System.out.println("runIDUnique");
+				log.info("hiwayDB FEHLER | runIDUnique");
 			} else if ((message.contains("JustOneFile"))) {
-				System.out.println("runIDUnique");
+				log.info("hiwayDB FEHLER | JustOneFile");
 			}
-
+			   logStackTrace(e);
+			   
 			if (tx != null)
+			{
+				log.info("hiwayDB Rollback");
 				tx.rollback();
-			return message;
-
+				//session.getTransaction().rollback();
+			}						
+			   System.exit(1);
+			   
 		} catch (Exception e) {
 			if (tx != null)
+			{
+				log.info("hiwayDB Rollback");
 				tx.rollback();
-			log.info(e);
+				//session.getTransaction().rollback();
+			}
+			log.info("hiwayDB FEHLER | " + e);
 
-			// e.printStackTrace();
-			// throw e;
-			return "Fehler: " + e.getMessage();
-			// return 1;
+			logStackTrace(e);
+			System.exit(1);
 
 		} finally {
-			if (session.isOpen()) {
-				session.close();
+			if (oneSession.isOpen()) {
+				log.info("hiwayDB | Close Session  -> lineToDB DONE");
+				oneSession.close();
 			}
 		}
 	}
@@ -933,37 +929,52 @@ public class HiwayDB implements HiwayDBI {
 
 			if (dbURL != null && username != null) {
 
-			
 				Configuration configuration = new Configuration();
 				// .configure(f);
 
 				configuration.setProperty("hibernate.connection.url", dbURL);
-				configuration.setProperty("hibernate.connection.username",
-						username);
+				configuration.setProperty("hibernate.connection.username",username);
 				if (this.password != null) {
 					configuration.setProperty("hibernate.connection.password",
 							this.password);
 				} else {
-					configuration.setProperty("hibernate.connection.password",
-							"");
+					configuration.setProperty("hibernate.connection.password","");
 				}
-				//<property name="hibernate.current_session_context_class">org.hibernate.context.ThreadLocal‌​SessionContext</property>
+				
+				configuration.setProperty("hibernate.dialect","org.hibernate.dialect.MySQLInnoDBDialect");
+				configuration.setProperty("hibernate.connection.driver_class","com.mysql.jdbc.Driver");
+				
+				//configuration.setProperty("hibernate.connection.pool_size","10");
+				configuration.setProperty("connection.provider_class","org.hibernate.connection.C3P0ConnectionProvider");
+				
+		       //<property name="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
+		     
+				configuration.setProperty("hibernate.transaction.factory_class","org.hibernate.transaction.JDBCTransactionFactory");
+				  // <property name="hibernate.current_session_context_class">thread</property>
+				configuration.setProperty("hibernate.current_session_context_class","thread");
+ 
+				
+				configuration.setProperty("hibernate.c3p0.min_size","10");			  
+				 configuration.setProperty("hibernate.c3p0.max_size","20");
+				 configuration.setProperty("hibernate.c3p0.timeout","1800");
+				 configuration.setProperty("hibernate.c3p0.max_statements","50");
+				 
+				 configuration.setProperty("hibernate.c3p0.acquire_increment","1");
+				 configuration.setProperty("hibernate.c3p0.idle_test_period","3000");
+				 
 
-			
-			//	configuration.setProperty("hibernate.current_session_context_class", "thread");
-				configuration.setProperty("hibernate.dialect",
-						"org.hibernate.dialect.MySQLInnoDBDialect");
-				configuration.setProperty("hibernate.connection.driver_class",
-						"com.mysql.jdbc.Driver");
-				// configuration.setProperty("hibernate.connection.password.driver_class",
-				// "com.mysql.jdbc.Driver");
-				configuration.setProperty("hibernate.connection.pool_size",
-						"10");
+			     //   <property name="hibernate.c3p0.acquireRetryAttempts">1</property>
+			     //   <property name="hibernate.c3p0.acquireRetryDelay">250</property>
 
-				// configuration.setProperty("hibernate.c3p0.min_size","5");
-				// configuration.setProperty("hibernate.c3p0.max_size","20");
-				// configuration.setProperty("hibernate.c3p0.timeout","1800");
-				// configuration.setProperty("hibernate.c3p0.max_statements","50");
+				
+				// name="hibernate.current_session_context_class">org.hibernate.context.ThreadLocal‌​SessionContext</property>
+
+				// configuration.setProperty("hibernate.current_session_context_class", "thread");
+		
+//				        <property name="hibernate.show_sql">true</property>
+//				        <property name="hibernate.use_sql_comments">true</property>
+
+
 
 				configuration
 						.addAnnotatedClass(de.huberlin.hiwaydb.dal.Hiwayevent.class);
@@ -980,7 +991,7 @@ public class HiwayDB implements HiwayDBI {
 				configuration
 						.addAnnotatedClass(de.huberlin.hiwaydb.dal.Workflowrun.class);
 				configuration
-				.addAnnotatedClass(de.huberlin.hiwaydb.dal.Accesstime.class);
+						.addAnnotatedClass(de.huberlin.hiwaydb.dal.Accesstime.class);
 
 				StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
 						.applySettings(configuration.getProperties());
@@ -1004,6 +1015,13 @@ public class HiwayDB implements HiwayDBI {
 			throw new ExceptionInInitializerError(ex);
 		}
 
+	}
+
+	public void logStackTrace(Throwable e) {
+		Writer writer = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(writer);
+		e.printStackTrace(printWriter);
+		log.error(writer.toString());
 	}
 
 }
