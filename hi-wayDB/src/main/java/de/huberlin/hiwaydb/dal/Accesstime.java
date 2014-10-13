@@ -26,6 +26,8 @@ public class Accesstime implements java.io.Serializable {
 	private Long ticktockdif;
 	private Long dbvolume;
 	private Long returnvolume;
+	private String wfName;
+	private String runId;
 	
 
 	public Accesstime() {
@@ -99,6 +101,26 @@ public class Accesstime implements java.io.Serializable {
 
 	public void setTicktockdif(Long ticktockdif) {
 		this.ticktockdif = ticktockdif;
+	}
+
+
+	public String getWfName() {
+		return wfName;
+	}
+
+
+	public void setWfName(String wfName) {
+		this.wfName = wfName;
+	}
+
+
+	public String getRunId() {
+		return runId;
+	}
+
+
+	public void setRunId(String runId) {
+		this.runId = runId;
 	}
 
 	

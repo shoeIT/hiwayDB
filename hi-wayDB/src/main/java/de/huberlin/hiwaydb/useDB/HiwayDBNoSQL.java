@@ -45,6 +45,8 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	private String dbURLSQL;
 	private String passwordSQL;
 	private String usernameSQL;
+	private String wfName;
+	private String runIDat;
 	
 	CouchbaseClient client = null;
 	Gson gson;
@@ -61,6 +63,8 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		this.usernameSQL = usernameSQL;
 		this.passwordSQL = passwordSQL;
 		this.dbURLSQL = dbURLSQL;
+		this.wfName = "";
+		this.runIDat="";
 
 		gson = new Gson();
 
@@ -180,6 +184,7 @@ Long tock = System.currentTimeMillis();
 
 			if (logEntryRow.getRunId() != null) {
 				runID = logEntryRow.getRunId().toString();
+				this.runIDat  = runID;
 			}
 
 			Long invocID = (long) 0;
@@ -282,6 +287,7 @@ Long tock = System.currentTimeMillis();
 				break;
 			case "wf-name":
 				wfRunDocument.setName(logEntryRow.getValueRawString());
+				this.wfName = logEntryRow.getValueRawString();
 				break;
 			case "wf-time":
 				String val = logEntryRow.getValueRawString();
@@ -300,7 +306,7 @@ Long tock = System.currentTimeMillis();
 				invocDocument.setStandardError(logEntryRow.getValueRawString());
 				break;
 
-			case "invoc-exec":
+			case JsonReportEntry.KEY_INVOC_SCRIPT:
 				//valuePart = logEntryRow.getValueJsonObj();
 
 				Map<String, String> input = invocDocument.getInput();
@@ -674,12 +680,8 @@ Long tock = System.currentTimeMillis();
 	private SessionFactory getSQLSession() {
 		try {
 			
-			
-			//"root", "keanu7.","jdbc:mysql://localhost/hiwaydb"
-			
 				Configuration configuration = new Configuration();
 				// .configure(f);
-
 							
 					configuration.setProperty("hibernate.connection.url", this.dbURLSQL);
 			//configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost/hiwaydb");
@@ -688,20 +690,40 @@ Long tock = System.currentTimeMillis();
 				
 					configuration.setProperty("hibernate.connection.password",
 							this.passwordSQL);
-				
-				//<property name="hibernate.current_session_context_class">org.hibernate.context.ThreadLocal‌​SessionContext</property>
-
-			
-			//	configuration.setProperty("hibernate.current_session_context_class", "thread");
 				configuration.setProperty("hibernate.dialect",
 						"org.hibernate.dialect.MySQLInnoDBDialect");
 				configuration.setProperty("hibernate.connection.driver_class",
 						"com.mysql.jdbc.Driver");
-				// configuration.setProperty("hibernate.connection.password.driver_class",
-				// "com.mysql.jdbc.Driver");
-				configuration.setProperty("hibernate.connection.pool_size",
-						"10");
 
+				// configuration.setProperty("hibernate.connection.pool_size","10");
+				configuration.setProperty("connection.provider_class",
+						"org.hibernate.connection.C3P0ConnectionProvider");
+
+				configuration.setProperty("hibernate.transaction.factory_class",
+						"org.hibernate.transaction.JDBCTransactionFactory");
+		
+				configuration.setProperty("hibernate.current_session_context_class", "thread");
+
+				configuration.setProperty("hibernate.initialPoolSize", "10");
+				configuration.setProperty("hibernate.c3p0.min_size", "5");
+				configuration.setProperty("hibernate.c3p0.max_size", "300");
+				
+				configuration.setProperty("hibernate.maxIdleTime", "3600");
+				configuration.setProperty("hibernate.c3p0.maxIdleTimeExcessConnections", "300");
+								
+				//configuration.setProperty("hibernate.c3p0.testConnectionOnCheckout", "false");
+				configuration.setProperty("hibernate.c3p0.timeout", "330");
+				configuration.setProperty("hibernate.c3p0.idle_test_period", "300");
+					
+				configuration.setProperty("hibernate.c3p0.max_statements", "3000");
+				configuration.setProperty("hibernate.c3p0.maxStatementsPerConnection", "20");
+
+				configuration.setProperty("hibernate.c3p0.acquire_increment","1");
+
+				// <property name="hibernate.show_sql">true</property>
+				// <property name="hibernate.use_sql_comments">true</property>
+			
+				
 				configuration
 				.addAnnotatedClass(de.huberlin.hiwaydb.dal.Accesstime.class);
 
@@ -742,6 +764,9 @@ Long tock = System.currentTimeMillis();
 				
 				at.setTock(tock);
 				at.setTicktockdif(tock-tick);
+				
+				at.setRunId(this.runIDat);
+				at.setWfName(this.wfName);
 			
 			sess.save(at);
 			
