@@ -709,8 +709,7 @@ public class HiwayDB implements HiwayDBI {
 				// query = session.createQuery("FROM File E WHERE E.name='"
 				// + filename + "' AND E.invocation" + invocID);
 
-				query = oneSession.createQuery("FROM File E WHERE E.name='"
-						+ filename + "'");
+				query = oneSession.createQuery("FROM File E WHERE E.name='"+ filename + "' AND e.invocation="+invocID);
 
 				List<File> resultsFileTemp = query.list();
 
@@ -892,13 +891,8 @@ public class HiwayDB implements HiwayDBI {
 				he.setContent(valuePart.toString());
 				he.setType(valuePart.get("type").toString());
 				oneSession.save(he);
-
 				break;
-			case "reduction-time":
-
-				break;
-			default:
-				throw new Exception("Der Typ ist nicht bekannt.:" + key);
+			
 			}
 
 			at.setReturnvolume((long) logEntryRow.toString().length());

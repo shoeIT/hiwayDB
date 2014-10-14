@@ -125,7 +125,6 @@ Long tock = System.currentTimeMillis();
 			getConnection();
 		}
 		
-	
 		View view = client.getView("dev_Invoc", "getHostNames");
 
 		Gson gson = new Gson();
@@ -133,26 +132,27 @@ Long tock = System.currentTimeMillis();
 		Query query = new Query();
 
 		// We the full documents and only the top 20
-		query.setIncludeDocs(true).setLimit(20);
+		//query.setIncludeDocs(true).setLimit(20);
+		query.setIncludeDocs(false).setGroup(true).setGroupLevel(1);
 
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
 
 		// This ArrayList will contain all found beers
-		ArrayList<HashMap<String, String>> hostnames = new ArrayList<HashMap<String, String>>();
+		//ArrayList<HashMap<String, String>> hostnames = new ArrayList<HashMap<String, String>>();
 
 		Set<String> tempResult = new HashSet<String>();
 		// Iterate over the found documents
 		for (ViewRow row : result) {
 			// Use Google GSON to parse the JSON into a HashMap
 			//System.out.println("resrow: " + row.getValue());
-			HashMap<String, String> parsedDoc = gson.fromJson(
-					(String) row.getDocument(), HashMap.class);
-			String x = row.getValue();
-			if(x != null && !x.equals(null))
-			{
-				tempResult.add(row.getValue());
-			}	
+//			HashMap<String, String> parsedDoc = gson.fromJson(
+//					(String) row.getDocument(), HashMap.class);
+//			String x = row.getValue();
+//			if(x != null && !x.equals(null))
+//			{
+				tempResult.add(row.getKey());
+			//}	
 		}
 		
 		Long tock = System.currentTimeMillis();
@@ -384,14 +384,7 @@ Long tock = System.currentTimeMillis();
 						valuePart.toString());
 				wfRunDocument.setHiwayEvent(hiwayEvents);
 
-				break;
-			case "reduction-time":
-				wfRunDocument.setReductionTime(Long.parseLong(
-						logEntryRow.getValueRawString(), 10));
-
-				break;
-			default:
-				throw new Exception("Der Typ ist nicht bekannt.:" + key);
+				break;			
 			}
 
 			if (invocDocument != null) {
@@ -585,7 +578,7 @@ Long tock = System.currentTimeMillis();
 			getConnection();
 		}
 
-		View view = client.getView("dev_Invoc", "LogEntriesForTaskOnHostSince");
+		View view = client.getView("dev_Invoc", "getLogEntriesForTaskOnHostSince");
 
 		// Set up the Query object
 		Query query = new Query();
@@ -604,7 +597,7 @@ Long tock = System.currentTimeMillis();
 Long tock = System.currentTimeMillis();
 
 		
-		saveAccessTime(tick,tock,result.size(),"LogEntriesForTaskOnHostSince");
+		saveAccessTime(tick,tock,result.size(),"getLogEntriesForTaskOnHostSince");
 
 			// shutdown();
 		return createInvocStat(result);
