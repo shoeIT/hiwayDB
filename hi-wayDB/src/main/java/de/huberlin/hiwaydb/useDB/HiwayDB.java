@@ -702,24 +702,7 @@ public class HiwayDB implements HiwayDBI {
 
 			Long timestampTemp = logEntryRow.getTimestamp();
 
-			String filename = null;
-			if (logEntryRow.getFile() != null) {
-				filename = logEntryRow.getFile();
-
-				// query = session.createQuery("FROM File E WHERE E.name='"
-				// + filename + "' AND E.invocation" + invocID);
-
-				query = oneSession.createQuery("FROM File E WHERE E.name='"+ filename + "' AND e.invocation="+invocID);
-
-				List<File> resultsFileTemp = query.list();
-
-				for (File f : resultsFileTemp) {
-					if (f.getInvocation().getInvocationId() == invocID) {
-						resultsFile.add(f);
-					}
-				}
-			}
-
+			
 			Task task = null;
 			if (resultsTasks != null && !resultsTasks.isEmpty()) {
 				task = resultsTasks.get(0);
@@ -728,12 +711,33 @@ public class HiwayDB implements HiwayDBI {
 			if (resultsInvoc != null && !resultsInvoc.isEmpty()) {
 				invoc = resultsInvoc.get(0);
 			}
+			
+			String filename = null;
+			if (logEntryRow.getFile() != null && invoc!=null) {
+				filename = logEntryRow.getFile();
+
+				// query = session.createQuery("FROM File E WHERE E.name='"
+				// + filename + "' AND E.invocation" + invocID);
+
+				query = oneSession.createQuery("FROM File E WHERE E.name='"+ filename + "' AND E.invocation="+invoc.getId());
+
+				log.info("File Query:" +query.toString());
+				//List<File> resultsFileTemp = 
+				resultsFile = query.list();
+
+//				for (File f : resultsFileTemp) {
+//					if (f.getInvocation().getInvocationId() == invocID) {
+//						resultsFile.add(f);
+//					}
+//				}
+			}
+
 
 			File file = null;
 			if (resultsFile != null && !resultsFile.isEmpty()) {
 				file = resultsFile.get(0);
-				// System.out.println("File haben wir:" + file.getName() +
-				// file.getId());
+				log.info("File haben wir:" + file.getName() +
+				file.getId());
 			}
 
 			if (wfRun == null && runID != null) {
