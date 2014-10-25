@@ -18,16 +18,32 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import javax.persistence.OneToMany;
+
 import net.spy.memcached.internal.OperationFuture;
 
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Projections;
 import org.json.JSONException;
 
+import de.huberlin.hiwaydb.dal.File;
+import de.huberlin.hiwaydb.dal.Hiwayevent;
+import de.huberlin.hiwaydb.dal.Inoutput;
+import de.huberlin.hiwaydb.dal.Invocation;
+import de.huberlin.hiwaydb.dal.Userevent;
+import de.huberlin.hiwaydb.dal.Workflowrun;
 import de.huberlin.wbi.cuneiform.core.semanticmodel.JsonReportEntry;
 
 public class Reader {
 
 	private static Path fFilePath;
 	private final static Charset ENCODING = StandardCharsets.UTF_8;
+	private static SessionFactory dbSessionFactory;
 
 	public static void main(String[] args) {
 
@@ -47,399 +63,96 @@ public class Reader {
 			}
 
 			if (lineIn.equalsIgnoreCase("cWrite")) {
-				
-				
-				System.out.println("COURCHBASe connecten...");
-				
-				
-				HiwayDBI writer = null;
-				
-				List<URI> uris = new ArrayList<URI>();
-				uris.add(URI.create("http://127.0.0.1:8091/pools"));
-
-				writer = new HiwayDBNoSQL("hiwaydb",	"", uris,"","","");
-				
-				
-
-					// String input = "D:\\Temp\\" + args[0];
-					// e00_01_3r_variant-call-setup-09_001
-					// e00_02_2r_variant-call-setup-09_001
-					// e11_11_1x_variant-call-09_003
-					//
-					// 
-					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
-					// String input =
-				//i1_s368_r1_placementAware
-			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\wordcount.cf.log";
-				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\wordcount.cf.log";
-
-				
-				
-					System.out.println("Input: " + input);
-
-					if (input.endsWith(".log")) {
-
-						fFilePath = Paths.get(input);
-
-						String result = "";
-						int i = 0;
-						try (Scanner scanner = new Scanner(fFilePath,
-								ENCODING.name())) {
-							while (scanner.hasNextLine()) {
-								i++;
-								System.out.println("line " + i);
-
-								String line = scanner.nextLine();
-
-								line = line.replaceAll("\0", "");
-
-								if (!line.isEmpty()) {
-
-									try {
-										writer.logToDB(new JsonReportEntry(line));
-									} catch (JSONException e) {
-										System.out
-												.println("JSON Exception FEHLER!!!!!!!!!!!!: "
-														+ e);
-										//jsonFehler.add("Z" + i + " | "+ e.getMessage());
-									} catch (org.hibernate.exception.ConstraintViolationException e) {
-										System.out
-												.println(" Hibernate FEHLER!!!!!!!!!!!!: "
-														+ e);
-										//fehler.add("Z" + i + " | "+ e.getMessage());
-									} catch (Exception e) {
-										System.out
-												.println("FEHLER!!!!!!!!!!!!: "+ e);
-									//fehler.add("Z" + i + " | "+ e.getMessage());
-									}
-								}
-
-								if (!result.isEmpty())
-									break;
-							}
-						}
-					} else {
-						System.out
-								.println("Eingabe: keine Logdatei, String direkt uebergeben.");
-						writer.logToDB(new JsonReportEntry(args[0].toString()));
-					}
-					
-				//	writer.shutdown();
-				  					
 
 			} else if (lineIn.equalsIgnoreCase("cRead")) {
-			
-				
-				List<URI> uris = new ArrayList<URI>();
-				uris.add(URI.create("http://127.0.0.1:8091/pools"));
-				
-						
-				HiwayDBI testGet = new HiwayDBNoSQL("hiwaydb","",uris,"root", "reverse","jdbc:mysql://localhost/hiwaydb");
-
-			//HiwayDBI testGet = new HiwayDB();
-				
-				System.out.println("go...");
-
-//				System.out.println("getLogEntriesForTask:");
-//
-//				 for (InvocStat f : testGet.getLogEntriesForTask(324609906700l))
-//				 {
-//				 System.out.println(f.toString());
-//				 }
-//				
-//
-//				System.out.println("getLogEntriesForTask mit Set:");
-//
-//				Set<Long> tasks = new HashSet<Long>();
-//				tasks.add(989639045l);
-//				tasks.add(324609906700l);
-//			
-//				 for (InvocStat f : testGet.getLogEntriesForTasks(tasks)) {
-//				 System.out.println(f.toString());				 }
-//
-//		
-
-
-//
-//				 System.out.println("All Invocs:");
-//				
-//				 for (InvocStat f : testGet.getLogEntriesForTask(989639045l)) {
-//				 System.out.println("Task: "
-//				 + f.getTaskId() + " RealTime:" + f.getRealTime());
-//				 
-//				 for (FileStat fi :f.getInputFiles()){
-//					 System.out.println("file in: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
-//				 }
-//				 
-//				 
-//				 for (FileStat fi :f.getOutputFiles()){
-//					 System.out.println("file out: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
-//				 }
-//				 }
-
-			//	System.out.println("All for host:");
-
-				// for (InvocStat f :
-				// testGet.getLogEntriesForHost("dbis13:8042")) {
-				// System.out.println("Host: " + f.getHostName() + "TaskID: "
-				// + f.getTaskId() + " | RealTime:" + f.getRealTime());
-				// }
 				//
-//				
-//				 Calendar cal = Calendar.getInstance();
-//				 cal.set(2014, Calendar.JUNE, 22);
-//				
-//				 System.out.println("All for host since: 1403599949182 " );
-//				 //_2014-06-20 17:03:58
-//				 
-//				// java.util.Date dt = new java.util.Date();
-//
-//				//["dbis14",3246099067099,1404103422872]
-//				 //["dbis11",324609906700,0], ["dbis11",324609906700,0]
-//				
-//				 for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(324609906700l,
-//				 "dbis11",1404101397760l)) {
-//				 System.out.println(f.toString());
-				 //+ " Date: " + f.getTimestamp());
-//				 for (FileStat fi :f.getInputFiles()){
-//					 System.out.println("file in: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
-//				 }
-//				 
-//				 
-//				 for (FileStat fi :f.getOutputFiles()){
-//					 System.out.println("file out: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
-//				 }
-//				 }
-//
-//				System.out.println("All for Task on Host:");
-//				for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
-//						324609906700l, "dbis11")) {
-//					System.out.println(f.toString());
-//				}
-//
-//				Calendar cal = Calendar.getInstance();
-//
-//				cal.set(2004, Calendar.MAY, 12);
-//
-//				System.out.println("All for Task on Host Since:");
-//				for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(
-//						1722821279659l, "dbis12:8042", cal.getTimeInMillis())) {
-//					System.out.println(f.toString());
-//				}
-				
-//				System.out.println("TaskIDs for Workflow:variant-call-09-setup.cf");
-//
-//				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09-setup.cf")) {
-//					System.out.println(f.toString());
-//				}
-//				
-//				System.out.println("getTaskNames for ID :");
-//				System.out.println("6: "
-//						+ testGet.getTaskName(6l));
-//				System.out.println("453506959: "
-//						+ testGet.getTaskName(453506959l));
-				
-				System.out.println("getHostnames:");
+				//
+				// List<URI> uris = new ArrayList<URI>();
+				// uris.add(URI.create("http://127.0.0.1:8091/pools"));
+				//
+				//
+				// HiwayDBI testGet = new HiwayDBNoSQL("hiwaydb","",uris,"root",
+				// "reverse","jdbc:mysql://localhost/hiwaydb");
 
-				for (String f : testGet.getHostNames()) {
-					System.out.println(f.toString());
+			} else if (lineIn.equalsIgnoreCase("db")) {
+
+				//
+				// Calendar cal = Calendar.getInstance();
+				// cal.set(2014, Calendar.JUNE, 22);
+				//
+				// System.out.println("All for host since: 1403599949182 " );
+				// //_2014-06-20 17:03:58
+				//
+				// // java.util.Date dt = new java.util.Date();
+				//
+				//
+				// for (InvocStat s :
+				// testGet.getLogEntriesForTaskOnHostSince(989639045l,
+				// "hiway", 1403599949113l)) {
+				// System.out.println("Host: " + s.getHostName() + "TaskID: "
+				// + s.getTaskId() + " | RealTime:" + s.getRealTime()
+				// + " Date: " + s.getTimestamp());
+				// }
+			} else {
+
+				int toLimit = Integer.parseInt(lineIn);
+				
+				if(toLimit < 10 )
+				{
+					toLimit =1000;
 				}
+				
+				System.out.println("SQL Datenbank füllen...bist Limit: " + toLimit);
+				dbSessionFactory = getSQLSession();
 
-			
+				Session session = dbSessionFactory.openSession();
+				Transaction tx = null;
+
+				// jede invocation und wf run einfach kopieren und ein paar
+				// Dinge ändern
+
+				try {
+
+					for (int i = 0; i < 1000; i++) {
+						tx = session.beginTransaction();
+
+						Query query = null;
+
+						query = session.createQuery("FROM Workflowrun");
+
+						List<Workflowrun> allWFs = new ArrayList<Workflowrun>();
+
+						allWFs = query.list();
+
+						tx.commit();
+						
+						int limit = toLimit;
+						
+						
+						if(allWFs.size() < limit)
+						{
+							if(copyWorkflows(allWFs, limit, session)==0)
+							{
+								break;
+							}
+							
+						}						
+					}
+
+					System.out.println("fertig");
+
+				} catch (RuntimeException e) {
+					
+					throw e; // or display error message
+				} finally {
+					if (session.isOpen()) {
+						session.close();
+					}
+				}
 
 			}
-			else if (lineIn.equalsIgnoreCase("db")) {
+			System.out.println("juchei fertig...");
 
-				HiwayDBI testGet = new HiwayDB( "root", "reverse","jdbc:mysql://localhost/hiwaydb");
-
-				//HiwayDBI testGet = new HiwayDB();
-					
-					System.out.println("go...");
-
-					System.out.println("getLogEntriesForTask:");
-
-					 for (InvocStat f : testGet.getLogEntriesForTask(324609906700l))
-					 {
-					 System.out.println(f.toString());
-					 }
-					
-
-					System.out.println("getLogEntriesForTask mit Set:");
-	
-					Set<Long> tasks = new HashSet<Long>();
-				tasks.add(2084368153987l);
-					tasks.add(324609906700l);
-				
-					 for (InvocStat f : testGet.getLogEntriesForTasks(tasks)) {
-					 System.out.println(f.toString());
-					}
-	//
-					System.out.println("getHostnames:");
-	
-					for (String f : testGet.getHostNames()) {
-						System.out.println(f.toString());
-					}
-	//////
-					System.out.println("TaskIDs for Workflow:variant-call-09.cf");
-	
-				for (Long f : testGet.getTaskIdsForWorkflow("variant-call-09.cf")) {
-						System.out.println(f.toString());
-					}
-	//
-				System.out.println("getTaskNames for ID :");
-					System.out.println("240495169287: "
-							+ testGet.getTaskName(240495169287l));
-				System.out.println("240495169287: "
-					+ testGet.getTaskName(240495169287l));
-	
-					 System.out.println("All Invocs:");
-					
-				 for (InvocStat f : testGet.getLogEntriesForTask(989639045l)) {
-				 System.out.println("Task: "
-				 + f.getTaskId() + " RealTime:" + f.getRealTime());
-					 
-				 for (FileStat fi :f.getInputFiles()){
-						 System.out.println("file in: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
-				 }
-//					 
-//					 
-//					 for (FileStat fi :f.getOutputFiles()){
-//						 System.out.println("file out: "+ fi.getFileName() + " size: " + fi.getSize() + " time: "+ fi.getRealTime());
-//					 }
-//					 }
-
-				
-					 Calendar cal = Calendar.getInstance();
-					 cal.set(2014, Calendar.JUNE, 22);
-					
-					 System.out.println("All for host since: 1403599949182 " );
-					 //_2014-06-20 17:03:58
-					 
-					// java.util.Date dt = new java.util.Date();
-
-					
-					 for (InvocStat s : testGet.getLogEntriesForTaskOnHostSince(989639045l,
-					 "hiway", 1403599949113l)) {
-					 System.out.println("Host: " + s.getHostName() + "TaskID: "
-					 + s.getTaskId() + " | RealTime:" + s.getRealTime()
-					 + " Date: " + s.getTimestamp());
-					 }
-
-//					System.out.println("All for Task on Host:");
-//					for (InvocStat f : testGet.getLogEntriesForTaskOnHost(
-//							1722821279659l, "dbis13:8042")) {
-//						System.out.println(f.toString());
-					}
-	//
-//					Calendar cal = Calendar.getInstance();
-	//
-//					cal.set(2004, Calendar.MAY, 12);
-	//
-//					System.out.println("All for Task on Host Since:");
-//					for (InvocStat f : testGet.getLogEntriesForTaskOnHostSince(
-//							1722821279659l, "dbis12:8042", cal.getTimeInMillis())) {
-//						System.out.println(f.toString());
-//					}
-
-				}
-			else {
-				HiwayDB writer = null;
-
-//				if (args.length == 0) {
-//					System.out.println("keine Eingabe...lese StandardIn");
-//
-//					// writer = new WriteHiwayDB("hibernate.cfg.xml");
-//					writer = new WriteHiwayDB("jdbc:mysql://localhost/hiwaydb",
-//							"root", "keanu7.", "hibernate.cfg.xml");
-//
-//					try (BufferedReader test = new BufferedReader(
-//							new InputStreamReader(System.in))) {
-//
-//						String line = test.readLine();
-//						while (line != null) {
-//							writer.lineToDB(new JsonReportEntry(line));
-//						}
-//					}
-//				} 
-//				else {
-//					System.out.println("Eingabe: Name der logdatei:  "
-//							+ args[0] + " Config: " + args[1]);
-
-//					if (args[1] != "") {
-//						writer = new WriteHiwayDB(args[1]);
-//					} else {
-//						writer = new WriteHiwayDB("hibernate.cfg.xml");
-//					}
-				
-				writer = new HiwayDB("root", "reverse","jdbc:mysql://localhost/hiwaydb"	);
-
-					// String input = "D:\\Temp\\" + args[0];
-					// e00_01_3r_variant-call-setup-09_001
-					// e00_02_2r_variant-call-setup-09_001
-					// e11_11_1x_variant-call-09_003
-					//
-					// 
-					// e11_16_1x2x3x5x6x7x_variant-call-09_005.log";
-					// String input =
-			//	 "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\wordcount.cf.log"; i1_s368_r2_placementAware
-				String input = "C:\\Users\\Hannes\\Dropbox\\Diplom Arbeit\\temp\\Logs\\i1_s368_r3_greedyQueue.log";
-
-
-					System.out.println("Input: " + input);
-
-					if (input.endsWith(".log")) {
-
-						fFilePath = Paths.get(input);
-
-						String result = "";
-						int i = 0;
-						try (Scanner scanner = new Scanner(fFilePath,
-								ENCODING.name())) {
-							while (scanner.hasNextLine()) {
-								i++;
-								System.out.println("line " + i);
-
-								String line = scanner.nextLine();
-
-								line = line.replaceAll("\0", "");
-
-								if (!line.isEmpty()) {
-
-									try {
-										writer.logToDB((new JsonReportEntry(line)));
-									} catch (JSONException e) {
-										System.out
-												.println("FEHLER!!!!!!!!!!!!: "
-														+ line);
-										jsonFehler.add("Z" + i + " | "
-												+ e.getMessage());
-									} catch (org.hibernate.exception.ConstraintViolationException e) {
-										System.out
-												.println("FEHLER!!!!!!!!!!!!: "
-														+ line);
-										fehler.add("Z" + i + " | "
-												+ e.getMessage());
-									} catch (Exception e) {
-										System.out
-												.println("FEHLER!!!!!!!!!!!!: "
-														+ line);
-										fehler.add("Z" + i + " | "
-												+ e.getMessage());
-									}
-								}
-
-								if (!result.isEmpty())
-									break;
-							}
-						}
-					} else {
-						System.out
-								.println("Eingabe: keine Logdatei, String direkt uebergeben.");
-						writer.logToDB((new JsonReportEntry(args[0].toString())));
-					}
-				}
-				System.out.println("juchei fertig...");
-			//}
 		} catch (Exception e) {
 
 			e.printStackTrace();
@@ -456,5 +169,256 @@ public class Reader {
 
 		}
 
+	}
+
+	private static SessionFactory getSQLSession() {
+		try {
+			// HiwayDBI testGet = new HiwayDB( "root",
+			// "reverse","jdbc:mysql://localhost/hiwaydb");
+
+			Configuration configuration = new Configuration();
+			// .configure(f);
+
+			configuration.setProperty("hibernate.connection.url",
+					"jdbc:mysql://localhost/hiwaydb");
+			configuration.setProperty("hibernate.connection.username", "root");
+			configuration.setProperty("hibernate.connection.password",
+					"reverse");
+
+			configuration.setProperty("hibernate.dialect",
+					"org.hibernate.dialect.MySQLInnoDBDialect");
+			configuration.setProperty("hibernate.connection.driver_class",
+					"com.mysql.jdbc.Driver");
+
+			// configuration.setProperty("hibernate.connection.pool_size","10");
+			configuration.setProperty("connection.provider_class",
+					"org.hibernate.connection.C3P0ConnectionProvider");
+
+			// <property
+			// name="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
+
+			configuration.setProperty("hibernate.transaction.factory_class",
+					"org.hibernate.transaction.JDBCTransactionFactory");
+
+			configuration.setProperty(
+					"hibernate.current_session_context_class", "thread");
+
+			configuration.setProperty("hibernate.initialPoolSize", "20");
+			configuration.setProperty("hibernate.c3p0.min_size", "5");
+			configuration.setProperty("hibernate.c3p0.max_size", "1000");
+
+			configuration.setProperty("hibernate.maxIdleTime", "3600");
+			configuration.setProperty(
+					"hibernate.c3p0.maxIdleTimeExcessConnections", "300");
+
+			// configuration.setProperty("hibernate.c3p0.testConnectionOnCheckout",
+			// "false");
+			configuration.setProperty("hibernate.c3p0.timeout", "330");
+			configuration.setProperty("hibernate.c3p0.idle_test_period", "300");
+
+			configuration.setProperty("hibernate.c3p0.max_statements", "13000");
+			configuration.setProperty(
+					"hibernate.c3p0.maxStatementsPerConnection", "30");
+
+			configuration.setProperty("hibernate.c3p0.acquire_increment", "10");
+
+			// <property name="hibernate.show_sql">true</property>
+			// <property name="hibernate.use_sql_comments">true</property>
+
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Hiwayevent.class);
+			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.File.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Inoutput.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Invocation.class);
+			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Task.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Userevent.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Workflowrun.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Accesstime.class);
+
+			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
+					.applySettings(configuration.getProperties());
+			SessionFactory sessionFactory = configuration
+					.buildSessionFactory(builder.build());
+			return sessionFactory;
+
+		} catch (Throwable ex) {
+			System.err.println("Failed to create sessionFactory object." + ex);
+			throw new ExceptionInInitializerError(ex);
+		}
+	}
+
+	private static int copyWorkflows(List<Workflowrun> allWFs, int limit, Session session) {
+
+		Workflowrun newRun = null;
+		Set<Hiwayevent> newHiwayevents = null;
+		Set<Invocation> newInvocations = null;
+
+		Set<Inoutput> newInoutputs = null;
+		Set<File> newfiles = null;
+		Set<Userevent> newUserevents = null;
+		
+		//Session session = dbSessionFactory.openSession();
+		
+		Calendar cal = Calendar.getInstance();
+
+		int allWFscount = allWFs.size();
+		Boolean toCommit = true;
+		int i = 0;
+		Transaction tx = null;
+		
+		tx = session.beginTransaction();
+
+		for (Workflowrun run : allWFs) {
+		
+			cal = Calendar.getInstance();
+			i++;
+			if (allWFscount + i >= limit+1) {
+				toCommit = false;
+				System.out.println("Break and comitt");
+				tx.commit();
+				return 0;
+			}
+
+			if (i % 1000 == 0) {
+				System.out.println("comitt in between...........");
+				tx.commit();
+				tx = session.beginTransaction();
+			}
+
+			String newName = run.getRunId().substring(0, 36) + "_"
+					+ cal.getTimeInMillis();
+
+			System.out.println("Run" + run.getId() + " , " + run.getWfName()
+					+ " , I: " + i + " | " + newName);
+			// run mit allen inhalten kopieren und speichern
+
+			newRun = new Workflowrun();
+			newRun.setRunId(newName);
+			newRun.setWfName(run.getWfName());
+			newRun.setWfTime(run.getWfTime());
+
+			// System.out.println("saven newRun");
+			session.save(newRun);
+
+			newHiwayevents = new HashSet<Hiwayevent>();
+			Hiwayevent newEvent = null;
+
+			for (Hiwayevent he : run.getHiwayevents()) {
+
+				newEvent = new Hiwayevent();
+				newEvent.setContent(he.getContent());
+				newEvent.setType(he.getType());
+				newEvent.setWorkflowrun(newRun);
+
+				session.save(newEvent);
+
+				newHiwayevents.add(newEvent);
+			}
+
+			if (newHiwayevents.size() > 0) {
+				// System.out.println("add newHiwayEvents");
+				newRun.setHiwayevents(newHiwayevents);
+			}
+
+			newInvocations = new HashSet<Invocation>();
+			Invocation newInvoc = null;
+
+			for (Invocation invoc : run.getInvocations()) {
+				cal = Calendar.getInstance();
+
+				newInvoc = new Invocation();
+				newInvoc.setDidOn(cal.getTime());
+				newInvoc.setHostname(invoc.getHostname());
+				newInvoc.setInvocationId(invoc.getInvocationId());
+				newInvoc.setRealTime(invoc.getRealTime());
+				newInvoc.setRealTimeIn(invoc.getRealTimeIn());
+				newInvoc.setRealTimeOut(invoc.getRealTimeOut());
+				newInvoc.setScheduleTime(invoc.getScheduleTime());
+				newInvoc.setStandardError(invoc.getStandardError());
+				newInvoc.setStandardOut(invoc.getStandardOut());
+				newInvoc.setTask(invoc.getTask());
+				newInvoc.setTimestamp(cal.getTimeInMillis());
+				newInvoc.setWorkflowrun(newRun);
+				session.save(newInvoc);
+
+				Userevent newUE = null;
+				newUserevents = new HashSet<Userevent>();
+				for (Userevent ue : invoc.getUserevents()) {
+					newUE = new Userevent();
+
+					newUE.setContent(ue.getContent());
+					newUE.setInvocation(newInvoc);
+
+					session.save(newUE);
+					newUserevents.add(newUE);
+				}
+
+				if (newUserevents.size() > 0) {
+					// System.out.println("add newUserevent");
+					newInvoc.setUserevents(newUserevents);
+				}
+
+				Inoutput newIO = null;
+				newInoutputs = new HashSet<Inoutput>();
+				for (Inoutput io : invoc.getInoutputs()) {
+					newIO = new Inoutput();
+
+					newIO.setContent(io.getContent());
+					newIO.setInvocation(newInvoc);
+					newIO.setKeypart(io.getKeypart());
+					newIO.setType(io.getType());
+
+					session.save(newIO);
+					newInoutputs.add(newIO);
+				}
+
+				if (newInoutputs.size() > 0) {
+					// System.out.println("add newInoutput");
+					newInvoc.setInoutputs(newInoutputs);
+				}
+
+				File newFile = null;
+				newfiles = new HashSet<File>();
+				for (File file : invoc.getFiles()) {
+					newFile = new File();
+
+					newFile.setName(file.getName());
+					newFile.setRealTimeIn(file.getRealTimeIn());
+					newFile.setRealTimeOut(file.getRealTimeOut());
+					newFile.setSize(file.getSize());
+					newFile.setInvocation(newInvoc);
+
+					session.save(newFile);
+					newfiles.add(newFile);
+				}
+
+				if (newfiles.size() > 0) {
+					// System.out.println("add newFiles");
+					newInvoc.setFiles(newfiles);
+				}
+
+				newInvocations.add(newInvoc);
+			}
+
+			if (newInvocations.size() > 0) {
+				// System.out.println("add newInvocations");
+				newRun.setInvocations(newInvocations);
+			}
+
+			// tx.commit();
+
+		}
+
+		if (toCommit) {
+			System.out.println("comitt");
+			tx.commit();
+		}
+		
+		return 1;
 	}
 }
