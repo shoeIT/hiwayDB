@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS `Workflowrun` ;
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `Workflowrun` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `runid` VARCHAR(36) NOT NULL,
+  `runid` VARCHAR(50) NOT NULL,
   `wfname` TEXT NULL,
   `wftime` BIGINT UNSIGNED NULL,
   PRIMARY KEY (`id`),
@@ -23,23 +23,6 @@ CREATE TABLE IF NOT EXISTS `Workflowrun` (
 ENGINE = InnoDB;
 
 SHOW WARNINGS;
-
-DROP TABLE IF EXISTS `accesstime` ;
-
-CREATE TABLE `messungen`.`accesstime` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `funktion` VARCHAR(100) NULL,
-  `input` VARCHAR(100) NULL,
-  `tick` BIGINT UNSIGNED NULL,
-  `tock` BIGINT UNSIGNED NULL,
-  `ticktockdif` BIGINT UNSIGNED NULL,
-  `dbvolume` BIGINT UNSIGNED NULL,
-  `returnvolume` BIGINT UNSIGNED NULL,
-    `runId` VARCHAR(100) NULL,
-      `key` VARCHAR(100) NULL,
-        `config` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`));
-
 
 -- -----------------------------------------------------
 -- Table `Task`
