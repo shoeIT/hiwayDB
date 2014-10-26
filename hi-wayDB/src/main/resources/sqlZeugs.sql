@@ -24,9 +24,9 @@ ENGINE = InnoDB;
 
 SHOW WARNINGS;
 
-DROP TABLE IF EXISTS `Accesstime` ;
+DROP TABLE IF EXISTS `accesstime` ;
 
-CREATE TABLE `hiwaydb`.`Accesstime` (
+CREATE TABLE `messungen`.`accesstime` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `funktion` VARCHAR(100) NULL,
   `input` VARCHAR(100) NULL,
@@ -35,7 +35,9 @@ CREATE TABLE `hiwaydb`.`Accesstime` (
   `ticktockdif` BIGINT UNSIGNED NULL,
   `dbvolume` BIGINT UNSIGNED NULL,
   `returnvolume` BIGINT UNSIGNED NULL,
-   `debug` VARCHAR(500) NULL,
+    `runId` VARCHAR(100) NULL,
+      `key` VARCHAR(100) NULL,
+        `config` VARCHAR(45) NULL,
   PRIMARY KEY (`id`));
 
 

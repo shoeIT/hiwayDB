@@ -28,6 +28,8 @@ public class Accesstime implements java.io.Serializable {
 	private Long returnvolume;
 	private String wfName;
 	private String runId;
+	private String keyinput;
+	private String config;
 	
 
 	public Accesstime() {
@@ -121,6 +123,26 @@ public class Accesstime implements java.io.Serializable {
 
 	public void setRunId(String runId) {
 		this.runId = runId;
+	}
+
+
+	public String getConfig() {
+		return config;
+	}
+
+
+	public void setConfig(String config) {
+		this.config = config;
+	}
+
+
+	public String getKeyinput() {
+		return keyinput;
+	}
+
+
+	public void setKeyinput(String keyinput) {
+		this.keyinput = keyinput;
 	}
 
 	
