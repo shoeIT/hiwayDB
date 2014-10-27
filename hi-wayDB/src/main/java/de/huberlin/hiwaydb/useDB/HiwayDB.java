@@ -742,6 +742,7 @@ public class HiwayDB implements HiwayDBI {
 
 			if (logEntryRow.hasInvocId()) {
 				invocID = logEntryRow.getInvocId();
+				log.info("Has InvovID: " + invocID);
 			}
 
 			query = oneSession
@@ -759,9 +760,47 @@ public class HiwayDB implements HiwayDBI {
 			Invocation invoc = null;
 			if (resultsInvoc != null && !resultsInvoc.isEmpty()) {
 				invoc = resultsInvoc.get(0);
+				log.info("invoc gefunden: ID " + invoc.getInvocationId());
+			}
+			
+			if (wfRun == null && runID != null) {
+
+				wfRun = new Workflowrun();
+				wfRun.setRunId(runID);
+				oneSession.save(wfRun);
+				log.info("hiwayDB | save WfRun: " + runID);
+				this.runIDat = runID;
+			}
+
+			if (taskID != 0 && (task == null)) {
+				task = new Task();
+
+				task.setTaskId(taskID);
+				task.setTaskName(logEntryRow.getTaskName());
+				task.setLanguage(logEntryRow.getLang());
+
+				oneSession.save(task);
+				log.info("hiwayDB | save Task: " + taskID + " - "+ task.getTaskName());
+				// System.out.println("Neuer.. Tasks in DB speichern ID: "
+				// + task.getTaskId());
+			}
+			
+			
+			if (invocID != 0 && (invoc == null)) {
+				invoc = new Invocation();
+				invoc.setTimestamp(timestampTemp);
+				invoc.setInvocationId(invocID);
+				invoc.setTask(task);
+				invoc.setWorkflowrun(wfRun);
+				oneSession.save(invoc);
+				log.info("hiwayDB | save Invoc: " + invocID);
 			}
 
 			String filename = null;
+			log.info("getFile != null ?  :" + logEntryRow.getFile() != null);
+			
+			log.info("invoc != null ?  :" + invoc != null);
+			
 			if (logEntryRow.getFile() != null && invoc != null) {
 				filename = logEntryRow.getFile();
 
@@ -788,46 +827,16 @@ public class HiwayDB implements HiwayDBI {
 				log.info("File haben wir:" + file.getName() + file.getId());
 			}
 
-			if (wfRun == null && runID != null) {
+			
 
-				wfRun = new Workflowrun();
-				wfRun.setRunId(runID);
-				oneSession.save(wfRun);
-				log.info("hiwayDB | save WfRun: " + runID);
-				this.runIDat = runID;
-			}
-
-			if (taskID != 0 && (task == null)) {
-				task = new Task();
-
-				task.setTaskId(taskID);
-				task.setTaskName(logEntryRow.getTaskName());
-				task.setLanguage(logEntryRow.getLang());
-
-				oneSession.save(task);
-				log.info("hiwayDB | save Task: " + taskID + " - "
-						+ task.getTaskName());
-				// System.out.println("Neuer.. Tasks in DB speichern ID: "
-				// + task.getTaskId());
-			}
-
-			if (invocID != 0 && (invoc == null)) {
-				invoc = new Invocation();
-				invoc.setTimestamp(timestampTemp);
-				invoc.setInvocationId(invocID);
-				invoc.setTask(task);
-				invoc.setWorkflowrun(wfRun);
-				oneSession.save(invoc);
-				// log.info("hiwayDB | save Invoc: " + invocID);
-			}
-
+			
 			if (file == null && filename != null) {
 
 				file = new File();
 				file.setName(filename);
 				file.setInvocation(invoc);
 				oneSession.save(file);
-				// log.info("hiwayDB | save File: " + filename);
+				log.info("hiwayDB | save File: " + filename);
 			}
 
 			String key = logEntryRow.getKey();
@@ -908,6 +917,7 @@ public class HiwayDB implements HiwayDBI {
 
 			case HiwayDBI.KEY_FILE_TIME_STAGEIN:
 				valuePart = logEntryRow.getValueJsonObj();
+				
 				file.setRealTimeIn(GetTimeStat(valuePart));
 
 				break;
@@ -933,7 +943,6 @@ public class HiwayDB implements HiwayDBI {
 
 				break;
 			case "file-size-stageout":
-
 				file.setSize(Long.parseLong(logEntryRow.getValueRawString(), 10));
 
 				break;

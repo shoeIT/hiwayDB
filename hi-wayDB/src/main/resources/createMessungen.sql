@@ -7,7 +7,7 @@ CREATE SCHEMA IF NOT EXISTS `messungen` DEFAULT CHARACTER SET utf8 COLLATE utf8_
 SHOW WARNINGS;
 USE `messungen` ;
 
-CREATE TABLE `messungen`.`accesstime` (
+CREATE TABLE `messungen`.`Accesstime` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `funktion` VARCHAR(100) NULL,
   `input` VARCHAR(100) NULL,
@@ -17,9 +17,9 @@ CREATE TABLE `messungen`.`accesstime` (
   `dbvolume` BIGINT UNSIGNED NULL,
   `returnvolume` BIGINT UNSIGNED NULL,
    `runId` VARCHAR(100) NULL,
-   `key` VARCHAR(100) NULL,
+   `keyinput` VARCHAR(100) NULL,
    `config` VARCHAR(45) NULL,
-      `wfName` VARCHAR(100) NULL,
+   `wfName` VARCHAR(100) NULL,
   PRIMARY KEY (`id`));
 
 SHOW WARNINGS;
