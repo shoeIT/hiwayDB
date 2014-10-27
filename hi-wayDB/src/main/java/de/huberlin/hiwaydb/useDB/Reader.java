@@ -423,15 +423,14 @@ public class Reader {
 	private static int copyWorkflowsSQL(List<Workflowrun> allWFs, int limit,
 			Session session) {
 
-		Workflowrun newRun = new Workflowrun();
-		Set<Hiwayevent> newHiwayevents = new HashSet<Hiwayevent>();
-		
-		Set<Invocation> newInvocations = new HashSet<Invocation>();
+		Workflowrun newRun = null;
+		Set<Hiwayevent> newHiwayevents = null;
+		Set<Invocation> newInvocations = null;
 
-		Set<Inoutput> newInoutputs = new HashSet<Inoutput>();
-		Set<File> newfiles  = new HashSet<File>();
-		Set<Userevent> newUserevents = new HashSet<Userevent>();
-		Invocation newInvoc = new Invocation();
+		Set<Inoutput> newInoutputs = null;
+		Set<File> newfiles = null;
+		Set<Userevent> newUserevents = null;
+		Invocation newInvoc = null;
 
 
 		// Session session = dbSessionFactory.openSession();
@@ -442,10 +441,10 @@ public class Reader {
 		Boolean toCommit = true;
 		int i = 0;
 		Transaction tx = null;
-		Hiwayevent newEvent = new Hiwayevent();
-		File newFile = new File();
-		Userevent newUE = new Userevent();
-		Inoutput newIO = new Inoutput();
+		Hiwayevent newEvent = null;
+		File newFile = null;
+		Userevent newUE = null;
+		Inoutput newIO = null;
 
 		tx = session.beginTransaction();
 
@@ -461,10 +460,6 @@ public class Reader {
 			}
 
 			if (i % 500 == 0) {
-				
-				System.out.println("comitt in between...........");
-				tx.commit();
-				
 				newRun =null;
 				newHiwayevents =null;
 				newEvent=null;
@@ -475,9 +470,9 @@ public class Reader {
 				newInoutputs = null;
 				newfiles = null;
 				newUserevents = null;
-				
+				System.out.println("comitt in between...........");
+				tx.commit();
 				System.gc();
-				
 				tx = session.beginTransaction();
 			}
 
@@ -486,7 +481,7 @@ public class Reader {
 			System.out.println("Run" + run.getId() + " , " + run.getWfName()+ " , I: " + i + " | " + newName);
 			// run mit allen inhalten kopieren und speichern
 
-			//newRun = new Workflowrun();
+			newRun = new Workflowrun();
 			newRun.setRunId(newName);
 			newRun.setWfName(run.getWfName());
 			newRun.setWfTime(run.getWfTime());
@@ -494,11 +489,12 @@ public class Reader {
 			// System.out.println("saven newRun");
 			session.save(newRun);
 
-			newHiwayevents.clear();
+			newHiwayevents = new HashSet<Hiwayevent>();
 			
 
 			for (Hiwayevent he : run.getHiwayevents()) {
 
+				newEvent = new Hiwayevent();
 				newEvent.setContent(he.getContent());
 				newEvent.setType(he.getType());
 				newEvent.setWorkflowrun(newRun);
@@ -513,12 +509,12 @@ public class Reader {
 				newRun.setHiwayevents(newHiwayevents);
 			}
 
-			newInvocations.clear(); 
+			newInvocations = new HashSet<Invocation>();
 			
 			for (Invocation invoc : run.getInvocations()) {
 				cal = Calendar.getInstance();
 
-				
+				newInvoc = new Invocation();
 				newInvoc.setDidOn(cal.getTime());
 				newInvoc.setHostname(invoc.getHostname());
 				newInvoc.setInvocationId(invoc.getInvocationId());
@@ -534,9 +530,9 @@ public class Reader {
 				session.save(newInvoc);
 
 				
-				newUserevents.clear();
+				newUserevents = new HashSet<Userevent>();
 				for (Userevent ue : invoc.getUserevents()) {
-					//newUE = new Userevent();
+					newUE = new Userevent();
 
 					newUE.setContent(ue.getContent());
 					newUE.setInvocation(newInvoc);
@@ -551,9 +547,9 @@ public class Reader {
 				}
 
 			
-				newInoutputs.clear(); 
+				newInoutputs = new HashSet<Inoutput>();
 				for (Inoutput io : invoc.getInoutputs()) {
-					//newIO = new Inoutput();
+					newIO = new Inoutput();
 
 					newIO.setContent(io.getContent());
 					newIO.setInvocation(newInvoc);
@@ -570,9 +566,9 @@ public class Reader {
 				}
 
 			
-				newfiles.clear(); 
+				newfiles = new HashSet<File>();
 				for (File file : invoc.getFiles()) {
-					//newFile = new File();
+					newFile = new File();
 
 					newFile.setName(file.getName());
 					newFile.setRealTimeIn(file.getRealTimeIn());
@@ -598,6 +594,17 @@ public class Reader {
 			}
 
 			// tx.commit();
+			
+			newRun =null;
+			newHiwayevents =null;
+			newEvent=null;
+			newInvocations =null;
+			newInvoc = null;
+			newUE = null;
+			newIO = null;
+			newInoutputs = null;
+			newfiles = null;
+			newUserevents = null;
 
 		}
 
