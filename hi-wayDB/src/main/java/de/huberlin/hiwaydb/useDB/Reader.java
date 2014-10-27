@@ -72,6 +72,8 @@ public class Reader {
 			try (BufferedReader test = new BufferedReader(
 					new InputStreamReader(System.in))) {
 
+				System.out.println("Datenbank füllen, Format:AnzahlWFs,schema");
+							
 				lineIn = test.readLine();
 
 			}
@@ -112,8 +114,6 @@ public class Reader {
 				int toLimit = Integer.parseInt(lineIn.substring(0,lineIn.lastIndexOf(",")));
 				
 				String db =  lineIn.substring(lineIn.lastIndexOf(",")+1,lineIn.length());
-
-
 				
 				
 				if (toLimit < 10) {
@@ -423,13 +423,16 @@ public class Reader {
 	private static int copyWorkflowsSQL(List<Workflowrun> allWFs, int limit,
 			Session session) {
 
-		Workflowrun newRun = null;
-		Set<Hiwayevent> newHiwayevents = null;
-		Set<Invocation> newInvocations = null;
+		Workflowrun newRun = new Workflowrun();
+		Set<Hiwayevent> newHiwayevents = new HashSet<Hiwayevent>();
+		
+		Set<Invocation> newInvocations = new HashSet<Invocation>();
 
-		Set<Inoutput> newInoutputs = null;
-		Set<File> newfiles = null;
-		Set<Userevent> newUserevents = null;
+		Set<Inoutput> newInoutputs = new HashSet<Inoutput>();
+		Set<File> newfiles  = new HashSet<File>();
+		Set<Userevent> newUserevents = new HashSet<Userevent>();
+		Invocation newInvoc = new Invocation();
+
 
 		// Session session = dbSessionFactory.openSession();
 
@@ -439,6 +442,10 @@ public class Reader {
 		Boolean toCommit = true;
 		int i = 0;
 		Transaction tx = null;
+		Hiwayevent newEvent = new Hiwayevent();
+		File newFile = new File();
+		Userevent newUE = new Userevent();
+		Inoutput newIO = new Inoutput();
 
 		tx = session.beginTransaction();
 
@@ -453,9 +460,24 @@ public class Reader {
 				return 0;
 			}
 
-			if (i % 1000 == 0) {
+			if (i % 500 == 0) {
+				
 				System.out.println("comitt in between...........");
 				tx.commit();
+				
+				newRun =null;
+				newHiwayevents =null;
+				newEvent=null;
+				newInvocations =null;
+				newInvoc = null;
+				newUE = null;
+				newIO = null;
+				newInoutputs = null;
+				newfiles = null;
+				newUserevents = null;
+				
+				System.gc();
+				
 				tx = session.beginTransaction();
 			}
 
@@ -464,7 +486,7 @@ public class Reader {
 			System.out.println("Run" + run.getId() + " , " + run.getWfName()+ " , I: " + i + " | " + newName);
 			// run mit allen inhalten kopieren und speichern
 
-			newRun = new Workflowrun();
+			//newRun = new Workflowrun();
 			newRun.setRunId(newName);
 			newRun.setWfName(run.getWfName());
 			newRun.setWfTime(run.getWfTime());
@@ -472,12 +494,11 @@ public class Reader {
 			// System.out.println("saven newRun");
 			session.save(newRun);
 
-			newHiwayevents = new HashSet<Hiwayevent>();
-			Hiwayevent newEvent = null;
+			newHiwayevents.clear();
+			
 
 			for (Hiwayevent he : run.getHiwayevents()) {
 
-				newEvent = new Hiwayevent();
 				newEvent.setContent(he.getContent());
 				newEvent.setType(he.getType());
 				newEvent.setWorkflowrun(newRun);
@@ -492,13 +513,12 @@ public class Reader {
 				newRun.setHiwayevents(newHiwayevents);
 			}
 
-			newInvocations = new HashSet<Invocation>();
-			Invocation newInvoc = null;
-
+			newInvocations.clear(); 
+			
 			for (Invocation invoc : run.getInvocations()) {
 				cal = Calendar.getInstance();
 
-				newInvoc = new Invocation();
+				
 				newInvoc.setDidOn(cal.getTime());
 				newInvoc.setHostname(invoc.getHostname());
 				newInvoc.setInvocationId(invoc.getInvocationId());
@@ -513,10 +533,10 @@ public class Reader {
 				newInvoc.setWorkflowrun(newRun);
 				session.save(newInvoc);
 
-				Userevent newUE = null;
-				newUserevents = new HashSet<Userevent>();
+				
+				newUserevents.clear();
 				for (Userevent ue : invoc.getUserevents()) {
-					newUE = new Userevent();
+					//newUE = new Userevent();
 
 					newUE.setContent(ue.getContent());
 					newUE.setInvocation(newInvoc);
@@ -530,10 +550,10 @@ public class Reader {
 					newInvoc.setUserevents(newUserevents);
 				}
 
-				Inoutput newIO = null;
-				newInoutputs = new HashSet<Inoutput>();
+			
+				newInoutputs.clear(); 
 				for (Inoutput io : invoc.getInoutputs()) {
-					newIO = new Inoutput();
+					//newIO = new Inoutput();
 
 					newIO.setContent(io.getContent());
 					newIO.setInvocation(newInvoc);
@@ -549,10 +569,10 @@ public class Reader {
 					newInvoc.setInoutputs(newInoutputs);
 				}
 
-				File newFile = null;
-				newfiles = new HashSet<File>();
+			
+				newfiles.clear(); 
 				for (File file : invoc.getFiles()) {
-					newFile = new File();
+					//newFile = new File();
 
 					newFile.setName(file.getName());
 					newFile.setRealTimeIn(file.getRealTimeIn());

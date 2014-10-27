@@ -1,4 +1,7 @@
 
+DOC: Invoc
+
+
 InvocCount
 
 map:
@@ -16,17 +19,17 @@ _count
 
 
 
-LogEntriesForTaskOnHostSince
+getLogEntriesForTaskOnHostSince
 
 map:
 function (doc, meta) {
-  if(doc.invocId)
+  if(doc.hostname)
     {
   emit([doc.taskId, doc.hostname,doc.timestamp], null);
     }
-}
-
-
+    }
+    
+    
 getHostNames
 
 function (doc, meta) {
@@ -37,17 +40,52 @@ function (doc, meta) {
  
 }
 
-getLogEntriesForTaskOnHost
+map: _count
+
 
 getLogEntriesForTasks
+
+function (doc, meta) {
+  if(doc.invocId)
+    {
+  emit(doc.taskId, null);
+    }
+}
+
+
+getTaskname
+
+function (doc, meta) {
+  if(doc.taskId)
+  {
+    emit(doc.taskId,doc.taskname)
+  }
+}
+
+DOC: Workflow
 
 getTaskIdsForWorkflow
 
 function (doc, meta) {
   if(doc.name)
   {
-     emit(doc.name, null);
+  emit(meta.id, null);
   }
 }
 
-getTaskname
+WfRunInvocs
+function (doc, meta) {
+  if(doc.invocId)
+  {  
+  emit(doc.runId, null);
+  }
+  }
+
+  WfRunAll
+  
+  function (doc, meta) {
+  if(doc.name)
+  {
+  emit(meta.id, null);
+  }
+}
