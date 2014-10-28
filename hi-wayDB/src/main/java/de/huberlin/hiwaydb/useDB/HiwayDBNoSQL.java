@@ -70,7 +70,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 		getConnection();
 
-		View view = client.getView("Invoc", "InvocCount");
+		View view = client.getView("Workflow", "WfRunCount");
 
 		Query query = new Query();
 

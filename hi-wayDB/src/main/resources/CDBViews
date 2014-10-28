@@ -35,8 +35,7 @@ function (doc, meta) {
   if(doc.invocId)
     {
       emit(doc.hostname,doc.hostname);
-   }
- 
+   } 
 }
 
 map: _count

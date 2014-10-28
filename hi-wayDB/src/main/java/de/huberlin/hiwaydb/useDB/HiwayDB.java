@@ -75,7 +75,7 @@ public class HiwayDB implements HiwayDBI {
 		try {
 			tx = session.beginTransaction();
 
-			dbVolume = (long) session.createCriteria(Invocation.class)
+			dbVolume = (long) session.createCriteria(Workflowrun.class)
 					.setProjection(Projections.rowCount()).uniqueResult();
 
 			tx.commit();
