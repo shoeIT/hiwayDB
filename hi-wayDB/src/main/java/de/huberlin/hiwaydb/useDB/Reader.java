@@ -262,7 +262,7 @@ public class Reader {
 
 					throw e; // or display error message
 				} finally {
-					if (session.isOpen()) {
+					if (session!=null && session.isOpen()) {
 						session.close();
 					}
 				}
@@ -509,16 +509,6 @@ public class Reader {
 					session.close();
 				}
 
-				return i;
-			}
-
-			if (i >= 3000) {
-				toCommit = false;
-				System.out.println("Break and comitt wegen 3000er Grenze");
-				tx.commit();
-				if (session.isOpen()) {
-					session.close();
-				}
 				return i;
 			}
 
