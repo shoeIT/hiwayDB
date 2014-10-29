@@ -30,12 +30,14 @@ import javax.persistence.OneToMany;
 
 import net.spy.memcached.internal.OperationFuture;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Projections;
+import org.hibernate.proxy.HibernateProxy;
 import org.json.JSONException;
 
 import com.couchbase.client.CouchbaseClient;
@@ -58,6 +60,7 @@ public class Reader {
 	private static Path fFilePath;
 	private final static Charset ENCODING = StandardCharsets.UTF_8;
 	private static SessionFactory dbSessionFactory;
+	private static SessionFactory dbSessionFactoryStandard;
 
 	public static void main(String[] args) {
 
@@ -73,7 +76,7 @@ public class Reader {
 					new InputStreamReader(System.in))) {
 
 				System.out.println("Datenbank füllen, Format:AnzahlWFs,schema");
-							
+
 				lineIn = test.readLine();
 
 			}
@@ -110,74 +113,93 @@ public class Reader {
 				// + " Date: " + s.getTimestamp());
 				// }
 			} else {
-				
-				int toLimit = Integer.parseInt(lineIn.substring(0,lineIn.lastIndexOf(",")));
-				
-				String db =  lineIn.substring(lineIn.lastIndexOf(",")+1,lineIn.length());
-				
-				
+
+				int toLimit = Integer.parseInt(lineIn.substring(0,
+						lineIn.lastIndexOf(",")));
+
+				String db = lineIn.substring(lineIn.lastIndexOf(",") + 1,
+						lineIn.lastIndexOf(";"));
+
+				String SqlNosql = lineIn.substring(lineIn.lastIndexOf(";") + 1,
+						lineIn.length());
+
 				if (toLimit < 10) {
 					toLimit = 1000;
 				}
 
 				int limit = toLimit;
 
-				System.out.println("Datenbanken " + db +"  füllen...bist Limit: "	+ toLimit);
-				dbSessionFactory = getSQLSession(db);
+				System.out.println("Datenbanken " + db
+						+ "  füllen...bist Limit: " + toLimit);
 
-				Session session = dbSessionFactory.openSession();
-				Transaction tx = null;
-
-				List<URI> uris = new ArrayList<URI>();
-				uris.add(URI.create("http://127.0.0.1:8091/pools"));
-				//
-				//
-				// HiwayDBI testGet = new HiwayDBNoSQL("hiwaydb","",uris,"root",
-
-				CouchbaseClient client = new CouchbaseClient(uris, db,"reverse");
+				Session session = null;
 
 				try {
 
-					View view = client.getView("Workflow", "WfRunAll");
-					Query query = new Query();
-					
-					ViewResponse result = client.query(view, query);
-					int startSize = result.size();
-					
-					
-					for (int i = 0; i < 1000; i++) {
+					if (SqlNosql.equals("nosql")) {
+
+						List<URI> uris = new ArrayList<URI>();
+						uris.add(URI.create("http://127.0.0.1:8091/pools"));
+						//
+						//
+						// HiwayDBI testGet = new
+						// HiwayDBNoSQL("hiwaydb","",uris,"root",
+
+						CouchbaseClient client = new CouchbaseClient(uris, db,
+								"reverse");
+						CouchbaseClient firstClient = new CouchbaseClient(uris,
+								"hiwaydb", "reverse");
+
+						int startSize = 0;
+
+						View view = client.getView("Workflow", "WfRunCount");
+
+						Query query = new Query();
+
+						// erst mal den Inhalt aus hiwaydb holen
+						ViewResponse result = client.query(view, query);
+
+						for (ViewRow row : result) {
+							startSize = Integer.parseInt(row.getValue());
+						}
+
+						view = firstClient.getView("Workflow", "WfRunAll");
 
 						query = new Query();
 						query.setIncludeDocs(true);
 
-						// Query the Cluster
-						result = client.query(view, query);
+						// erst mal den Inhalt aus hiwaydb holen
+						result = firstClient.query(view, query);
+
 						int resultSize = result.size();
 
-						System.out.println("Couchbase durchgang:" + i+ " Anzahl WFs: " + resultSize);
+						int y = 0;
 
-						if (startSize < limit) {
+						while (startSize < limit && SqlNosql.equals("nosql")) {
 
-							int  back = copyWorkflowNoSQL(result, limit, client,startSize);
-							
-							
-							if (back == 0) {
-								System.out.println("Couchbase durchgang beendet!!!!!!!!!!!!!!");
-								break;
-							}
-							else
-							{
-								startSize = startSize + back;								
+							y++;
+							System.out.println("Couchbase durchgang:" + y
+									+ " Anzahl WFs: " + startSize + " addWFs: "
+									+ resultSize);
+
+							if (startSize < limit) {
+
+								int back = copyWorkflowNoSQL(result, limit,
+										client, startSize);
+
+								startSize = startSize + back;
+
 							}
 						}
-						else
-						{
-							System.out.println("Couchbase hat bereits genug Runs: " +resultSize);
-							break;
-						}	
 					}
 
-					for (int i = 0; i < 1000; i++) {
+					if (SqlNosql.equals("sql")) {
+
+						dbSessionFactory = getSQLSession(db);
+						dbSessionFactoryStandard = getSQLSession("hiwaydb");
+
+						session = dbSessionFactoryStandard.openSession();
+						Transaction tx = null;
 
 						tx = session.beginTransaction();
 
@@ -189,24 +211,49 @@ public class Reader {
 
 						allWFs = querySQL.list();
 
-						System.out.println("MySQL durchgang:" + i
-								+ " Anzahl WFs: " + allWFs.size());
+						tx.commit();
+
+						Session session2 = dbSessionFactory.openSession();
+						tx = session2.beginTransaction();
+
+						querySQL = session2.createQuery("FROM Workflowrun");
+
+						List<Workflowrun> allWFsCurrent = new ArrayList<Workflowrun>();
+
+						allWFsCurrent = querySQL.list();
+
+						int currentSize = allWFsCurrent.size();
 
 						tx.commit();
 
-						if (allWFs.size() < limit) {
-							if (copyWorkflowsSQL(allWFs, limit, session) == 0) {
-								System.out
-										.println("MySQL durchgang beendet!!!!!!!!!!!!!!");
-								break;
+						session2.close();
+
+						int newWFs = 0;
+
+						int y = 0;
+						while (currentSize < limit && SqlNosql.equals("sql")) {
+								//&& newWFs < 3000
+							y++;
+							System.out.println("MySQL durchgang:" + y
+									+ " CurrentSize: " + currentSize
+									+ " Anzahln neueWFs: " + allWFs.size()
+									+ " newWFs : " + newWFs);
+
+							if (currentSize < limit) {
+								int added = copyWorkflowsSQL(allWFs, limit,
+										currentSize);
+								currentSize = currentSize + added;
+								newWFs += added;
+
 							}
-						}
-						else
-						{
-							System.out.println("SQL hat bereits genug Runs: " +allWFs.size());
-							break;
+							System.out.println("MySQL durchgang:" + y
+									+ " fertig! CurrentSize: " + currentSize
+									+ " newWFs : " + newWFs + " limit: "
+									+ limit);
+
 						}
 
+						session.close();
 					}
 
 					System.out.println("fertig");
@@ -250,7 +297,7 @@ public class Reader {
 			// .configure(f);
 
 			configuration.setProperty("hibernate.connection.url",
-					"jdbc:mysql://localhost/"+db);
+					"jdbc:mysql://localhost/" + db);
 			configuration.setProperty("hibernate.connection.username", "root");
 			configuration.setProperty("hibernate.connection.password",
 					"reverse");
@@ -323,18 +370,18 @@ public class Reader {
 	}
 
 	private static int copyWorkflowNoSQL(ViewResponse result, int limit,
-			CouchbaseClient client,int  currentSize) {
+			CouchbaseClient client, int currentSize) {
 
-		
 		Set<InvocStat> tempResult = new HashSet<InvocStat>();
 		Gson gson = new Gson();
 		Calendar cal = Calendar.getInstance();
 
 		WfRunDoc newRun = null;
 		WfRunDoc run = null;
-		//int allWFscount = result.size();
-		
-		System.out.println("copy NoSQL anzwahl wf:" + currentSize);
+		// int allWFscount = result.size();
+
+		System.out.println("copy NoSQL anzwahl wf:" + currentSize
+				+ " resultSize:" + result.size());
 
 		int i = 0;
 		InvocStat temp = null;
@@ -344,7 +391,8 @@ public class Reader {
 			i++;
 			if (currentSize + i >= limit + 1) {
 
-				System.out.println("Break and raus: all: " + currentSize  + " | i: " + i  + " limit: " + limit);
+				System.out.println("Break and raus: all: " + currentSize
+						+ " | i: " + i + " limit: " + limit);
 				return 0;
 			}
 
@@ -410,7 +458,7 @@ public class Reader {
 
 					String invocID = newName + "_" + newInvoc.getInvocId();
 
-					//System.out.println("save invoc..." + invocID);
+					// System.out.println("save invoc..." + invocID);
 					client.set(invocID, gson.toJson(newInvoc));
 				}
 			}
@@ -421,7 +469,7 @@ public class Reader {
 	}
 
 	private static int copyWorkflowsSQL(List<Workflowrun> allWFs, int limit,
-			Session session) {
+			int currentSize) {
 
 		Workflowrun newRun = null;
 		Set<Hiwayevent> newHiwayevents = null;
@@ -432,12 +480,10 @@ public class Reader {
 		Set<Userevent> newUserevents = null;
 		Invocation newInvoc = null;
 
-
 		// Session session = dbSessionFactory.openSession();
 
 		Calendar cal = Calendar.getInstance();
 
-		int allWFscount = allWFs.size();
 		Boolean toCommit = true;
 		int i = 0;
 		Transaction tx = null;
@@ -446,24 +492,41 @@ public class Reader {
 		Userevent newUE = null;
 		Inoutput newIO = null;
 
+		Session session = dbSessionFactory.openSession();
+
 		tx = session.beginTransaction();
 
 		for (Workflowrun run : allWFs) {
 
 			cal = Calendar.getInstance();
 			i++;
-			if (allWFscount + i >= limit + 1) {
+			if (currentSize + i >= limit + 1) {
 				toCommit = false;
-				System.out.println("Break and comitt");
+				System.out.println("Break and comitt CZ= " + currentSize
+						+ " i=" + i + " LIMIT: " + limit);
 				tx.commit();
-				return 0;
+				if (session.isOpen()) {
+					session.close();
+				}
+
+				return i;
+			}
+
+			if (i >= 3000) {
+				toCommit = false;
+				System.out.println("Break and comitt wegen 3000er Grenze");
+				tx.commit();
+				if (session.isOpen()) {
+					session.close();
+				}
+				return i;
 			}
 
 			if (i % 500 == 0) {
-				newRun =null;
-				newHiwayevents =null;
-				newEvent=null;
-				newInvocations =null;
+				newRun = null;
+				newHiwayevents = null;
+				newEvent = null;
+				newInvocations = null;
 				newInvoc = null;
 				newUE = null;
 				newIO = null;
@@ -476,9 +539,11 @@ public class Reader {
 				tx = session.beginTransaction();
 			}
 
-			String newName = run.getRunId().substring(0, 36) + "_"+ cal.getTimeInMillis();
+			String newName = run.getRunId().substring(0, 36) + "_"
+					+ cal.getTimeInMillis();
 
-			System.out.println("Run" + run.getId() + " , " + run.getWfName()+ " , I: " + i + " | " + newName);
+			System.out.println("Run" + run.getId() + " , " + run.getWfName()
+					+ " , I: " + i + " | " + newName);
 			// run mit allen inhalten kopieren und speichern
 
 			newRun = new Workflowrun();
@@ -490,7 +555,6 @@ public class Reader {
 			session.save(newRun);
 
 			newHiwayevents = new HashSet<Hiwayevent>();
-			
 
 			for (Hiwayevent he : run.getHiwayevents()) {
 
@@ -510,7 +574,7 @@ public class Reader {
 			}
 
 			newInvocations = new HashSet<Invocation>();
-			
+
 			for (Invocation invoc : run.getInvocations()) {
 				cal = Calendar.getInstance();
 
@@ -529,7 +593,6 @@ public class Reader {
 				newInvoc.setWorkflowrun(newRun);
 				session.save(newInvoc);
 
-				
 				newUserevents = new HashSet<Userevent>();
 				for (Userevent ue : invoc.getUserevents()) {
 					newUE = new Userevent();
@@ -546,7 +609,6 @@ public class Reader {
 					newInvoc.setUserevents(newUserevents);
 				}
 
-			
 				newInoutputs = new HashSet<Inoutput>();
 				for (Inoutput io : invoc.getInoutputs()) {
 					newIO = new Inoutput();
@@ -565,7 +627,6 @@ public class Reader {
 					newInvoc.setInoutputs(newInoutputs);
 				}
 
-			
 				newfiles = new HashSet<File>();
 				for (File file : invoc.getFiles()) {
 					newFile = new File();
@@ -594,11 +655,11 @@ public class Reader {
 			}
 
 			// tx.commit();
-			
-			newRun =null;
-			newHiwayevents =null;
-			newEvent=null;
-			newInvocations =null;
+
+			newRun = null;
+			newHiwayevents = null;
+			newEvent = null;
+			newInvocations = null;
 			newInvoc = null;
 			newUE = null;
 			newIO = null;
@@ -613,6 +674,24 @@ public class Reader {
 			tx.commit();
 		}
 
-		return 1;
+		if (session.isOpen()) {
+			session.close();
+		}
+
+		return i;
+	}
+
+	public static <T> T initializeAndUnproxy(T entity) {
+		if (entity == null) {
+			throw new NullPointerException(
+					"Entity passed for initialization is null");
+		}
+
+		Hibernate.initialize(entity);
+		if (entity instanceof HibernateProxy) {
+			entity = (T) ((HibernateProxy) entity)
+					.getHibernateLazyInitializer().getImplementation();
+		}
+		return entity;
 	}
 }
