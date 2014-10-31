@@ -139,7 +139,7 @@ public class Reader {
 					if (SqlNosql.equals("nosql")) {
 
 						List<URI> uris = new ArrayList<URI>();
-						uris.add(URI.create("http://127.0.0.1:8091/pools"));
+						uris.add(URI.create("http://192.168.127.43:8091/pools"));
 						//
 						//
 						// HiwayDBI testGet = new
@@ -174,7 +174,7 @@ public class Reader {
 						int resultSize = result.size();
 
 						int y = 0;
-
+												
 						while (startSize < limit && SqlNosql.equals("nosql")) {
 
 							y++;
@@ -185,7 +185,7 @@ public class Reader {
 							if (startSize < limit) {
 
 								int back = copyWorkflowNoSQL(result, limit,
-										client, startSize);
+										client, startSize, firstClient);
 
 								startSize = startSize + back;
 
@@ -297,10 +297,9 @@ public class Reader {
 			// .configure(f);
 
 			configuration.setProperty("hibernate.connection.url",
-					"jdbc:mysql://localhost/" + db);
+					"jdbc:mysql://192.168.127.43/" + db);
 			configuration.setProperty("hibernate.connection.username", "root");
-			configuration.setProperty("hibernate.connection.password",
-					"reverse");
+			configuration.setProperty("hibernate.connection.password","reverse");
 
 			configuration.setProperty("hibernate.dialect",
 					"org.hibernate.dialect.MySQLInnoDBDialect");
@@ -370,7 +369,7 @@ public class Reader {
 	}
 
 	private static int copyWorkflowNoSQL(ViewResponse result, int limit,
-			CouchbaseClient client, int currentSize) {
+			CouchbaseClient client, int currentSize, CouchbaseClient hiwayClient) {
 
 		Set<InvocStat> tempResult = new HashSet<InvocStat>();
 		Gson gson = new Gson();
@@ -393,7 +392,7 @@ public class Reader {
 
 				System.out.println("Break and raus: all: " + currentSize
 						+ " | i: " + i + " limit: " + limit);
-				return 0;
+				return i;
 			}
 
 			run = gson.fromJson((String) row.getDocument(), WfRunDoc.class);
@@ -403,8 +402,7 @@ public class Reader {
 				String newName = run.getRunId().substring(0, 36) + "_"
 						+ Calendar.getInstance().getTimeInMillis();
 
-				System.out.println("Run: " + run.getName() + " , I: " + i
-						+ " | " + newName);
+				System.out.println("Run: " + run.getName() + " , I: " + i + " | " + newName);
 
 				// System.out.println("resrow: "+ row.getValue()) ;
 
@@ -419,12 +417,12 @@ public class Reader {
 
 				client.set(newName, gson.toJson(newRun));
 
-				View view = client.getView("Workflow", "WfRunInvocs");
+				View view = hiwayClient.getView("Workflow", "WfRunInvocs");
 				Query query = new Query();
 				query.setIncludeDocs(true).setKey(run.getRunId());
 
 				// Query the Cluster
-				result = client.query(view, query);
+				result = hiwayClient.query(view, query);
 
 				InvocDoc newInvoc = null;
 				InvocDoc oldInvoc = null;
@@ -458,7 +456,7 @@ public class Reader {
 
 					String invocID = newName + "_" + newInvoc.getInvocId();
 
-					// System.out.println("save invoc..." + invocID);
+					System.out.println("save invoc..." + invocID);
 					client.set(invocID, gson.toJson(newInvoc));
 				}
 			}
@@ -509,6 +507,16 @@ public class Reader {
 					session.close();
 				}
 
+				return i;
+			}
+
+			if (i >= 3000) {
+				toCommit = false;
+				System.out.println("Break and comitt wegen 3000er Grenze");
+				tx.commit();
+				if (session.isOpen()) {
+					session.close();
+				}
 				return i;
 			}
 
