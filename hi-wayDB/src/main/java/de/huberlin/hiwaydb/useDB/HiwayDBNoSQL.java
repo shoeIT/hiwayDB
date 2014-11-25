@@ -88,7 +88,7 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	private void getConnection() {
 		try {
 
-			log.info("connecting to Couchbase, bucket: " + this.bucket
+			log.info("connecting to Couchbase NEUE Tocks gesetzt, bucket: " + this.bucket
 					+ " pwd:" + this.password);
 
 			client = new CouchbaseClient(this.dbURLs, this.bucket,

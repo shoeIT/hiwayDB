@@ -1163,7 +1163,7 @@ public class HiwayDB implements HiwayDBI {
 						.applySettings(configuration.getProperties());
 				SessionFactory sessionFactory = configuration
 						.buildSessionFactory(builder.build());
-				log.info("Session Factory Starten!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+				log.info("Session Factory Starten!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEUE Tocks gesetzt");
 				return sessionFactory;
 
 			} else {
