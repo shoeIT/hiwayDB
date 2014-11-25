@@ -47,6 +47,7 @@ import com.couchbase.client.protocol.views.ViewRow;
 
 import de.huberlin.hiwaydb.LogToDB.InvocDoc;
 import de.huberlin.hiwaydb.LogToDB.WfRunDoc;
+import de.huberlin.hiwaydb.dal.Accesstime;
 import de.huberlin.hiwaydb.dal.File;
 import de.huberlin.hiwaydb.dal.Hiwayevent;
 import de.huberlin.hiwaydb.dal.Inoutput;
@@ -112,7 +113,68 @@ public class Reader {
 				// + s.getTaskId() + " | RealTime:" + s.getRealTime()
 				// + " Date: " + s.getTimestamp());
 				// }
-			} else {
+
+			} else if (lineIn.equalsIgnoreCase("accesstime")) {
+
+				System.out.println("korrektur accesstime...");
+				dbSessionFactoryStandard = getSQLSession("messungen");
+
+				Session session = dbSessionFactoryStandard.openSession();
+				Transaction tx = null;
+
+				tx = session.beginTransaction();
+
+				org.hibernate.Query querySQL = null;
+
+				querySQL = session
+						.createQuery("FROM Accesstime at where at.wfName='' or at.funktion='JsonReportEntryToDB'"
+								+ " order by at.id desc");
+
+				List<Accesstime> allTimes = new ArrayList<Accesstime>();
+
+				allTimes = querySQL.list();
+
+				tx.commit();
+
+				//Session session2 = dbSessionFactoryStandard.openSession();
+
+
+				tx = session.beginTransaction();
+				
+				String currRunID = "";
+				String currentWFName = "";
+
+				int fill = 0;
+
+				for (Accesstime at : allTimes) {
+
+					if (!at.getWfName().equals("") && at.getWfName() != "") {
+						currentWFName = at.getWfName();
+						currRunID = at.getRunId();
+						//System.out.println("haben einen namen: "+ currentWFName);
+					} else {
+						fill++;
+						System.out.println("haben KEINEN namen: DIESEN setzen "
+								+ currentWFName + " anzahl:" + fill);
+
+						at.setWfName(currentWFName);
+						at.setRunId(currRunID);
+
+						session.save(at);
+					}
+
+				}
+				
+				tx.commit();
+				
+				session.close();
+				//session2.close();
+				
+				System.out.println("fertig...");
+
+			}
+
+			else {
 
 				int toLimit = Integer.parseInt(lineIn.substring(0,
 						lineIn.lastIndexOf(",")));
@@ -174,7 +236,7 @@ public class Reader {
 						int resultSize = result.size();
 
 						int y = 0;
-												
+
 						while (startSize < limit && SqlNosql.equals("nosql")) {
 
 							y++;
@@ -232,7 +294,7 @@ public class Reader {
 
 						int y = 0;
 						while (currentSize < limit && SqlNosql.equals("sql")) {
-								//&& newWFs < 3000
+							// && newWFs < 3000
 							y++;
 							System.out.println("MySQL durchgang:" + y
 									+ " CurrentSize: " + currentSize
@@ -262,7 +324,7 @@ public class Reader {
 
 					throw e; // or display error message
 				} finally {
-					if (session!=null && session.isOpen()) {
+					if (session != null && session.isOpen()) {
 						session.close();
 					}
 				}
@@ -296,10 +358,13 @@ public class Reader {
 			Configuration configuration = new Configuration();
 			// .configure(f);
 
+			System.out.println("connect to: "  + db);
+			
 			configuration.setProperty("hibernate.connection.url",
-					"jdbc:mysql://192.168.127.43/" + db);
+					"jdbc:mysql://127.0.0.1/" + db);
 			configuration.setProperty("hibernate.connection.username", "root");
-			configuration.setProperty("hibernate.connection.password","reverse");
+			configuration.setProperty("hibernate.connection.password",
+					"reverse");
 
 			configuration.setProperty("hibernate.dialect",
 					"org.hibernate.dialect.MySQLInnoDBDialect");
@@ -341,20 +406,19 @@ public class Reader {
 			// <property name="hibernate.show_sql">true</property>
 			// <property name="hibernate.use_sql_comments">true</property>
 
-			configuration
-					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Hiwayevent.class);
-			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.File.class);
-			configuration
-					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Inoutput.class);
-			configuration
-					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Invocation.class);
-			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Task.class);
-			configuration
-					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Userevent.class);
-			configuration
-					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Workflowrun.class);
-			configuration
-					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Accesstime.class);
+//			configuration
+//					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Hiwayevent.class);
+//			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.File.class);
+//			configuration
+//					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Inoutput.class);
+//			configuration
+//					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Invocation.class);
+//			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Task.class);
+//			configuration
+//					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Userevent.class);
+//			configuration
+//					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Workflowrun.class);
+			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Accesstime.class);
 
 			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
 					.applySettings(configuration.getProperties());
@@ -402,7 +466,8 @@ public class Reader {
 				String newName = run.getRunId().substring(0, 36) + "_"
 						+ Calendar.getInstance().getTimeInMillis();
 
-				System.out.println("Run: " + run.getName() + " , I: " + i + " | " + newName);
+				System.out.println("Run: " + run.getName() + " , I: " + i
+						+ " | " + newName);
 
 				// System.out.println("resrow: "+ row.getValue()) ;
 

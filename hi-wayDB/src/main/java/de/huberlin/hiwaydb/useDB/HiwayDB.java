@@ -64,7 +64,7 @@ public class HiwayDB implements HiwayDBI {
 		this.wfName = "";
 		this.runIDat = "";
 
-		this.config = "PAoderso";
+		this.config = "nix";
 
 		dbSessionFactory = getSQLSession();
 		dbSessionFactoryMessung = getSQLSessionMessung();
@@ -116,13 +116,13 @@ public class HiwayDB implements HiwayDBI {
 		Session sessAT = dbSessionFactoryMessung.openSession();
 		Transaction txMessung = null;
 		Session sess = dbSessionFactory.openSession();
-		Transaction tx = null;
+		//Transaction tx = null;
 		
 		List<String> results = null;
 
 		// Non-managed environment idiom with getCurrentSession()
 		try {
-			tx = sess.beginTransaction();
+			//tx = sess.beginTransaction();
 		
 			txMessung = sessAT.beginTransaction();
 			Accesstime at = new Accesstime();
@@ -154,12 +154,11 @@ public class HiwayDB implements HiwayDBI {
 			at.setRunId(this.runIDat);
 			at.setWfName(this.wfName);
 			sessAT.save(at);
-
-			tx.commit();
+			//tx.commit();
 			txMessung.commit();
 		} catch (RuntimeException e) {
-			if (tx != null)
-				tx.rollback();
+//			if (tx != null)
+//				tx.rollback();
 			throw e; // or display error message
 		} finally {
 			if (sess.isOpen()) {
@@ -244,13 +243,13 @@ public class HiwayDB implements HiwayDBI {
 		Transaction tx = null;
 		Session sessAT = dbSessionFactoryMessung.openSession();
 		Transaction txMessung = null;
+		
+		Accesstime at = new Accesstime();
 
 		try {
-			tx = sess.beginTransaction();
+		//	tx = sess.beginTransaction();
 			txMessung = sessAT.beginTransaction();
 			
-			Accesstime at = new Accesstime();
-
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTasks");
 			at.setInput("SQL");
@@ -276,31 +275,33 @@ public class HiwayDB implements HiwayDBI {
 			Long x = (long) resultsInvoc.size();
 
 			at.setReturnvolume(x);
-			Long tock = System.currentTimeMillis();
-			at.setTock(tock);
-			at.setTicktockdif(tock - tick);
-			at.setRunId(this.runIDat);
-			at.setWfName(this.wfName);
-			sessAT.save(at);
-
-			tx.commit();
-			txMessung.commit();
-			
+			//tx.commit();
 			resultList = createInvocStat(resultsInvoc, null);
 
 		} catch (RuntimeException e) {
-			if (tx != null)
-				tx.rollback();
+//			if (tx != null)
+//				tx.rollback();
 			throw e; // or display error message
 		} finally {
 			if (sess.isOpen()) {
 				sess.close();
 			}
-			if (sessAT.isOpen()) {
-				sessAT.close();
-			}
+			
 		}
 
+		Long tock = System.currentTimeMillis();
+		at.setTock(tock);
+		at.setTicktockdif(tock - tick);
+		at.setRunId(this.runIDat);
+		at.setWfName(this.wfName);
+		sessAT.save(at);
+		
+		txMessung.commit();
+		
+		if (sessAT.isOpen()) {
+			sessAT.close();
+		}
+		
 		return resultList;
 
 	}
@@ -315,15 +316,16 @@ public class HiwayDB implements HiwayDBI {
 		Set<Long> tempResult = new HashSet<Long>();
 
 		Session sess = dbSessionFactory.openSession();
-		Transaction tx = null;
+		//Transaction tx = null;
 		Session sessAT = dbSessionFactoryMessung.openSession();
+		
+		Accesstime at = new Accesstime();
+
 		Transaction txMessung = null;
 		try {
-			tx = sess.beginTransaction();
+		//	tx = sess.beginTransaction();
 			txMessung = sessAT.beginTransaction();
-			
-			Accesstime at = new Accesstime();
-
+		
 			at.setTick(tick);
 			at.setFunktion("getTaskIdsForWorkflow");
 			at.setInput("SQL");
@@ -351,27 +353,32 @@ public class HiwayDB implements HiwayDBI {
 
 			Long x = (long) tempResult.size();
 
-			at.setReturnvolume(x);
-			Long tock = System.currentTimeMillis();
-			at.setTock(tock);
-			at.setTicktockdif(tock - tick);
-			at.setRunId(this.runIDat);
-			at.setWfName(this.wfName);
-			sessAT.save(at);
+			at.setReturnvolume(x);	
 	
-			tx.commit();
-			txMessung.commit();
+			//tx.commit();
+			
 		} catch (RuntimeException e) {
-			if (tx != null)
-				tx.rollback();
+//			if (tx != null)
+//				tx.rollback();
 			throw e; // or display error message
 		} finally {
 			if (sess.isOpen()) {
 				sess.close();
 			}
-			if (sessAT.isOpen()) {
-				sessAT.close();
-			}
+			
+		}
+		
+		Long tock = System.currentTimeMillis();
+		at.setTock(tock);
+		at.setTicktockdif(tock - tick);
+		at.setRunId(this.runIDat);
+		at.setWfName(this.wfName);
+		sessAT.save(at);
+		
+		txMessung.commit();
+		
+		if (sessAT.isOpen()) {
+			sessAT.close();
 		}
 
 		return tempResult;
@@ -387,16 +394,17 @@ public class HiwayDB implements HiwayDBI {
 		List<Task> resultsInvoc = new ArrayList<Task>();
 
 		Session sess = dbSessionFactory.openSession();
-		Transaction tx = null;
+		//Transaction tx = null;
 		String result = "";
 		Session sessAT = dbSessionFactoryMessung.openSession();
 		Transaction txMessung = null;
+		Accesstime at = new Accesstime();
 
 		try {
-			tx = sess.beginTransaction();
+			//tx = sess.beginTransaction();
 			txMessung = sessAT.beginTransaction();
 			
-			Accesstime at = new Accesstime();
+		
 
 			at.setTick(tick);
 			at.setFunktion("getTaskName");
@@ -414,32 +422,33 @@ public class HiwayDB implements HiwayDBI {
 			Long x = (long) resultsInvoc.size();
 
 			at.setReturnvolume(x);
-			Long tock = System.currentTimeMillis();
-			at.setTock(tock);
-			at.setTicktockdif(tock - tick);
-			at.setRunId(this.runIDat);
-			at.setWfName(this.wfName);
-			sessAT.save(at);
-
-			tx.commit();
-
-			txMessung.commit();
-			
+						
 			if (!resultsInvoc.isEmpty()) {
 				result = resultsInvoc.get(0).getTaskName();
 			}
 
 		} catch (RuntimeException e) {
-			if (tx != null)
-				tx.rollback();
+//			if (tx != null)
+//				tx.rollback();
 			throw e; // or display error message
 		} finally {
 			if (sess.isOpen()) {
 				sess.close();
 			}
-			if (sessAT.isOpen()) {
-				sessAT.close();
-			}
+			
+		}
+		
+		Long tock = System.currentTimeMillis();
+		at.setTock(tock);
+		at.setTicktockdif(tock - tick);
+		at.setRunId(this.runIDat);
+		at.setWfName(this.wfName);
+		sessAT.save(at);
+
+		txMessung.commit();
+		
+		if (sessAT.isOpen()) {
+			sessAT.close();
 		}
 		
 		return result;
@@ -613,17 +622,18 @@ public class HiwayDB implements HiwayDBI {
 		// log.info("open Session");
 		Session sess = dbSessionFactory.openSession();
 		// log.info("weiter... und return");
-		Transaction tx = sess.getTransaction();
+		//Transaction tx = sess.getTransaction();
 		Session sessAT = dbSessionFactoryMessung.openSession();
 		Transaction txMessung = null;
+		Accesstime at = new Accesstime();
+
 
 		try {
 			// log.info("beginn TA");
-			tx = sess.beginTransaction();
+			//tx = sess.beginTransaction();
 			txMessung = sessAT.beginTransaction();
 			// log.info("started TA for getLogEntriesForTaskOnHostSince ");
-			Accesstime at = new Accesstime();
-
+			
 			at.setTick(tick);
 			at.setFunktion("getLogEntriesForTaskOnHostSince");
 			at.setInput("SQL");
@@ -651,30 +661,36 @@ public class HiwayDB implements HiwayDBI {
 			Long x = (long) resultsInvoc.size();
 
 			at.setReturnvolume(x);
-			Long tock = System.currentTimeMillis();
-			at.setTock(tock);
-			at.setTicktockdif(tock - tick);
-			at.setRunId(this.runIDat);
-			at.setWfName(this.wfName);
-			sessAT.save(at);
+			
 			// log.info("commit");
-			tx.commit();
-			txMessung.commit();
+			//tx.commit();
+			
 			resultList = createInvocStat(resultsInvoc, null);
 
 		} catch (RuntimeException e) {
-			if (tx != null)
-				tx.rollback();
+//			if (tx != null)
+//				tx.rollback();
 			throw e; // or display error message
 		} finally {
 			if (sess.isOpen()) {
 				sess.close();
 			}
-			if (sessAT.isOpen()) {
-				sessAT.close();
-			}
+			
 		}
 
+		Long tock = System.currentTimeMillis();
+		at.setTock(tock);
+		at.setTicktockdif(tock - tick);
+		at.setRunId(this.runIDat);
+		at.setWfName(this.wfName);
+		sessAT.save(at);
+	
+		txMessung.commit();
+		
+		if (sessAT.isOpen()) {
+			sessAT.close();
+		}
+		
 		return resultList;
 	}
 
@@ -957,6 +973,8 @@ public class HiwayDB implements HiwayDBI {
 				break;
 
 			}
+			
+			tx.commit();
 
 			at.setReturnvolume((long) logEntryRow.toString().length());
 			Long tock = System.currentTimeMillis();
@@ -969,7 +987,7 @@ public class HiwayDB implements HiwayDBI {
 
 			// log.info("hiwayDB | Commit " + tx.getLocalStatus() + " und " +
 			// oneSession.getStatistics());
-			tx.commit();
+			
 			txMessung.commit();
 			// log.info("hiwayDB | nach comit " + tx.getLocalStatus() +
 			// " und Session " + oneSession.isOpen() +" stat " +
