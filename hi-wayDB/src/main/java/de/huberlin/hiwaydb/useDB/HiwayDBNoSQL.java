@@ -20,8 +20,11 @@ import org.hibernate.cfg.Configuration;
 import org.json.JSONObject;
 
 import com.couchbase.client.CouchbaseClient;
+import com.couchbase.client.CouchbaseConnectionFactory;
+import com.couchbase.client.CouchbaseConnectionFactoryBuilder;
 import com.couchbase.client.protocol.views.ComplexKey;
 import com.couchbase.client.protocol.views.Query;
+import com.couchbase.client.protocol.views.Stale;
 import com.couchbase.client.protocol.views.View;
 import com.couchbase.client.protocol.views.ViewResponse;
 import com.couchbase.client.protocol.views.ViewRow;
@@ -87,12 +90,35 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 	private void getConnection() {
 		try {
+			
+//					CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
+////
+////			// Ovveride default values on CouchbaseConnectionFactoryBuilder
+////			// For example - wait up to 10 seconds for an operation to succeed
+//		cfb.setOpTimeout(50000);
+//		cfb.setViewConnsPerNode(100);
+//		cfb.setViewTimeout(550);
+//		cfb.setViewWorkerSize(5);
+//////
+//	CouchbaseConnectionFactory cf = cfb.buildCouchbaseConnection(this.dbURLs, this.bucket,
+//			this.password);
+////
+//	client = new CouchbaseClient(cf);
+//						
+////			client = new CouchbaseClient(
+////					new CouchbaseConnectionFactoryBuilder().setOpTimeout(20000)
+////					.setViewTimeout(120) // set the timeout to 30 seconds
+////					.setViewWorkerSize(5) // use 5 worker threads instead of one
+////					.setViewConnsPerNode(100) // allow 20 parallel http connections per node in the cluster
+////					.buildCouchbaseConnection(this.dbURLs, this.bucket,this.password));
+////			
+			
 
-			log.info("connecting to Couchbase NEUE Tocks gesetzt, bucket: " + this.bucket
+			log.info("connecting to Couchbase NEUE Tocks gesetzt und mehr timeout, bucket: " + this.bucket
 					+ " pwd:" + this.password);
 
-			client = new CouchbaseClient(this.dbURLs, this.bucket,
-					this.password);
+		client = new CouchbaseClient(this.dbURLs, this.bucket,	this.password);
+		
 
 		} catch (Exception e) {
 			log.info("hiwayDBNoSQL |Error connecting to Couchbase: "
@@ -424,8 +450,11 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		
 		Long tick = System.currentTimeMillis();
 
+		log.info("in getTaskIdsForWF...");
+		
 		Set<Long> tempResult = getTaskIdsForWorkflowTemp(workflowName);
 		
+		log.info("in getTaskIdsForWF...tock");
 		Long tock = System.currentTimeMillis();
 		
 		if (tempResult.size() > 0) {
@@ -441,36 +470,45 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		
 	private Set<Long> getTaskIdsForWorkflowTemp(String workflowName) {
 		//Long tick = System.currentTimeMillis();
+		log.info("in getTaskIdsForWF TEMP...");
 		if (client == null) {
 			getConnection();
 		}
 
+		log.info("in getTaskIdsForWF...2");
 		View view = client.getView("Workflow", "getTaskIdsForWorkflow");
+		
 
 		// Set up the Query object
 		Query query = new Query();
+		query.setStale(Stale.OK);
+		log.info("in getTaskIdsForWF...4");
 
 		// query.setIncludeDocs(true).setKey("[\""+workflowName+"\"]");
 
 		query.setIncludeDocs(true).setLimit(1).setKey(workflowName);
-
+		log.info("in getTaskIdsForWF...5");
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
+		log.info("in getTaskIdsForWF...6");
 
 		WfRunDoc wfRun = null;
 		for (ViewRow row : result) {
+			log.info("in im ergebnis...");
 			// System.out.println("resrow: "+ row.getValue()) ;
 			wfRun = gson.fromJson((String) row.getDocument(), WfRunDoc.class);
 		}
 
+		log.info("in wieder raus...");
 		Long tock = System.currentTimeMillis();
 		if (wfRun != null) {
 			//saveAccessTime(tick, tock, 1, "getTaskIdsForWorkflow", null);
+			log.info("in return...mit");
 			return wfRun.getTaskIDs();
 		}
 
 		//saveAccessTime(tick, tock, 0, "getTaskIdsForWorkflow", null);
-
+		log.info("in getTaskIdsForWF..ohne.");
 		return new HashSet<Long>();
 
 	}
@@ -799,9 +837,9 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	private void saveAccessTime(long tick, long tock, long returnVolume,
 			String funktion, String key) {
 
-		if (this.wfName.contains("NOAT")) {
-			return;
-		}
+//		if (true) {
+//			return;
+//		}
 
 		if (dbSessionFactory == null) {
 			dbSessionFactory = getSQLSession();

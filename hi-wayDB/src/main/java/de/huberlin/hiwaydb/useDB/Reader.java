@@ -361,7 +361,7 @@ public class Reader {
 			System.out.println("connect to: "  + db);
 			
 			configuration.setProperty("hibernate.connection.url",
-					"jdbc:mysql://127.0.0.1/" + db);
+					"jdbc:mysql://192.168.127.43/" + db);
 			configuration.setProperty("hibernate.connection.username", "root");
 			configuration.setProperty("hibernate.connection.password",
 					"reverse");
@@ -398,27 +398,30 @@ public class Reader {
 			configuration.setProperty("hibernate.c3p0.idle_test_period", "300");
 
 			configuration.setProperty("hibernate.c3p0.max_statements", "13000");
-			configuration.setProperty(
-					"hibernate.c3p0.maxStatementsPerConnection", "30");
+			configuration.setProperty("hibernate.c3p0.maxStatementsPerConnection", "30");
 
 			configuration.setProperty("hibernate.c3p0.acquire_increment", "10");
 
 			// <property name="hibernate.show_sql">true</property>
 			// <property name="hibernate.use_sql_comments">true</property>
 
-//			configuration
-//					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Hiwayevent.class);
-//			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.File.class);
-//			configuration
-//					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Inoutput.class);
-//			configuration
-//					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Invocation.class);
-//			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Task.class);
-//			configuration
-//					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Userevent.class);
-//			configuration
-//					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Workflowrun.class);
-			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Accesstime.class);
+
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Hiwayevent.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.File.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Inoutput.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Invocation.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Task.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Userevent.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Workflowrun.class);
+			configuration
+					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Accesstime.class);
 
 			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
 					.applySettings(configuration.getProperties());
