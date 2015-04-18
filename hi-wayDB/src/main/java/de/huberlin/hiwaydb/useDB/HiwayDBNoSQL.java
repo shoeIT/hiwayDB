@@ -90,35 +90,11 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 	private void getConnection() {
 		try {
-			
-//					CouchbaseConnectionFactoryBuilder cfb = new CouchbaseConnectionFactoryBuilder();
-////
-////			// Ovveride default values on CouchbaseConnectionFactoryBuilder
-////			// For example - wait up to 10 seconds for an operation to succeed
-//		cfb.setOpTimeout(50000);
-//		cfb.setViewConnsPerNode(100);
-//		cfb.setViewTimeout(550);
-//		cfb.setViewWorkerSize(5);
-//////
-//	CouchbaseConnectionFactory cf = cfb.buildCouchbaseConnection(this.dbURLs, this.bucket,
-//			this.password);
-////
-//	client = new CouchbaseClient(cf);
-//						
-////			client = new CouchbaseClient(
-////					new CouchbaseConnectionFactoryBuilder().setOpTimeout(20000)
-////					.setViewTimeout(120) // set the timeout to 30 seconds
-////					.setViewWorkerSize(5) // use 5 worker threads instead of one
-////					.setViewConnsPerNode(100) // allow 20 parallel http connections per node in the cluster
-////					.buildCouchbaseConnection(this.dbURLs, this.bucket,this.password));
-////			
-			
-
-			log.info("connecting to Couchbase NEUE Tocks gesetzt und mehr timeout, bucket: " + this.bucket
+			log.info("connecting to Couchbase  bucket: " + this.bucket
 					+ " pwd:" + this.password);
 
-		client = new CouchbaseClient(this.dbURLs, this.bucket,	this.password);
-		
+			client = new CouchbaseClient(this.dbURLs, this.bucket,
+					this.password);
 
 		} catch (Exception e) {
 			log.info("hiwayDBNoSQL |Error connecting to Couchbase: "
@@ -149,12 +125,12 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		Long tick = System.currentTimeMillis();
 
 		Set<String> tempResult = getHostNamesTemp();
-				
+
 		Long tock = System.currentTimeMillis();
 
 		saveAccessTime(tick, tock, tempResult.size(), "getHostNames", null);
-		 
-		 return tempResult;	
+
+		return tempResult;
 
 	}
 
@@ -170,24 +146,14 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// Set up the Query object
 		Query query = new Query();
 
-		// We the full documents and only the top 20
-		// query.setIncludeDocs(true).setLimit(20);
 		query.setIncludeDocs(false).setGroup(true).setGroupLevel(1);
 
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
 
-		// This ArrayList will contain all found beers
-		// ArrayList<HashMap<String, String>> hostnames = new
-		// ArrayList<HashMap<String, String>>();
-
 		Set<String> tempResult = new HashSet<String>();
 		// Iterate over the found documents
 		for (ViewRow row : result) {
-			// Use Google GSON to parse the JSON into a HashMap
-			// System.out.println("resrow: " + row.getValue());
-			// HashMap<String, String> parsedDoc = gson.fromJson(
-			// (String) row.getDocument(), HashMap.class);
 			String x = row.getKey();
 			if (x != null && !x.equals("null")) {
 				tempResult.add(x);
@@ -431,9 +397,8 @@ public class HiwayDBNoSQL implements HiwayDBI {
 			log.info(e);
 
 			e.printStackTrace();
-			// throw e;
+
 			return "";
-			// return 1;
 
 		} finally {
 			// client.shutdown();
@@ -447,68 +412,59 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 	@Override
 	public Set<Long> getTaskIdsForWorkflow(String workflowName) {
-		
+
 		Long tick = System.currentTimeMillis();
 
-		log.info("in getTaskIdsForWF...");
-		
+		// log.info("in getTaskIdsForWF...");
+
 		Set<Long> tempResult = getTaskIdsForWorkflowTemp(workflowName);
-		
-		log.info("in getTaskIdsForWF...tock");
+
+		// log.info("in getTaskIdsForWF...tock");
 		Long tock = System.currentTimeMillis();
-		
+
 		if (tempResult.size() > 0) {
 			saveAccessTime(tick, tock, 1, "getTaskIdsForWorkflow", null);
-		}
-		else
-		{
+		} else {
 			saveAccessTime(tick, tock, 0, "getTaskIdsForWorkflow", null);
 		}
-				
-		return tempResult;		
+
+		return tempResult;
 	}
-		
+
 	private Set<Long> getTaskIdsForWorkflowTemp(String workflowName) {
-		//Long tick = System.currentTimeMillis();
-		log.info("in getTaskIdsForWF TEMP...");
+
 		if (client == null) {
 			getConnection();
 		}
 
-		log.info("in getTaskIdsForWF...2");
 		View view = client.getView("Workflow", "getTaskIdsForWorkflow");
-		
 
 		// Set up the Query object
 		Query query = new Query();
 		query.setStale(Stale.OK);
-		log.info("in getTaskIdsForWF...4");
 
 		// query.setIncludeDocs(true).setKey("[\""+workflowName+"\"]");
 
 		query.setIncludeDocs(true).setLimit(1).setKey(workflowName);
-		log.info("in getTaskIdsForWF...5");
+
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
-		log.info("in getTaskIdsForWF...6");
+		// log.info("in getTaskIdsForWF...6");
 
 		WfRunDoc wfRun = null;
 		for (ViewRow row : result) {
-			log.info("in im ergebnis...");
+			// log.info("in im ergebnis...");
 			// System.out.println("resrow: "+ row.getValue()) ;
 			wfRun = gson.fromJson((String) row.getDocument(), WfRunDoc.class);
 		}
 
-		log.info("in wieder raus...");
+		// log.info("in wieder raus...");
+
 		Long tock = System.currentTimeMillis();
 		if (wfRun != null) {
-			//saveAccessTime(tick, tock, 1, "getTaskIdsForWorkflow", null);
-			log.info("in return...mit");
 			return wfRun.getTaskIDs();
 		}
 
-		//saveAccessTime(tick, tock, 0, "getTaskIdsForWorkflow", null);
-		log.info("in getTaskIdsForWF..ohne.");
 		return new HashSet<Long>();
 
 	}
@@ -518,19 +474,18 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		Long tick = System.currentTimeMillis();
 
 		String wfName = getTaskNameTemp(taskId);
-		
+
 		Long tock = System.currentTimeMillis();
 
-		if (wfName!="") {
+		if (wfName != "") {
 			saveAccessTime(tick, tock, 1, "getTaskname", null);
 		} else {
 			saveAccessTime(tick, tock, 0, "getTaskname", null);
 		}
-		
-		return wfName;		
+
+		return wfName;
 	}
-	
-	
+
 	private String getTaskNameTemp(long taskId) {
 		Long tick = System.currentTimeMillis();
 		if (client == null) {
@@ -551,31 +506,13 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 		String name = "";
 		for (ViewRow row : result) {
-
-			// System.out.println("resrow: "+ row.getValue()) ;
-			// wfRun = gson.fromJson((String) row.getDocument(),
-			// WfRunDoc.class);
 			name = row.getValue();
 		}
-	//	Long tock = System.currentTimeMillis();
 
-//		if (result.size() > 0) {
-//			saveAccessTime(tick, tock, 1, "getTaskname", null);
-//		} else {
-//			saveAccessTime(tick, tock, 0, "getTaskname", null);
-//		}
 		return name;
 	}
 
-	// @Override
-	// public Collection<InvocStat> getLogEntriesForTask(long taskId) {
-	//
-	// Set<Long> ids = new HashSet<Long>();
-	// ids.add(taskId);
-	//
-	// return getLogEntriesForTasks(ids);
-	// }
-
+	// wird nicht mehr genutzt steht aber noch im Interface
 	@Override
 	public Collection<InvocStat> getLogEntriesForTasks(Set<Long> taskIds) {
 		Long tick = System.currentTimeMillis();
@@ -606,61 +543,28 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 		saveAccessTime(tick, tock, 1, "getLogEntriesForTasks", null);
 
-		// shutdown();
 		return createInvocStat(result);
 
 	}
 
-	// @Override
-	// public Collection<InvocStat> getLogEntriesForTaskOnHost(long taskId,
-	// String hostName) {
-	// Long tick =System.currentTimeMillis();
-	// if (client == null) {
-	// getConnection();
-	// }
-	//
-	// View view = client.getView("dev_Invoc", "getLogEntriesForTaskOnHost");
-	//
-	// // Set up the Query object
-	// Query query = new Query();
-	//
-	// // ["dbis14",3246099067099]
-	// query.setIncludeDocs(true).setKey(ComplexKey.of(taskId, hostName));
-	// // We the full documents and only the top 20
-	// // .setLimit(20);
-	// // ["dbis11",324609906700,1404101397760]
-	//
-	// // Query the Cluster
-	// ViewResponse result = client.query(view, query);
-	//
-	//
-	// Long tock = System.currentTimeMillis();
-	//
-	//
-	// saveAccessTime(tick,tock,result.size(),"getLogEntriesForTaskOnHost");
-	// // shutdown();
-	// return createInvocStat(result);
-	// }
-	
 	@Override
 	public Collection<InvocStat> getLogEntriesForTaskOnHostSince(long taskId,
 			String hostName, long timestamp) {
 		Long tick = System.currentTimeMillis();
-	
-		Collection<InvocStat> stats = getLogEntriesForTaskOnHostSinceTemp(taskId,hostName,timestamp);
-		
-		
+
+		Collection<InvocStat> stats = getLogEntriesForTaskOnHostSinceTemp(
+				taskId, hostName, timestamp);
+
 		Long tock = System.currentTimeMillis();
 
 		saveAccessTime(tick, tock, stats.size(),
 				"getLogEntriesForTaskOnHostSince", null);
 
-		return stats;		
+		return stats;
 	}
 
-	
-	private Collection<InvocStat> getLogEntriesForTaskOnHostSinceTemp(long taskId,
-			String hostName, long timestamp) {
+	private Collection<InvocStat> getLogEntriesForTaskOnHostSinceTemp(
+			long taskId, String hostName, long timestamp) {
 		Long tick = System.currentTimeMillis();
 		if (client == null) {
 			getConnection();
@@ -671,23 +575,13 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		// Set up the Query object
 		Query query = new Query();
 
-		// ["dbis14",3246099067099]
 		query.setIncludeDocs(true).setRange(
 				ComplexKey.of(taskId, hostName, timestamp),
 				ComplexKey.of(taskId, hostName, 999999999999999999l));
-		// We the full documents and only the top 20
-		// .setLimit(20);
-		// ["dbis11",324609906700,1404101397760]
-
+		
 		// Query the Cluster
 		ViewResponse result = client.query(view, query);
 
-//		Long tock = System.currentTimeMillis();
-//
-//		saveAccessTime(tick, tock, result.size(),
-//				"getLogEntriesForTaskOnHostSince", null);
-
-		// shutdown();
 		return createInvocStat(result);
 	}
 
@@ -748,16 +642,11 @@ public class HiwayDBNoSQL implements HiwayDBI {
 
 				tempResult.add(temp);
 			} else {
-				// System.out.println("DOCccuuuuuuuuuuuuuument !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11wird NICHT genutzt ID:"
+				// System.out.println("DOCccuuuuuuuuuuuuuument !!!!!!!!!!!! wird NICHT genutzt ID:"
 				// +invocDocument.getInvocId());
-
 			}
-
 		}
-
-		// shutdown();
-		// System.out.println("COUuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuut:"
-		// + tempResult.size());
+		
 		return tempResult;
 	}
 
@@ -837,9 +726,10 @@ public class HiwayDBNoSQL implements HiwayDBI {
 	private void saveAccessTime(long tick, long tock, long returnVolume,
 			String funktion, String key) {
 
-//		if (true) {
-//			return;
-//		}
+		//zum ausschalten der Accesstimemessung
+		// if (true) {
+		// return;
+		// }
 
 		if (dbSessionFactory == null) {
 			dbSessionFactory = getSQLSession();
@@ -848,7 +738,6 @@ public class HiwayDBNoSQL implements HiwayDBI {
 		Session sess = dbSessionFactory.openSession();
 		Transaction tx = null;
 
-		// Non-managed environment idiom with getCurrentSession()
 		try {
 			tx = sess.beginTransaction();
 

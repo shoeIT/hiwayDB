@@ -20,8 +20,10 @@ import java.util.concurrent.TimeoutException;
 
 import com.couchbase.client.CouchbaseClient;
 import com.couchbase.client.protocol.views.ComplexKey;
+import com.couchbase.client.protocol.views.DesignDocument;
 import com.couchbase.client.protocol.views.Query;
 import com.couchbase.client.protocol.views.View;
+import com.couchbase.client.protocol.views.ViewDesign;
 import com.couchbase.client.protocol.views.ViewResponse;
 import com.couchbase.client.protocol.views.ViewRow;
 import com.google.gson.Gson;
@@ -75,6 +77,8 @@ public class Reader {
 
 			try (BufferedReader test = new BufferedReader(
 					new InputStreamReader(System.in))) {
+				
+				//Verschiedene Helperfunktionen abhängig von der Eingabe, für die Datenbankfüllung das Schema beachten
 
 				System.out.println("Datenbank füllen, Format:AnzahlWFs,schema");
 
@@ -82,10 +86,102 @@ public class Reader {
 
 			}
 
-			if (lineIn.equalsIgnoreCase("cWrite")) {
+			if (lineIn.equalsIgnoreCase("cViews")) {
+
+				
+				System.out.println("CB Views einbauen....");
+								
+				//vebinden
+				List<URI> uris = new ArrayList<URI>();
+				
+				//Cluster:
+				//uris.add(URI.create("http://192.168.127.43:8091/pools"));
+								//local
+				uris.add(URI.create("http://127.0.0.1:8091/pools"));
+				
+				CouchbaseClient client = new CouchbaseClient(uris, "hiwaydb","reverse");
+
+				// jede View einmal für das DesignDoc anlegen
+
+				DesignDocument designDoc = new DesignDocument("dev_Invoc");
+
+				String viewName = "InvocCount";
+				String mapFunction = "function (doc, meta) {\n"
+						+ "  if(doc.invocId) {\n"
+						+ "    emit(doc.invocId, null);\n" + "  }\n" + "}";
+
+				String reduceFunc = "_count";
+
+				ViewDesign viewDesign = new ViewDesign(viewName, mapFunction,reduceFunc);
+				designDoc.getViews().add(viewDesign);
+
+				viewName = "getHostNames";
+				mapFunction = "function (doc, meta) {\n"
+						+ "  if(doc.invocId) {\n"
+						+ "    emit(doc.hostname, doc.hostname);\n" + "  }\n"
+						+ "}";
+
+				reduceFunc = "_count";
+
+				viewDesign = new ViewDesign(viewName, mapFunction,reduceFunc);
+				designDoc.getViews().add(viewDesign);
+				
+				viewName = "getTaskname";
+				mapFunction = "function (doc, meta) {\n"
+						+ "  if(doc.taskId) {\n"
+						+ "    emit(doc.taskId, doc.taskname);\n" + "  }\n"
+						+ "}";
+				
+				viewDesign = new ViewDesign(viewName, mapFunction);
+				designDoc.getViews().add(viewDesign);
+				
+				viewName = "getLogEntriesForTaskOnHostSince";
+				mapFunction = "function (doc, meta) {\n"
+						+ "  if(doc.hostname) {\n"
+						+ "    emit([doc.taskId, doc.hostname,doc.timestamp], null);\n" + "  }\n"
+						+ "}";
+				
+				viewDesign = new ViewDesign(viewName, mapFunction);
+				designDoc.getViews().add(viewDesign);
+				
+				//design doc hinzufügen
+				client.createDesignDoc(designDoc);
+				
+				//Workflow views				
+				designDoc = new DesignDocument("dev_Workflow");
+
+				 viewName = "WfRunAll";
+				 mapFunction = "function (doc, meta) {\n"
+						+ "  if(doc.name) {\n"
+						+ "    emit(meta.id, null);\n" + "  }\n" + "}";
+
+				viewDesign = new ViewDesign(viewName, mapFunction);
+				designDoc.getViews().add(viewDesign);
+				
+						
+				 viewName = "WfRunInvocs";
+				 mapFunction = "function (doc, meta) {\n"
+						+ "  if(doc.InvocId) {\n"
+						+ "    emit(doc.runId, null);\n" + "  }\n" + "}";
+
+				viewDesign = new ViewDesign(viewName, mapFunction);
+				designDoc.getViews().add(viewDesign);
+				
+				
+				 viewName = "getTaskIdsForWorkflow";
+				 mapFunction = "function (doc, meta) {\n"
+						+ "  if(doc.name) {\n"
+						+ "    emit(meta.Id, null);\n" + "  }\n" + "}";
+
+				viewDesign = new ViewDesign(viewName, mapFunction);
+				designDoc.getViews().add(viewDesign);
+								
+				//design doc hinzufügen
+				client.createDesignDoc(designDoc);
+											
 
 			} else if (lineIn.equalsIgnoreCase("cRead")) {
-				//
+				// Couchbase R
 				//
 				// List<URI> uris = new ArrayList<URI>();
 				// uris.add(URI.create("http://127.0.0.1:8091/pools"));
@@ -116,6 +212,8 @@ public class Reader {
 
 			} else if (lineIn.equalsIgnoreCase("accesstime")) {
 
+				//Helperfunktion um die Ergebnisse (Accesstime) anzureichern
+				
 				System.out.println("korrektur accesstime...");
 				dbSessionFactoryStandard = getSQLSession("messungen");
 
@@ -136,11 +234,10 @@ public class Reader {
 
 				tx.commit();
 
-				//Session session2 = dbSessionFactoryStandard.openSession();
-
+				// Session session2 = dbSessionFactoryStandard.openSession();
 
 				tx = session.beginTransaction();
-				
+
 				String currRunID = "";
 				String currentWFName = "";
 
@@ -151,7 +248,8 @@ public class Reader {
 					if (!at.getWfName().equals("") && at.getWfName() != "") {
 						currentWFName = at.getWfName();
 						currRunID = at.getRunId();
-						//System.out.println("haben einen namen: "+ currentWFName);
+						// System.out.println("haben einen namen: "+
+						// currentWFName);
 					} else {
 						fill++;
 						System.out.println("haben KEINEN namen: DIESEN setzen "
@@ -164,18 +262,20 @@ public class Reader {
 					}
 
 				}
-				
+
 				tx.commit();
-				
+
 				session.close();
-				//session2.close();
-				
+				// session2.close();
+
 				System.out.println("fertig...");
 
 			}
 
 			else {
 
+				//Helperfunktion um die Datenbanken zu vergrößern
+				
 				int toLimit = Integer.parseInt(lineIn.substring(0,
 						lineIn.lastIndexOf(",")));
 
@@ -191,8 +291,7 @@ public class Reader {
 
 				int limit = toLimit;
 
-				System.out.println("Datenbanken " + db
-						+ "  füllen...bist Limit: " + toLimit);
+				System.out.println("Datenbanken " + db + "  füllen...bist Limit: " + toLimit);
 
 				Session session = null;
 
@@ -202,10 +301,7 @@ public class Reader {
 
 						List<URI> uris = new ArrayList<URI>();
 						uris.add(URI.create("http://192.168.127.43:8091/pools"));
-						//
-						//
-						// HiwayDBI testGet = new
-						// HiwayDBNoSQL("hiwaydb","",uris,"root",
+					
 
 						CouchbaseClient client = new CouchbaseClient(uris, db,
 								"reverse");
@@ -358,8 +454,8 @@ public class Reader {
 			Configuration configuration = new Configuration();
 			// .configure(f);
 
-			System.out.println("connect to: "  + db);
-			
+			System.out.println("connect to: " + db);
+
 			configuration.setProperty("hibernate.connection.url",
 					"jdbc:mysql://192.168.127.43/" + db);
 			configuration.setProperty("hibernate.connection.username", "root");
@@ -398,24 +494,22 @@ public class Reader {
 			configuration.setProperty("hibernate.c3p0.idle_test_period", "300");
 
 			configuration.setProperty("hibernate.c3p0.max_statements", "13000");
-			configuration.setProperty("hibernate.c3p0.maxStatementsPerConnection", "30");
+			configuration.setProperty(
+					"hibernate.c3p0.maxStatementsPerConnection", "30");
 
 			configuration.setProperty("hibernate.c3p0.acquire_increment", "10");
 
 			// <property name="hibernate.show_sql">true</property>
 			// <property name="hibernate.use_sql_comments">true</property>
 
-
 			configuration
 					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Hiwayevent.class);
-			configuration
-					.addAnnotatedClass(de.huberlin.hiwaydb.dal.File.class);
+			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.File.class);
 			configuration
 					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Inoutput.class);
 			configuration
 					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Invocation.class);
-			configuration
-					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Task.class);
+			configuration.addAnnotatedClass(de.huberlin.hiwaydb.dal.Task.class);
 			configuration
 					.addAnnotatedClass(de.huberlin.hiwaydb.dal.Userevent.class);
 			configuration
@@ -546,7 +640,6 @@ public class Reader {
 		Set<Userevent> newUserevents = null;
 		Invocation newInvoc = null;
 
-		// Session session = dbSessionFactory.openSession();
 
 		Calendar cal = Calendar.getInstance();
 
